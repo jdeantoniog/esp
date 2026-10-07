@@ -131,15 +131,17 @@
   .status.warn { color: var(--warn); }
 
   /* ---------- Previsión detallada ---------- */
-  .days { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .day { border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+  .days { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .day { border: 1px solid var(--line); border-radius: 10px; padding: 10px; min-width: 0; overflow-wrap: anywhere; }
   .day-name { font-weight: 700; }
-  .day-temp { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 6px 0; }
-  .day-temp .tr { flex-direction: column; align-items: center; gap: 0; padding: 4px 2px; }
+  .day-temp { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; margin: 6px 0; }
+  .day-temp .tr { flex-direction: column; align-items: center; gap: 0; padding: 4px 2px; min-width: 0; }
   .day p { margin: 2px 0; font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
   .day p.snow { color: var(--deep-blue); font-weight: 700; }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .day p.snow { color: #8fb4ff; } }
   .day-head { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
+  .day-head { flex-wrap: wrap; row-gap: 2px; }
+  .day-name { overflow-wrap: normal; white-space: nowrap; }
   .day-ico { width: 28px; height: 28px; flex: none; }
   .day-ico svg { width: 100%; height: 100%; display: block; }
   .details .card:first-child { margin-top: 16px; }
@@ -304,8 +306,12 @@
     .card { padding: 14px 12px; }
     .conv-row { grid-template-columns: 1fr; }
     .equals { display: none; }
-    .days { gap: 6px; }
-    .day { padding: 8px; }
+    .days { gap: 5px; }
+    .day { padding: 6px; }
+    .day-name { font-size: 0.85rem; }
+    .day-ico { width: 22px; height: 22px; }
+    .day p { font-size: 0.74rem; }
+    .day-temp .tr i { font-size: 0.62rem; }
     .day-temp .tr b { font-size: 1.05rem; }
   }
 </style>
@@ -621,8 +627,8 @@
               '<div class="day-head"><span class="day-name">' + dayLabel(dl.time[i], i) + '</span><span class="day-ico">' + icon(dl.weather_code[i], 1) + "</span></div>" +
               '<div class="day-temp">' + rangeHTML(dl.temperature_2m_max[i], dl.temperature_2m_min[i], unit) + "</div>" +
               "<p>" + (WMO[dl.weather_code[i]] || "—") + "</p>" +
-              "<p>Sensación mín " + t(dl.apparent_temperature_min[i], unit) + "</p>" +
-              "<p>Precipitación " + (rain == null ? "—" : rain + " %") + "</p>" +
+              "<p>Sens. mín " + t(dl.apparent_temperature_min[i], unit) + "</p>" +
+              "<p>Lluvia " + (rain == null ? "—" : rain + " %") + "</p>" +
               (snow > 0 ? '<p class="snow">Nieve ' + nf1.format(snow) + " cm</p>" : "<p>Sin nieve</p>") +
               "</div>";
           }
