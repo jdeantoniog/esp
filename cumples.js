@@ -38,6 +38,7 @@ window.CUMPLES = [
   ["09-27", "Belén"],
   // Octubre
   ["10-03", "Papá y Vero"],
+  ["10-07", "cumplaños prueba", { avisar: true }],
   // Noviembre
   ["11-04", "Felipe"],
   ["11-14", "Ernesto"],
