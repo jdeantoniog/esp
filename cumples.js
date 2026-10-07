@@ -17,7 +17,7 @@ window.CUMPLES = [
   ["01-27", "Juane"],
   ["01-30", "Vanessa"],
   // Febrero
-  ["02-28", "Carlota", { avisar: false }],
+  ["02-28", "Carlota"],
   // Abril
   ["04-05", "Celia"],
   // Mayo
@@ -38,7 +38,6 @@ window.CUMPLES = [
   ["09-27", "Belén"],
   // Octubre
   ["10-03", "Papá y Vero"],
-  ["10-07", "cumplaños prueba", { avisar: true }],
   // Noviembre
   ["11-04", "Felipe"],
   ["11-14", "Ernesto"],
