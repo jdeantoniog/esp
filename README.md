@@ -1,14 +1,14 @@
 # Inicio (versión España)
 
-Página de inicio estática: hora en Madrid, tiempo en España, índice UV y calidad del aire (índice europeo), previsión detallada, conversor de unidades, expresiones en inglés, próximas fechas y cuenta atrás.
+Página de inicio estática. Orden en pantalla: frase del día, hora en Madrid, previsión de 6 días en Madrid, cuenta atrás (3 próximos eventos), expresiones útiles en inglés de la época del año (12 al día, en 2 columnas), conversor de unidades y próximas fechas.
 
 ## Archivos
 
 | Archivo | Para qué sirve | ¿Se edita? |
 |---|---|---|
 | `index.html` | La página | No hace falta |
-| `config.js` | Ciudades, fechas, mensajes, cumpleaños | Sí |
-| `palabras.js` | Expresiones, frases y vocabulario en inglés | Solo para añadir o quitar palabras |
+| `config.js` | Previsión, fechas, mensajes, cumpleaños, nº de eventos y expresiones | Sí |
+| `palabras.js` | Frases del día y 500 expresiones (125 por estación) | Solo para añadir o quitar expresiones |
 
 Los tres archivos son necesarios. Si falta `palabras.js`, la página carga pero desaparecen las tarjetas de expresiones y vocabulario sin dar error.
 
@@ -20,19 +20,17 @@ Los tres archivos son necesarios. Si falta `palabras.js`, la página carga pero 
 4. En 1–2 minutos estará en `https://TU-USUARIO.github.io/NOMBRE-REPO/`.
 5. En el iPhone: Safari > *Compartir > Añadir a pantalla de inicio*.
 
-## Cambiar ciudades o fechas
+## Cambiar ajustes
 
-Edita `config.js` en GitHub (icono del lápiz). Cada lugar es una línea:
+Edita `config.js` en GitHub (icono del lápiz).
 
-```js
-{ nombre: "Valencia", lat: 39.4699, lon: -0.3763 },
-```
-
-- El orden de la lista es el orden en pantalla.
+- Días de previsión: `dias` dentro de `detalles` (de 1 a 16).
+- Eventos de la cuenta atrás: `cuentaAtras.maxEventos`.
+- Expresiones por día: `palabrasPorDia` (12 = 2 columnas de 6).
 - Si la página queda en blanco tras un cambio, falta una coma o una comilla.
 - GitHub Pages puede tardar hasta 10 minutos en mostrar los cambios.
 - La lista `fechas` llega hasta agosto de 2027: añade las de después cuando toque.
 
 ## Fuentes de datos
 
-- Tiempo, UV y calidad del aire: Open-Meteo (sin clave, gratuito para uso no comercial).
+- Previsión: Open-Meteo (sin clave, gratuito para uso no comercial).

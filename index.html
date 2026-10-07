@@ -83,38 +83,16 @@
   .small { font-size: 0.85rem; }
   .num { font-variant-numeric: tabular-nums; }
 
-  /* ---------- Banderas y relojes ---------- */
-  .flags { display: grid; grid-template-columns: minmax(0, 320px); justify-content: center; gap: 12px; }
-  .flag-block { text-align: center; }
-  .flag {
-    display: block; width: 100%; aspect-ratio: 3 / 2; height: auto;
-    border-radius: 6px; box-shadow: 0 0 0 1px var(--line);
-  }
+  /* ---------- Reloj ---------- */
+  .clock-block { text-align: center; }
   .clock {
     font-size: clamp(2rem, 9vw, 3.6rem); font-weight: 800; letter-spacing: -0.03em;
-    line-height: 1; margin-top: 12px; font-variant-numeric: tabular-nums;
+    line-height: 1; margin-top: 4px; font-variant-numeric: tabular-nums;
   }
   .clock { display: flex; justify-content: center; align-items: center; gap: 0.18em; }
-  .wx-ico { display: inline-flex; width: 0.8em; height: 0.8em; flex: none; }
-  .wx-ico:empty { display: none; }
-  .wx-ico svg, .mini-ico svg, .day-ico svg { width: 100%; height: 100%; display: block; }
-  .clock-wx {
-    font-size: 0.85rem; font-weight: 600; margin-top: 2px; font-variant-numeric: tabular-nums;
-    line-height: 1.3; height: 2.6em; overflow: hidden;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-  }
   .clock-place { font-weight: 600; margin-top: 4px; }
   .clock-date { color: var(--muted); font-size: 0.9rem; }
   .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: none; }
-  /* ---------- Líneas informativas ---------- */
-  .trip {
-    margin-top: 16px; display: flex; align-items: center; gap: 10px;
-    background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--oh-gold); border-radius: 12px;
-    padding: 8px 12px; font-size: 0.9rem; white-space: nowrap;
-  }
-  .trip-label { font-weight: 700; }
-  .trip-info { color: var(--muted); font-variant-numeric: tabular-nums; }
-  .trip-info strong { color: var(--ink); }
   /* ---------- Formularios comunes ---------- */
   .conv-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; }
   .field label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
@@ -142,26 +120,8 @@
   /* ---------- Unidades ---------- */
   .unit-row { margin-top: 12px; }
 
-  /* ---------- Tiempo ---------- */
-  .weather-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 16px; }
-  .weather { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 14px 6px; border-top: 4px solid var(--es-red); }
-  .weather ul, .list { list-style: none; margin: 0; padding: 0; }
-  .weather li { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 10px 0; border-top: 1px solid var(--line); }
-  .weather li:first-child { border-top: 0; padding-top: 0; }
-  .w-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-  .w-temp {
-    font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1; text-align: right;
-    grid-row: span 2; align-self: center; font-variant-numeric: tabular-nums;
-  }
-  .w-temp small { display: block; font-size: 0.75rem; font-weight: 400; color: var(--muted); letter-spacing: 0; }
-  /* Altura fija: descripción y detalle siempre ocupan 2 líneas para que ambos paneles queden nivelados */
-  .w-desc, .w-extra {
-    line-height: 1.3; height: 2.6em; overflow: hidden;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-  }
-  .w-desc { font-size: 0.85rem; color: var(--muted); }
-  .w-extra { grid-column: 1 / -1; font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .w-range { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 2px 0 4px; }
+  /* ---------- Previsión: bloques de temperatura ---------- */
+  .list { list-style: none; margin: 0; padding: 0; }
   .tr { display: flex; align-items: baseline; justify-content: center; gap: 5px; border-radius: 8px; padding: 4px 6px; background: var(--paper); font-variant-numeric: tabular-nums; }
   .tr i { font-style: normal; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
   .tr b { font-size: 1.15rem; font-weight: 800; line-height: 1.1; }
@@ -171,10 +131,8 @@
   .status.warn { color: var(--warn); }
 
   /* ---------- Previsión detallada ---------- */
-  .sun { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-  .sun div { background: var(--paper); border-radius: 10px; padding: 8px 10px; }
-  .sun strong { display: block; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
   .days { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  @media (min-width: 760px) { .days { grid-template-columns: repeat(6, 1fr); } }
   .day { border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
   .day-name { font-weight: 700; }
   .day-temp { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 6px 0; }
@@ -182,10 +140,80 @@
   .day p { margin: 2px 0; font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
   .day p.snow { color: var(--deep-blue); font-weight: 700; }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .day p.snow { color: #8fb4ff; } }
-  .mini-ico { display: inline-block; width: 1.25em; height: 1.25em; vertical-align: -0.3em; margin-right: 3px; }
   .day-head { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
   .day-ico { width: 28px; height: 28px; flex: none; }
+  .day-ico svg { width: 100%; height: 100%; display: block; }
   .details .card:first-child { margin-top: 16px; }
+
+  /* ---------- Tiempo: hoy y hora a hora ---------- */
+  .today-main { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .today-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .today-name { font-weight: 800; font-size: 1.25rem; }
+  .today-ico { width: 34px; height: 34px; flex: none; }
+  .today-ico svg, .h-i svg { width: 100%; height: 100%; display: block; }
+  .today-desc { color: var(--muted); font-size: 0.9rem; }
+  .today-range { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; min-width: 150px; flex: none; }
+  .today-meta { margin: 8px 0 0; font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .today-meta strong { color: var(--ink); }
+  .hours {
+    position: relative; display: flex; gap: 4px; overflow-x: auto; margin: 12px 0 0; padding-bottom: 6px;
+    scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; scrollbar-width: thin;
+  }
+  .hour { flex: 0 0 50px; text-align: center; border-radius: 10px; background: var(--paper); padding: 6px 2px; font-variant-numeric: tabular-nums; scroll-snap-align: start; }
+  .hour.past { opacity: 0.45; }
+  .hour.now { background: var(--oh-accent-bg); color: var(--oh-on-accent); }
+  .h-t { display: block; font-size: 0.72rem; color: var(--muted); }
+  .h-i { display: block; width: 26px; height: 26px; margin: 2px auto; }
+  .h-v { display: block; font-weight: 800; }
+  .h-r { display: block; font-size: 0.68rem; color: var(--rain); min-height: 1.1em; }
+  .hour.now .h-t, .hour.now .h-r { color: inherit; }
+  .sub { font-size: 0.95rem; font-weight: 700; margin: 16px 0 8px; }
+  @media (max-width: 520px) { .today-range { min-width: 128px; } .today-name { font-size: 1.1rem; } }
+
+  /* ---------- Calendario ---------- */
+  .cal-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+  .cal-month { font-weight: 800; font-size: 1.1rem; text-align: center; flex: 1; }
+  .cal-month button { font: inherit; font-size: 0.75rem; font-weight: 700; margin-left: 8px; vertical-align: 2px; }
+  .cal-btn {
+    width: 40px; height: 40px; flex: none; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--paper); color: var(--ink); display: grid; place-items: center; cursor: pointer; padding: 0;
+  }
+  .cal-btn svg { width: 18px; height: 18px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal-dow { text-align: center; font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; padding: 2px 0 4px; }
+  .cal-day {
+    min-height: 46px; border: 0; border-radius: 10px; background: var(--paper); color: var(--ink);
+    font: inherit; font-weight: 600; cursor: pointer; padding: 6px 0 5px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-variant-numeric: tabular-nums;
+  }
+  .cal-day.empty { visibility: hidden; }
+  .cal-day.sun { color: var(--es-red); }
+  .cal-day.fest { background: var(--es-red); color: #ffffff; }
+  .cal-day.fest.prov { background: transparent; color: var(--es-red); box-shadow: inset 0 0 0 2px var(--es-red); }
+  .cal-day.today { box-shadow: inset 0 0 0 2px var(--ink); }
+  .cal-day.fest.today { box-shadow: inset 0 0 0 2px var(--ink), inset 0 0 0 4px #ffffff; }
+  .cal-day[aria-pressed="true"] { outline: 3px solid var(--focus); outline-offset: 1px; }
+  .cal-dots { display: flex; gap: 3px; height: 6px; }
+  .cal-dots i { width: 6px; height: 6px; border-radius: 50%; display: block; }
+  .d-fam { background: var(--ok); }
+  .d-sen { background: var(--oh-gold); }
+  .cal-day.fest .d-fam { background: #ffffff; }
+  .cal-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 10px 0 0; font-size: 0.78rem; color: var(--muted); }
+  .cal-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .sw.fest { background: var(--es-red); }
+  .sw.prov { box-shadow: inset 0 0 0 2px var(--es-red); }
+  .sw.dot { border-radius: 50%; width: 8px; height: 8px; }
+  .cal-detail { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+  .cal-date { font-weight: 800; margin: 0 0 6px; }
+  .cal-date::first-letter { text-transform: uppercase; }
+  .cal-marks { list-style: none; margin: 0; padding: 0; }
+  .cal-marks li { display: flex; align-items: baseline; gap: 8px; padding: 4px 0; }
+  .cal-marks .meta { display: block; font-size: 0.78rem; color: var(--muted); }
+  .cal-none { margin: 0; color: var(--muted); font-size: 0.9rem; }
+  .cal-santo { margin: 8px 0 0; font-size: 0.9rem; }
+  .cal-santo b { font-weight: 700; }
+  @media (max-width: 520px) { .cal-grid { gap: 3px; } .cal-day { min-height: 40px; font-size: 0.92rem; } }
 
   /* ---------- Aviso a pantalla completa ---------- */
   .splash {
@@ -227,25 +255,16 @@
   .love-pre { display: block; font-style: normal; font-weight: 600; color: var(--es-red); margin-top: 4px; }
   .love-pre:empty { display: none; }
 
-  /* ---------- Historial de expresiones ---------- */
-  .hist li { grid-template-columns: 1fr auto; }
-  .hist .h-en { font-weight: 600; }
-  .hist .h-es { color: var(--muted); font-size: 0.9rem; }
-
-  /* ---------- Luz del día ---------- */
-  .trip.light { white-space: normal; align-items: baseline; flex-wrap: wrap; row-gap: 2px; line-height: 1.35; }
-  .trip.light .trip-info strong { color: var(--ink); }
-
-  /* ---------- Listas de vocabulario ---------- */
-  .vlist { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
-  .vlist li { padding: 8px 0; border-top: 1px solid var(--line); display: flex; flex-direction: column; }
-  .vlist li:nth-child(-n+2) { border-top: 0; }
-  .v-en { font-weight: 700; }
-  .v-es { color: var(--muted); font-size: 0.88rem; }
-  @media (max-width: 520px) {
-    .vlist { grid-template-columns: 1fr; }
-    .vlist li:nth-child(2) { border-top: 1px solid var(--line); }
+  /* ---------- Expresiones útiles: 2 columnas x 6 ---------- */
+  .xlist {
+    list-style: none; margin: 0; padding: 0; display: grid;
+    grid-template-columns: 1fr 1fr; grid-template-rows: repeat(6, auto); grid-auto-flow: column; gap: 0 14px;
   }
+  .xlist li { padding: 5px 0; border-top: 1px solid var(--line); min-width: 0; line-height: 1.25; }
+  .xlist li:nth-child(6n+1) { border-top: 0; }
+  .x-en { display: block; font-weight: 700; font-size: 0.92rem; }
+  .x-es { display: block; color: var(--muted); font-size: 0.8rem; }
+  @media (max-width: 520px) { .xlist { gap: 0 10px; } .x-en { font-size: 0.85rem; } .x-es { font-size: 0.75rem; } }
 
   /* ---------- Cuenta atrás ---------- */
   .cd-list { list-style: none; margin: 0; padding: 0; }
@@ -264,39 +283,12 @@
   .cd-list li:first-child .cd-u i { color: var(--oh-on-accent); opacity: 0.75; }
   .cd-today { grid-column: 1 / -1; font-weight: 800; color: var(--es-red); font-size: 1.15rem; }
 
-  /* ---------- UV y aire ---------- */
-  .uv-bar { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; }
-  .uv-cell { text-align: center; font-variant-numeric: tabular-nums; }
-  .uv-val { display: block; border-radius: 6px; padding: 8px 0; font-weight: 800; font-size: 1.05rem; color: #ffffff; }
-  .uv-cell.now .uv-val { outline: 2px solid var(--ink); outline-offset: 1px; }
-  .uv-hour { display: block; font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
-  .uv-cell.now .uv-hour { color: var(--ink); font-weight: 700; }
-  .uv0 { background: #3ea72d; } .uv1 { background: #e8c100; color: #1b2233 !important; }
-  .uv2 { background: #f18b00; } .uv3 { background: #e53210; } .uv4 { background: #8e4ab1; }
-  .uv-note { margin: 8px 0 0; }
-  .uv-place + .uv-place { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
-  .uv-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
-  .uv-head strong { font-size: 1rem; }
-  .uv-head .aq { margin: 0; font-size: 0.85rem; }
-  .aq { margin: 10px 0 0; display: flex; align-items: center; gap: 8px; font-weight: 600; }
-  .aq.a0 .dot { background: #3ea72d; } .aq.a1 .dot { background: #e8c100; } .aq.a2 .dot { background: #f18b00; }
-  .aq.a3 .dot { background: #e53210; } .aq.a4 .dot { background: #8e4ab1; } .aq.a5 .dot { background: #7e0023; }
-
-  /* ---------- Expresión del día ---------- */
-  .word-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-  .word-head h2 { margin: 0; }
-  .word-head { align-items: flex-start; }
-  .word-en { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.01em; margin: 0; line-height: 1.15; }
-  .word-es { font-size: 1.05rem; font-weight: 600; color: var(--muted); margin: 4px 0 0; }
-  .word-ex { margin: 12px 0 0; font-style: italic; }
-  .word-ex-es { margin: 2px 0 0; }
-
   /* ---------- Fechas (estilos) ---------- */
   .list li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--line); }
   .list li:first-child { border-top: 0; }
   .tag { font-size: 0.75rem; font-weight: 700; border-radius: 6px; padding: 2px 7px; color: #ffffff; min-width: 2.6em; text-align: center; }
-  .tag.ES { background: var(--es-red); }
-  .tag.Otro { background: var(--muted); }
+  .tag.Fest { background: var(--es-red); }
+  .tag.Dia { background: var(--muted); }
   .tag.Fam { background: var(--ok); }
   .when { text-align: right; font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
@@ -309,24 +301,13 @@
 
   @media (max-width: 520px) {
     main { padding: 14px 10px 32px; }
-    .flags { gap: 8px; }
     .clock-date { font-size: 0.8rem; }
     .card { padding: 14px 12px; }
     .conv-row { grid-template-columns: 1fr; }
     .equals { display: none; }
-    .trip { font-size: 0.82rem; gap: 8px; padding: 7px 10px; }
-    .weather-grid { gap: 8px; }
-    .weather { padding: 10px 10px 4px; }
-    .weather h2 { font-size: 1rem; }
-    .w-name { font-size: 0.9rem; }
-    .w-temp { font-size: 1.3rem; }
-    .w-desc, .w-extra { font-size: 0.75rem; }
     .days { gap: 6px; }
     .day { padding: 8px; }
     .day-temp .tr b { font-size: 1.05rem; }
-    .w-range .tr b { font-size: 1.05rem; }
-    .w-range .tr { padding: 4px 4px; gap: 3px; }
-    .sun strong { font-size: 1.05rem; }
   }
 </style>
 </head>
@@ -335,54 +316,50 @@
   <!-- Frase cariñosa del día -->
   <p class="love" id="love" hidden><span id="love-en"></span><span class="love-es" id="love-es"></span><span class="love-pre" id="love-pre"></span></p>
 
-  <!-- Banderas y hora -->
-  <section aria-label="Hora local">
-    <div class="flags">
-      <div class="flag-block">
-        <svg class="flag" viewBox="0 0 750 500" role="img" aria-label="Bandera de España">
-          <rect width="750" height="500" fill="#aa151b"/>
-          <rect y="125" width="750" height="250" fill="#f1bf00"/>
-        </svg>
-        <div class="clock"><span class="wx-ico" id="ico-es" aria-hidden="true"></span><span id="clock-es">--:--</span></div>
-        <div class="clock-place" id="place-es"></div>
-        <div class="clock-date" id="date-es"></div>
-        <div class="clock-wx" id="wx-es"></div>
-      </div>
-    </div>
+  <!-- Hora -->
+  <section class="clock-block" aria-label="Hora local">
+    <div class="clock"><span id="clock-es">--:--</span></div>
+    <div class="clock-place" id="place-es"></div>
+    <div class="clock-date" id="date-es"></div>
   </section>
 
-  <!-- Índice UV por hora y calidad del aire: un bloque por lugar de "uv" en config.js -->
-  <section class="card" aria-labelledby="uv-title">
-    <h2 id="uv-title">Sol y aire</h2>
-    <div id="uv-wrap"></div>
-  </section>
-
-  <!-- Tiempo -->
-  <section class="weather-grid">
-    <div class="weather es">
-      <h2 id="title-es">España</h2>
-      <ul id="list-es"><li class="status">Cargando el tiempo…</li></ul>
-    </div>
-  </section>
-
-  <!-- Previsión detallada: una tarjeta por cada lugar de "detalles" en config.js -->
-  <!-- Luz del día: una línea -->
-  <section class="trip light" id="light" aria-label="Horas de luz" hidden>
-    <span class="trip-label" id="light-label">Luz</span>
-    <span class="trip-info" id="light-info"></span>
-  </section>
-
+  <!-- Tiempo: una tarjeta por cada lugar de "detalles" en config.js -->
   <div id="details"></div>
 
-  <!-- Palabra o expresión del día -->
-  <section class="card word" id="word-card" aria-label="Expresión del día en inglés" hidden>
-    <div class="word-head">
-      <p class="word-en" id="word-en"></p>
-      <button type="button" class="chip" id="word-next">Otra</button>
+  <!-- Cuenta atrás a fechas significativas -->
+  <section class="card" id="cd-card" aria-labelledby="cd-title" hidden>
+    <h2 id="cd-title">Cuenta atrás</h2>
+    <ul class="cd-list" id="cd-list"></ul>
+  </section>
+
+  <!-- Expresiones útiles de la época del año -->
+  <section class="card" id="expr-card" aria-labelledby="expr-title" hidden>
+    <h2 id="expr-title">Expresiones útiles</h2>
+    <ul class="xlist" id="expr-list"></ul>
+  </section>
+
+  <!-- Calendario -->
+  <section class="card" id="cal-card" aria-labelledby="cal-title">
+    <h2 id="cal-title">Calendario</h2>
+    <div class="cal-nav">
+      <button type="button" class="cal-btn" id="cal-prev" aria-label="Mes anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="cal-month"><span id="cal-month" aria-live="polite"></span><button type="button" class="chip" id="cal-today" hidden>Hoy</button></div>
+      <button type="button" class="cal-btn" id="cal-next" aria-label="Mes siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
-    <p class="word-es" id="word-es"></p>
-    <p class="word-ex" id="word-ex"></p>
-    <p class="word-ex-es small muted" id="word-ex-es"></p>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-legend" aria-hidden="true">
+      <span><i class="sw fest"></i>Festivo</span>
+      <span><i class="sw prov"></i>Festivo previsto</span>
+      <span><i class="sw dot d-fam"></i>Familia</span>
+      <span><i class="sw dot d-sen"></i>Día señalado</span>
+    </div>
+    <div class="cal-detail" id="cal-detail" aria-live="polite"></div>
+  </section>
+
+  <!-- Fechas -->
+  <section class="card" aria-labelledby="dates-title">
+    <h2 id="dates-title">Próximas fechas</h2>
+    <ul class="list" id="dates"></ul>
   </section>
 
   <!-- Conversor de unidades -->
@@ -404,36 +381,6 @@
     <p class="small muted" id="unit-note"></p>
   </section>
 
-  <!-- Fechas -->
-  <section class="card" aria-labelledby="dates-title">
-    <h2 id="dates-title">Próximas fechas</h2>
-    <ul class="list" id="dates"></ul>
-  </section>
-
-  <!-- Últimas expresiones -->
-  <section class="card" id="history-card" aria-labelledby="history-title" hidden>
-    <h2 id="history-title">Últimas expresiones</h2>
-    <ul class="list hist" id="history"></ul>
-  </section>
-
-  <!-- Palabras de la estación -->
-  <section class="card" id="season-card" aria-labelledby="season-title" hidden>
-    <h2 id="season-title">Palabras de la estación</h2>
-    <ul class="vlist" id="season-list"></ul>
-  </section>
-
-  <!-- Vocabulario de high school -->
-  <section class="card" id="vocab-card" aria-labelledby="vocab-title" hidden>
-    <h2 id="vocab-title">Vocabulario de high school</h2>
-    <ul class="vlist" id="vocab-list"></ul>
-  </section>
-
-  <!-- Cuenta atrás a fechas significativas -->
-  <section class="card" id="cd-card" aria-labelledby="cd-title" hidden>
-    <h2 id="cd-title">Cuenta atrás</h2>
-    <ul class="cd-list" id="cd-list"></ul>
-  </section>
-
   <footer>
     <p id="updated"></p>
     <button type="button" id="refresh">Actualizar ahora</button>
@@ -452,6 +399,7 @@
 
 <script src="config.js"></script>
 <script src="palabras.js"></script>
+<script src="santoral.js"></script>
 <script>
 
 (function () {
@@ -466,7 +414,6 @@
   function $(id) { return document.getElementById(id); }
 
   document.title = CFG.titulo || "Inicio";
-  $("title-es").textContent = CFG.espana.titulo;
 
   /* ---------- Formatos ---------- */
   var nf2 = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -497,7 +444,6 @@
   tickClocks();
   setInterval(tickClocks, 15000);
 
-  function localDate(s) { var p = s.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
   setInterval(function () { if (typeof renderLove === "function") renderLove(); }, 15 * 60 * 1000);
 
   /* ---------- Conversor de unidades ---------- */
@@ -598,46 +544,6 @@
     return fetch(url).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); });
   }
 
-  function renderList(listId, region, data) {
-    var ul = $(listId), unit = region.unidad, other = otherUnit(unit);
-    ul.innerHTML = "";
-    region.lugares.forEach(function (lugar, i) {
-      var d = data[i], li = document.createElement("li");
-      if (!d || !d.current) {
-        li.innerHTML = '<span class="w-name"></span><span class="status warn">Sin datos</span>';
-      } else {
-        var cur = d.current, day = d.daily;
-        var both = region.mostrarAmbasUnidades ? "<small>" + t(cur.temperature_2m, other) + unitLetter(other) + "</small>" : "";
-        var rain = day.precipitation_probability_max[0];
-        li.innerHTML =
-          '<span class="w-name"></span>' +
-          '<span class="w-temp">' + t(cur.temperature_2m, unit) + both + "</span>" +
-          '<span class="w-desc"><span class="mini-ico">' + icon(cur.weather_code, cur.is_day) + "</span>" + (WMO[cur.weather_code] || "—") + "</span>" +
-          '<span class="w-range">' + rangeHTML(day.temperature_2m_max[0], day.temperature_2m_min[0], unit) + "</span>" +
-          '<span class="w-extra">Sensación ' + t(cur.apparent_temperature, unit) +
-          "  ·  Lluvia " + (rain == null ? "—" : rain + " %") + "</span>";
-      }
-      li.querySelector(".w-name").textContent = lugar.nombre;
-      ul.appendChild(li);
-    });
-    // El primer lugar de cada lista alimenta el icono junto al reloj
-    var key = "es", first = data[0];
-    if (first && first.current) {
-      $("ico-" + key).innerHTML = icon(first.current.weather_code, first.current.is_day);
-      $("wx-" + key).textContent = t(first.current.temperature_2m, unit) + "  " + (WMO[first.current.weather_code] || "");
-    }
-  }
-
-  function fetchWeather(region) {
-    var lats = region.lugares.map(function (l) { return l.lat; }).join(",");
-    var lons = region.lugares.map(function (l) { return l.lon; }).join(",");
-    return fetchJSON("https://api.open-meteo.com/v1/forecast?latitude=" + lats + "&longitude=" + lons +
-      "&current=temperature_2m,apparent_temperature,weather_code,is_day" +
-      "&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max" +
-      "&forecast_days=1&timezone=auto")
-      .then(function (d) { return Array.isArray(d) ? d : [d]; });
-  }
-
   /* ---------- Previsión detallada ---------- */
   function hhmm(iso) { return iso ? iso.slice(11, 16) : "—"; }
   function minutesOf(iso) { var p = iso.slice(11, 16).split(":"); return +p[0] * 60 + +p[1]; }
@@ -655,10 +561,13 @@
     (CFG.detalles || []).forEach(function (D, n) {
       var sec = document.createElement("section");
       sec.className = "card";
-      sec.innerHTML = '<h2 id="detail-title-' + n + '"></h2><div class="sun" id="sun-' + n + '"></div>' +
-        '<div class="days" id="days-' + n + '"><p class="status">Cargando previsión…</p></div>';
+      sec.innerHTML = '<h2 id="detail-title-' + n + '"></h2>' +
+        '<div id="today-' + n + '"><p class="status">Cargando el tiempo…</p></div>' +
+        '<div class="hours" id="hours-' + n + '" aria-label="Hoy hora a hora"></div>' +
+        '<h3 class="sub">Próximos días</h3>' +
+        '<div class="days" id="days-' + n + '"></div>';
       wrap.appendChild(sec);
-      $("detail-title-" + n).textContent = "Próximos días en " + D.nombre;
+      $("detail-title-" + n).textContent = "Tiempo en " + D.nombre;
     });
   }
   buildDetailCards();
@@ -666,79 +575,238 @@
   function loadDetail() {
     (CFG.detalles || []).forEach(function (D, n) {
       var unit = D.unidad || "celsius", other = otherUnit(unit), both = D.mostrarAmbasUnidades;
+      var dias = Math.max(1, Math.min(15, D.dias || 6));
       fetchJSON("https://api.open-meteo.com/v1/forecast?latitude=" + D.lat + "&longitude=" + D.lon +
         "&current=temperature_2m,apparent_temperature,weather_code,is_day" +
+        "&hourly=temperature_2m,weather_code,precipitation_probability,is_day" +
         "&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_min," +
         "snowfall_sum,precipitation_probability_max,sunrise,sunset" +
-        "&forecast_days=" + (D.dias || 3) + "&timezone=" + encodeURIComponent(D.zonaHoraria))
+        "&forecast_days=" + (dias + 1) + "&timezone=" + encodeURIComponent(D.zonaHoraria))
         .then(function (d) {
-          var dl = d.daily, cur = d.current;
-          var light = minutesOf(dl.sunset[0]) - minutesOf(dl.sunrise[0]);
-          $("sun-" + n).innerHTML =
-            '<div><span class="small muted">Amanecer</span><strong>' + hhmm(dl.sunrise[0]) + "</strong></div>" +
-            '<div><span class="small muted">Atardecer</span><strong>' + hhmm(dl.sunset[0]) + "</strong></div>" +
-            '<div><span class="small muted">Sensación ahora</span><strong>' + t(cur.apparent_temperature, unit) +
-            (both ? ' <span class="small muted">' + t(cur.apparent_temperature, other) + unitLetter(other) + "</span>" : "") +
-            "</strong></div>";
-          var html = "";
-          dl.time.forEach(function (day, i) {
+          var dl = d.daily, cur = d.current, hr = d.hourly;
+          // Hoy: máxima, mínima y resumen
+          var light = minutesOf(dl.sunset[0]) - minutesOf(dl.sunrise[0]), rain0 = dl.precipitation_probability_max[0];
+          $("today-" + n).innerHTML =
+            '<div class="today-main"><div class="today-left"><span class="today-name">Hoy</span>' +
+            '<span class="today-ico">' + icon(dl.weather_code[0], 1) + '</span>' +
+            '<span class="today-desc">' + (WMO[dl.weather_code[0]] || "—") + '</span></div>' +
+            '<div class="today-range">' + rangeHTML(dl.temperature_2m_max[0], dl.temperature_2m_min[0], unit) + '</div></div>' +
+            '<p class="today-meta">Ahora <strong>' + t(cur.temperature_2m, unit) + '</strong>' +
+            (both ? " (" + t(cur.temperature_2m, other) + unitLetter(other) + ")" : "") +
+            ' · sensación ' + t(cur.apparent_temperature, unit) +
+            ' · lluvia ' + (rain0 == null ? "—" : rain0 + " %") +
+            ' · amanece ' + hhmm(dl.sunrise[0]) + ' · anochece ' + hhmm(dl.sunset[0]) +
+            ' · ' + Math.floor(light / 60) + ' h ' + (light % 60) + ' min de luz</p>';
+
+          // Hoy hora a hora (00 a 23)
+          var todayStr = dl.time[0], nowH = +localParts(D.zonaHoraria).hour, html = "";
+          hr.time.forEach(function (tm, i) {
+            if (tm.slice(0, 10) !== todayStr) return;
+            var h = +tm.slice(11, 13), p = hr.precipitation_probability[i];
+            html += '<div class="hour' + (h < nowH ? " past" : h === nowH ? " now" : "") + '" data-h="' + h + '">' +
+              '<span class="h-t">' + (h === nowH ? "Ahora" : String(h).padStart(2, "0") + " h") + '</span>' +
+              '<span class="h-i">' + icon(hr.weather_code[i], hr.is_day[i]) + '</span>' +
+              '<span class="h-v">' + t(hr.temperature_2m[i], unit) + '</span>' +
+              '<span class="h-r">' + (p ? p + " %" : "") + '</span></div>';
+          });
+          var box = $("hours-" + n);
+          box.innerHTML = html;
+          var nowEl = box.querySelector(".hour.now");
+          box.scrollLeft = nowEl ? Math.max(0, nowEl.offsetLeft - 4) : 0;
+
+          // Días siguientes: desde mañana
+          html = "";
+          for (var i = 1; i < dl.time.length; i++) {
             var snow = dl.snowfall_sum[i], rain = dl.precipitation_probability_max[i];
             html += '<div class="day">' +
-              '<div class="day-head"><span class="day-name">' + dayLabel(day, i) + '</span><span class="day-ico">' + icon(dl.weather_code[i], 1) + "</span></div>" +
+              '<div class="day-head"><span class="day-name">' + dayLabel(dl.time[i], i) + '</span><span class="day-ico">' + icon(dl.weather_code[i], 1) + "</span></div>" +
               '<div class="day-temp">' + rangeHTML(dl.temperature_2m_max[i], dl.temperature_2m_min[i], unit) + "</div>" +
               "<p>" + (WMO[dl.weather_code[i]] || "—") + "</p>" +
               "<p>Sensación mín " + t(dl.apparent_temperature_min[i], unit) + "</p>" +
               "<p>Precipitación " + (rain == null ? "—" : rain + " %") + "</p>" +
               (snow > 0 ? '<p class="snow">Nieve ' + nf1.format(snow) + " cm</p>" : "<p>Sin nieve</p>") +
               "</div>";
-          });
+          }
           $("days-" + n).innerHTML = html;
-          $("detail-title-" + n).textContent = "Próximos días en " + D.nombre + "  ·  " +
-            Math.floor(light / 60) + " h " + (light % 60) + " min de luz";
         })
         .catch(function () {
-          $("days-" + n).innerHTML = '<p class="status warn">No se ha podido cargar la previsión. Pulsa Actualizar ahora.</p>';
+          $("today-" + n).innerHTML = '<p class="status warn">No se ha podido cargar el tiempo. Pulsa Actualizar ahora.</p>';
+          $("hours-" + n).innerHTML = "";
+          $("days-" + n).innerHTML = "";
         });
     });
   }
 
-  /* ---------- Fechas ---------- */
-  function renderDates() {
-    var today = new Date(); today.setHours(0, 0, 0, 0);
-    var extra = [];
-    (CFG.mensajesEspeciales || []).forEach(function (x) {
-      if (!x.lista || !x.fecha) return;
-      var f = x.fecha.replace(/\s/g, ""), d;
-      if (f.length === 10) d = localDate(f);
-      else {
-        var mm = +f.slice(0, 2), dd = +f.slice(3, 5);
-        d = new Date(today.getFullYear(), mm - 1, dd);
-        if (d < today) d = new Date(today.getFullYear() + 1, mm - 1, dd);
-      }
-      extra.push({ d: d, f: { pais: "Fam", nombre: x.lista } });
+  /* ---------- Calendario: marcas por día (festivos, familia, días señalados) ---------- */
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+  function keyOf(y, m, d) { return y + "-" + pad2(m) + "-" + pad2(d); }
+  function shiftDays(y, m, d, k) { var x = new Date(Date.UTC(y, m - 1, d + k)); return [x.getUTCFullYear(), x.getUTCMonth() + 1, x.getUTCDate()]; }
+  function easterSunday(y) {           // algoritmo gregoriano anónimo (Meeus/Jones/Butcher)
+    var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4,
+        f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30,
+        i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451),
+        mes = Math.floor((h + l - 7 * m + 114) / 31), dia = ((h + l - 7 * m + 114) % 31) + 1;
+    return [y, mes, dia];
+  }
+  function ymdOfRule(x, y) {
+    if (x.pascua != null) { var e = easterSunday(y); return shiftDays(e[0], e[1], e[2], x.pascua); }
+    if (x.regla) {
+      var d = nthWeekday(y, x.regla);
+      return d ? shiftDays(y, x.regla.mes, d, x.regla.desplazamiento || 0) : null;
+    }
+    if (x.fecha) {
+      var f = x.fecha.replace(/\s/g, "");
+      if (f.length === 10) return +f.slice(0, 4) === y ? [y, +f.slice(5, 7), +f.slice(8, 10)] : null;
+      var mm = +f.slice(0, 2), dd = +f.slice(3, 5);
+      if (mm === 2 && dd === 29 && new Date(Date.UTC(y, 1, 29)).getUTCMonth() !== 1) return null;
+      return [y, mm, dd];
+    }
+    return null;
+  }
+  // Festivos habituales cuando el año no tiene calendario oficial cargado en config.js
+  function defaultHolidays(y) {
+    var e = easterSunday(y), js = shiftDays(e[0], e[1], e[2], -3), vs = shiftDays(e[0], e[1], e[2], -2);
+    return [
+      ["01-01", "Año Nuevo", "Nacional"], ["01-06", "Epifanía del Señor (Reyes)", "Nacional"],
+      [pad2(js[1]) + "-" + pad2(js[2]), "Jueves Santo", "Comunidad de Madrid"],
+      [pad2(vs[1]) + "-" + pad2(vs[2]), "Viernes Santo", "Nacional"],
+      ["05-01", "Fiesta del Trabajo", "Nacional"], ["05-02", "Fiesta de la Comunidad de Madrid", "Comunidad de Madrid"],
+      ["05-15", "San Isidro Labrador", "Madrid capital"], ["08-15", "Asunción de la Virgen", "Nacional"],
+      ["10-12", "Fiesta Nacional de España", "Nacional"], ["11-01", "Todos los Santos", "Nacional"],
+      ["11-09", "Nuestra Señora de la Almudena", "Madrid capital"], ["12-06", "Día de la Constitución", "Nacional"],
+      ["12-08", "Inmaculada Concepción", "Nacional"], ["12-25", "Navidad", "Nacional"]
+    ].map(function (h) { return { fecha: y + "-" + h[0], nombre: h[1], ambito: h[2], provisional: true, estimado: true }; });
+  }
+  var marksCache = {};
+  function marksForYear(y) {
+    if (marksCache[y]) return marksCache[y];
+    var C = CFG.calendario || {}, map = {};
+    function add(k, m) { (map[k] = map[k] || []).push(m); }
+    var fest = (C.festivos && C.festivos[y]) || defaultHolidays(y);
+    fest.forEach(function (f) {
+      add(f.fecha, { tipo: "fest", nombre: f.nombre, ambito: f.ambito, provisional: !!f.provisional, estimado: !!f.estimado });
     });
-    var items = (CFG.fechas || [])
-      .map(function (f) { return { d: localDate(f.fecha), f: f }; })
-      .concat(extra)
-      .filter(function (x) { return x.d >= today; })
-      .sort(function (a, b) { return a.d - b.d; })
-      .slice(0, CFG.mostrarFechas || 6);
+    (CFG.mensajesEspeciales || []).forEach(function (x) {
+      if (!x.lista) return;
+      var r = ymdOfRule(x, y);
+      if (r) add(keyOf(r[0], r[1], r[2]), { tipo: "fam", nombre: x.lista });
+    });
+    (C.senalados || []).forEach(function (x) {
+      var r = ymdOfRule(x, y);
+      if (!r || r[0] !== y) return;
+      var k = keyOf(r[0], r[1], r[2]);
+      // no repetir un día señalado que ese mismo día ya es festivo con el mismo nombre
+      var dup = (map[k] || []).some(function (m) { return m.tipo === "fest" && m.nombre.indexOf(x.nombre) === 0; });
+      if (!dup) add(k, { tipo: "sen", nombre: x.nombre });
+    });
+    var order = { fest: 0, fam: 1, sen: 2 };
+    Object.keys(map).forEach(function (k) { map[k].sort(function (a, b) { return order[a.tipo] - order[b.tipo]; }); });
+    return (marksCache[y] = map);
+  }
+  function marksOn(y, m, d) { return marksForYear(y)[keyOf(y, m, d)] || []; }
+  function todayYMD() { var p = localParts(tzES); return [+p.year, +p.month, +p.day]; }
+
+  /* ---------- Calendario mensual ---------- */
+  var calY, calM, calSel;
+  var MONTHS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  function festMeta(m) {
+    return "Festivo · " + m.ambito + (m.estimado ? " · previsto, sin calendario oficial cargado" : m.provisional ? " · pendiente de aprobación" : "");
+  }
+  function renderCalendar() {
+    var td = todayYMD(), grid = $("cal-grid");
+    $("cal-month").textContent = MONTHS[calM - 1].charAt(0).toUpperCase() + MONTHS[calM - 1].slice(1) + " " + calY;
+    $("cal-today").hidden = calY === td[0] && calM === td[1];
+    var first = (new Date(Date.UTC(calY, calM - 1, 1)).getUTCDay() + 6) % 7;     // lunes = 0
+    var dim = new Date(Date.UTC(calY, calM, 0)).getUTCDate();
+    var html = "";
+    ["L", "M", "X", "J", "V", "S", "D"].forEach(function (w) { html += '<div class="cal-dow">' + w + "</div>"; });
+    for (var i = 0; i < first; i++) html += '<div class="cal-day empty" aria-hidden="true"></div>';
+    for (var d = 1; d <= dim; d++) {
+      var marks = marksOn(calY, calM, d), cls = "cal-day", dots = "", label = d + " de " + MONTHS[calM - 1];
+      var f = marks.filter(function (x) { return x.tipo === "fest"; })[0];
+      if ((first + d - 1) % 7 === 6) cls += " sun";
+      if (f) cls += " fest" + (f.provisional ? " prov" : "");
+      if (calY === td[0] && calM === td[1] && d === td[2]) { cls += " today"; label += ", hoy"; }
+      if (marks.some(function (x) { return x.tipo === "fam"; })) dots += '<i class="d-fam"></i>';
+      if (marks.some(function (x) { return x.tipo === "sen"; })) dots += '<i class="d-sen"></i>';
+      if (marks.length) label += ": " + marks.map(function (x) { return x.nombre; }).join(", ");
+      html += '<button type="button" class="' + cls + '" data-d="' + d + '" aria-pressed="' + (d === calSel) + '" aria-label="' +
+        label.replace(/"/g, "&quot;") + '"><span>' + d + '</span><span class="cal-dots">' + dots + "</span></button>";
+    }
+    grid.innerHTML = html;
+    renderCalDetail();
+  }
+  function renderCalDetail() {
+    var box = $("cal-detail"), marks = marksOn(calY, calM, calSel);
+    var dt = new Date(Date.UTC(calY, calM - 1, calSel));
+    var title = new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(dt);
+    box.innerHTML = '<p class="cal-date"></p>';
+    box.firstChild.textContent = title;
+    if (marks.length) {
+      var ul = document.createElement("ul");
+      ul.className = "cal-marks";
+      marks.forEach(function (m) {
+        var li = document.createElement("li"), tag = m.tipo === "fest" ? "Fest" : m.tipo === "fam" ? "Fam" : "Dia";
+        li.innerHTML = '<span class="tag ' + tag + '">' + (tag === "Dia" ? "Día" : tag) + '</span><span><span class="nm"></span><span class="meta"></span></span>';
+        li.querySelector(".nm").textContent = m.nombre;
+        li.querySelector(".meta").textContent = m.tipo === "fest" ? festMeta(m) : m.tipo === "fam" ? "Familia" : "Día señalado";
+        ul.appendChild(li);
+      });
+      box.appendChild(ul);
+    } else {
+      box.insertAdjacentHTML("beforeend", '<p class="cal-none">Nada marcado para este día.</p>');
+    }
+    var S = window.SANTORAL, santo = S && S[pad2(calM) + "-" + pad2(calSel)];
+    if (santo) {
+      var p = document.createElement("p");
+      p.className = "cal-santo";
+      p.innerHTML = "<b>Santoral:</b> <span></span>";
+      p.querySelector("span").textContent = santo;
+      box.appendChild(p);
+    }
+  }
+  function goMonth(y, m, sel) {
+    calY = y; calM = m;
+    var td = todayYMD();
+    calSel = sel || (y === td[0] && m === td[1] ? td[2] : 1);
+    renderCalendar();
+  }
+  function stepMonth(k) { var x = new Date(Date.UTC(calY, calM - 1 + k, 1)); goMonth(x.getUTCFullYear(), x.getUTCMonth() + 1); }
+  $("cal-prev").addEventListener("click", function () { stepMonth(-1); });
+  $("cal-next").addEventListener("click", function () { stepMonth(1); });
+  $("cal-today").addEventListener("click", function () { var td = todayYMD(); goMonth(td[0], td[1]); });
+  $("cal-grid").addEventListener("click", function (e) {
+    var b = e.target.closest(".cal-day");
+    if (!b || !b.dataset.d) return;
+    calSel = +b.dataset.d;
+    Array.prototype.forEach.call(this.querySelectorAll(".cal-day[aria-pressed]"), function (x) {
+      x.setAttribute("aria-pressed", String(+x.dataset.d === calSel));
+    });
+    renderCalDetail();
+  });
+  function renderCalendarToday() { var td = todayYMD(); marksCache = {}; goMonth(td[0], td[1]); }
+
+  /* ---------- Próximas fechas (misma fuente que el calendario) ---------- */
+  function renderDates() {
+    var td = todayYMD(), items = [], max = CFG.mostrarFechas || 6;
+    for (var k = 0; k < 400 && items.length < max; k++) {
+      var r = shiftDays(td[0], td[1], td[2], k);
+      marksOn(r[0], r[1], r[2]).forEach(function (m) { items.push({ r: r, k: k, m: m }); });
+    }
+    items = items.slice(0, max);
     var ul = $("dates");
     ul.innerHTML = "";
     if (!items.length) {
-      ul.innerHTML = '<li><span></span><span class="muted">No hay fechas próximas. Añádelas en config.js.</span><span></span></li>';
+      ul.innerHTML = '<li><span></span><span class="muted">No hay fechas próximas.</span><span></span></li>';
       return;
     }
-    var dfmt = new Intl.DateTimeFormat("es-ES", { weekday: "short", day: "numeric", month: "short" });
+    var dfmt = new Intl.DateTimeFormat("es-ES", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
     items.forEach(function (x) {
-      var days = Math.round((x.d - today) / 86400000);
-      var li = document.createElement("li");
-      var label = x.f.pais === "ES" ? "ES" : x.f.pais === "US" ? "US" : x.f.pais === "Fam" ? "Fam" : "Otro";
-      var tagTxt = label === "Otro" ? "Nota" : label === "Fam" ? "Fam" : label;
-      li.innerHTML = '<span class="tag ' + label + '">' + tagTxt + "</span>" +
-        "<span></span>" +
-        '<span class="when">' + dfmt.format(x.d) + "<br>" + (days === 0 ? "hoy" : days === 1 ? "mañana" : "en " + days + " días") + "</span>";
-      li.children[1].textContent = x.f.nombre;
+      var li = document.createElement("li"), tag = x.m.tipo === "fest" ? "Fest" : x.m.tipo === "fam" ? "Fam" : "Dia";
+      li.innerHTML = '<span class="tag ' + tag + '">' + (tag === "Dia" ? "Día" : tag) + "</span><span></span>" +
+        '<span class="when">' + dfmt.format(new Date(Date.UTC(x.r[0], x.r[1] - 1, x.r[2]))) + "<br>" +
+        (x.k === 0 ? "hoy" : x.k === 1 ? "mañana" : "en " + x.k + " días") + "</span>";
+      li.children[1].textContent = x.m.nombre + (x.m.tipo === "fest" && x.m.provisional ? " (previsto)" : "");
       ul.appendChild(li);
     });
   }
@@ -753,101 +821,13 @@
   }
   function localHourISO(tz, d) { var p = localParts(tz, d); return p.year + "-" + p.month + "-" + p.day + "T" + p.hour + ":00"; }
 
-  /* ---------- Índice UV por hora y calidad del aire (Open-Meteo) ---------- */
-  var UV_TXT = ["bajo", "moderado", "alto", "muy alto", "extremo"];
-  function uvClass(v) { return v < 3 ? 0 : v < 6 ? 1 : v < 8 ? 2 : v < 11 ? 3 : 4; }
-  // Índice europeo de calidad del aire (EAQI)
-  var AQ_TXT = ["Buena", "Razonable", "Moderada", "Mala", "Muy mala", "Extremadamente mala"];
-  function aqClass(v) { return v <= 20 ? 0 : v <= 40 ? 1 : v <= 60 ? 2 : v <= 80 ? 3 : v <= 100 ? 4 : 5; }
-  function buildUV() {
-    var wrap = $("uv-wrap");
-    wrap.innerHTML = "";
-    (CFG.uv || []).forEach(function (U, n) {
-      var div = document.createElement("div");
-      div.className = "uv-place";
-      div.innerHTML = '<div class="uv-head"><strong id="uv-name-' + n + '"></strong>' +
-        '<span class="aq" id="aq-' + n + '"><span class="dot" aria-hidden="true"></span><span id="aq-text-' + n + '">Cargando aire…</span></span></div>' +
-        '<div class="uv-bar" id="uv-bar-' + n + '"><p class="status">Cargando índice UV…</p></div>' +
-        '<p class="uv-note small muted" id="uv-note-' + n + '"></p>';
-      wrap.appendChild(div);
-      $("uv-name-" + n).textContent = U.nombre;
-    });
-  }
-  buildUV();
-
-  function loadUV() {
-    (CFG.uv || []).forEach(function (U, n) {
-      fetchJSON("https://air-quality-api.open-meteo.com/v1/air-quality?latitude=" + U.lat + "&longitude=" + U.lon +
-        "&current=european_aqi&hourly=uv_index&forecast_days=1&timezone=" + encodeURIComponent(U.zonaHoraria))
-        .then(function (d) {
-          var nowH = +localParts(U.zonaHoraria).hour, html = "", maxV = -1, maxH = null;
-          d.hourly.time.forEach(function (tm, i) {
-            var h = +tm.slice(11, 13), v = d.hourly.uv_index[i];
-            if (v != null && v > maxV) { maxV = v; maxH = h; }
-            if (h < U.horaInicio || h > U.horaFin) return;
-            html += '<div class="uv-cell' + (h === nowH ? " now" : "") + '">' +
-              '<span class="uv-val uv' + (v == null ? 0 : uvClass(v)) + '">' + (v == null ? "—" : Math.round(v)) + "</span>" +
-              '<span class="uv-hour">' + h + "h</span></div>";
-          });
-          $("uv-bar-" + n).innerHTML = html;
-          $("uv-bar-" + n).setAttribute("aria-label", "Índice UV por hora en " + U.nombre);
-          if (maxV >= 0) {
-            $("uv-note-" + n).textContent = "UV máximo " + Math.round(maxV) + " (" + UV_TXT[uvClass(maxV)] + ") hacia las " + maxH + " h. " +
-              (maxV >= 3 ? "Protección solar en las horas amarillas o superiores." : "No hace falta protección solar especial.");
-          }
-          var aq = d.current && d.current.european_aqi;
-          if (aq != null) {
-            var c = aqClass(aq);
-            $("aq-" + n).className = "aq a" + c;
-            $("aq-text-" + n).textContent = "Aire " + Math.round(aq) + " · " + AQ_TXT[c];
-          } else {
-            $("aq-text-" + n).textContent = "Aire: sin datos";
-          }
-        })
-        .catch(function () {
-          $("uv-bar-" + n).innerHTML = '<p class="status warn">No se ha podido cargar el índice UV.</p>';
-          $("aq-text-" + n).textContent = "Aire: sin datos";
-        });
-    });
-  }
-
-  /* ---------- Expresión del día e historial ---------- */
-  var WORDS = window.PALABRAS || [], FRASES = window.FRASES || [], wordIdx = 0;
+  /* ---------- Rotación diaria ---------- */
+  var FRASES = window.FRASES || [];
   function pick(list, i) { return list[((i % list.length) + list.length) % list.length]; }
   function dayNumber() {
     var p = localParts(tzES);
     return Math.floor(Date.UTC(+p.year, +p.month - 1, +p.day) / 86400000);   // cambia a medianoche de Madrid
   }
-  function showWord(i) {
-    var w = pick(WORDS, i);
-    $("word-en").textContent = w.en;
-    $("word-es").textContent = w.es;
-    $("word-ex").textContent = w.ej || "";
-    $("word-ex-es").textContent = w.ejEs || "";
-  }
-  function renderWord() {
-    if (!WORDS.length) { $("word-card").hidden = true; $("history-card").hidden = true; return; }
-    var today = dayNumber();
-    wordIdx = today;
-    $("word-card").hidden = false;
-    showWord(wordIdx);
-
-    // Historial: las expresiones del día de los 5 días anteriores
-    var ul = $("history"), n = Math.min(5, WORDS.length - 1);
-    ul.innerHTML = "";
-    var dfmt = new Intl.DateTimeFormat("es-ES", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
-    for (var k = 1; k <= n; k++) {
-      var w = pick(WORDS, today - k), li = document.createElement("li");
-      li.innerHTML = '<span><span class="h-en"></span><br><span class="h-es"></span></span><span class="when"></span>';
-      li.querySelector(".h-en").textContent = w.en;
-      li.querySelector(".h-es").textContent = w.es;
-      li.querySelector(".when").textContent = k === 1 ? "ayer" : dfmt.format(new Date((today - k) * 86400000));
-      ul.appendChild(li);
-    }
-    $("history-card").hidden = n < 1;
-  }
-  $("word-next").addEventListener("click", function () { wordIdx++; showWord(wordIdx); });
-
   // Mensajes especiales: "MM-DD" (cada año), "AAAA-MM-DD" (un día concreto)
   // o regla de festivo móvil { mes, diaSemana (0 domingo ... 6 sábado), orden (1-5, o -1 = último) }.
   // Todas las fechas se evalúan en hora de Madrid.
@@ -907,83 +887,33 @@
     $("love").hidden = false;
   }
 
-  /* ---------- Luz del día (cálculo astronómico local, sin conexión) ---------- */
-  function dayLengthMin(lat, y, m, d) {
-    var n = Math.round((Date.UTC(y, m - 1, d) - Date.UTC(y, 0, 0)) / 86400000);
-    var g = 2 * Math.PI / 365 * (n - 1);
-    var de = 0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g) - 0.006758 * Math.cos(2 * g) +
-             0.000907 * Math.sin(2 * g) - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g);
-    var phi = lat * Math.PI / 180;
-    var c = (Math.sin(-0.833 * Math.PI / 180) - Math.sin(phi) * Math.sin(de)) / (Math.cos(phi) * Math.cos(de));
-    c = Math.max(-1, Math.min(1, c));
-    return 2 * Math.acos(c) * 180 / Math.PI / 15 * 60;
-  }
-  function fmtHM(min) { var h = Math.floor(min / 60), mm = Math.round(min - h * 60); if (mm === 60) { h++; mm = 0; } return h + " h " + mm + " min"; }
-  function fmtMS(sec) { sec = Math.round(Math.abs(sec)); var m = Math.floor(sec / 60), s = sec % 60; return (m ? m + " min " : "") + s + " s"; }
-  function renderLight() {
-    var L = CFG.luz;
-    if (!L) { $("light").hidden = true; return; }
-    var p = localParts(L.zonaHoraria), y = +p.year, m = +p.month, d = +p.day;
-    var today = dayLengthMin(L.lat, y, m, d);
-    var yd = new Date(Date.UTC(y, m - 1, d - 1));
-    var yesterday = dayLengthMin(L.lat, yd.getUTCFullYear(), yd.getUTCMonth() + 1, yd.getUTCDate());
-    var diffSec = (today - yesterday) * 60;
-    var todayUTC = Date.UTC(y, m - 1, d);
-    // Solsticios: invierno el 21 de diciembre, verano el 21 de junio
-    var winter = Date.UTC(m === 12 && d >= 21 ? y : (m <= 6 ? y - 1 : y), 11, 21);
-    var gaining = diffSec > 0;
-    var info;
-    if (gaining) {
-      var wy = new Date(winter).getUTCFullYear();
-      var since = today - dayLengthMin(L.lat, wy, 12, 21);
-      info = "<strong>Ganando luz</strong> · " + fmtHM(today) + " hoy · <strong>+" + fmtMS(diffSec) + "</strong> que ayer · +" +
-             Math.round(since) + " min desde el 21 dic";
-    } else {
-      var nextWinter = Date.UTC(m === 12 && d > 21 ? y + 1 : y, 11, 21);
-      var daysTo = Math.round((nextWinter - todayUTC) / 86400000);
-      info = fmtHM(today) + " de luz hoy · <strong>" + fmtMS(diffSec) + " menos</strong> que ayer · " +
-             (daysTo === 0 ? "hoy es el día más corto; desde mañana gana luz" : "empieza a ganar luz en " + daysTo + (daysTo === 1 ? " día" : " días"));
-    }
-    $("light-label").textContent = "Luz en " + L.nombre;
-    $("light-info").innerHTML = info;
-    $("light").hidden = false;
-  }
-
-  /* ---------- Palabras de la estación y vocabulario de high school ---------- */
-  function fillWordList(ul, list) {
-    ul.innerHTML = "";
-    list.forEach(function (w) {
-      var li = document.createElement("li");
-      li.innerHTML = '<span class="v-en"></span><span class="v-es"></span>';
-      li.children[0].textContent = w.en;
-      li.children[1].textContent = w.es;
-      ul.appendChild(li);
-    });
-  }
-  // Elige n palabras seguidas que cambian cada día (al acabar la lista, vuelve a empezar)
+  /* ---------- Expresiones útiles de la época del año ---------- */
+  // Elige n expresiones seguidas que cambian cada día a medianoche de Madrid (al acabar la lista, vuelve a empezar)
   function dailySlice(list, n) {
     if (list.length <= n) return list.slice();
     var start = (dayNumber() * n) % list.length, out = [];
     for (var i = 0; i < n; i++) out.push(list[(start + i) % list.length]);
     return out;
   }
-  function renderSeason() {
-    var E = window.ESTACIONES;
-    if (!E) { $("season-card").hidden = true; return; }
+  function renderExpr() {
+    var E = window.EXPRESIONES, card = $("expr-card");
+    if (!E) { card.hidden = true; return; }
     var m = +localParts(tzES).month;
     var key = m >= 3 && m <= 5 ? "primavera" : m >= 6 && m <= 8 ? "verano" : m >= 9 && m <= 11 ? "otono" : "invierno";
-    var names = { primavera: "de la primavera", verano: "del verano", otono: "del otoño", invierno: "del invierno" };
+    var names = { primavera: "primavera", verano: "verano", otono: "otoño", invierno: "invierno" };
     var list = E[key] || [];
-    if (!list.length) { $("season-card").hidden = true; return; }
-    $("season-title").textContent = "Palabras " + names[key];
-    fillWordList($("season-list"), dailySlice(list, CFG.palabrasPorDia || 6));
-    $("season-card").hidden = false;
-  }
-  function renderVocab() {
-    var V = window.VOCAB_HS || [];
-    if (!V.length) { $("vocab-card").hidden = true; return; }
-    fillWordList($("vocab-list"), dailySlice(V, CFG.palabrasPorDia || 6));
-    $("vocab-card").hidden = false;
+    if (!list.length) { card.hidden = true; return; }
+    $("expr-title").textContent = "Expresiones útiles de " + names[key];
+    var ul = $("expr-list");
+    ul.innerHTML = "";
+    dailySlice(list, CFG.palabrasPorDia || 12).forEach(function (w) {
+      var li = document.createElement("li");
+      li.innerHTML = '<span class="x-en"></span><span class="x-es"></span>';
+      li.children[0].textContent = w.en;
+      li.children[1].textContent = w.es;
+      ul.appendChild(li);
+    });
+    card.hidden = false;
   }
 
   /* ---------- Cuenta atrás a fechas significativas (máximo 1 año) ---------- */
@@ -1024,7 +954,8 @@
       });
       if (best) out.push({ name: x.nombre || x.lista || x.texto, start: best.start, ymd: best.ymd, today: best.start <= now });
     });
-    return out.sort(function (a, b) { return a.start - b.start; });
+    return out.sort(function (a, b) { return a.start - b.start; })
+      .slice(0, (CFG.cuentaAtras && CFG.cuentaAtras.maxEventos) || 3);
   }
   function addMonths(t, n) {
     var d = new Date(t), day = d.getDate();
@@ -1086,19 +1017,11 @@
 
   /* ---------- Carga y refresco ---------- */
   function loadWeatherAll() {
-    [["list-es", CFG.espana]].forEach(function (pair) {
-      fetchWeather(pair[1])
-        .then(function (data) { renderList(pair[0], pair[1], data); })
-        .catch(function () {
-          $(pair[0]).innerHTML = '<li class="status warn">No se ha podido cargar el tiempo. Comprueba la conexión y pulsa Actualizar ahora.</li>';
-        });
-    });
     loadDetail();
-    loadUV();
     $("updated").textContent = "Actualizado a las " + fmtTime(tzES) + " (" + CFG.espana.ciudadReloj + ")";
   }
   var lastLoad = Date.now();
-  function loadAll() { lastLoad = Date.now(); loadWeatherAll(); renderDates(); renderWord(); renderLove(); renderLight(); renderSeason(); renderVocab(); buildCountdown(); }
+  function loadAll() { lastLoad = Date.now(); loadWeatherAll(); renderCalendarToday(); renderDates(); renderLove(); renderExpr(); buildCountdown(); }
   $("refresh").addEventListener("click", loadAll);
   loadAll();
   showSplash();
