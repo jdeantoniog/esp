@@ -437,6 +437,7 @@
 </div>
 
 <script src="config.js"></script>
+<script src="cumples.js"></script>
 <script src="palabras.js"></script>
 <script src="santoral.js"></script>
 <script>
@@ -445,6 +446,14 @@
   "use strict";
 
   var CFG = window.CONFIG;
+  // Cumpleaños de cumples.js: se convierten en mensajes especiales (calendario, próximas fechas, cuenta atrás, aviso y confeti)
+  CFG.mensajesEspeciales = (CFG.mensajesEspeciales || []).concat((window.CUMPLES || []).filter(function (c) {
+    return c && /^\d\d-\d\d$/.test(c[0]) && c[1];
+  }).map(function (c) {
+    var o = c[2] || {};
+    return { fecha: c[0], texto: o.texto || "¡Felicita a " + c[1] + "!", lista: "Cumpleaños de " + c[1],
+             avisar: o.avisar !== false, confeti: o.confeti !== false };
+  }));
   if (!CFG) {
     document.body.insertAdjacentHTML("afterbegin",
       "<p style='padding:16px'>No se ha podido leer config.js. Revisa comas y comillas en ese archivo.</p>");
@@ -1228,7 +1237,7 @@
       if (best) out.push({ name: x.nombre || x.lista || x.texto, start: best.start, ymd: best.ymd, today: best.start <= now });
     });
     return out.sort(function (a, b) { return a.start - b.start; })
-      .slice(0, (CFG.cuentaAtras && CFG.cuentaAtras.maxEventos) || 3);
+      .slice(0, (CFG.cuentaAtras && CFG.cuentaAtras.maxEventos) || undefined);    // 0 = sin límite
   }
   function addMonths(t, n) {
     var d = new Date(t), day = d.getDate();

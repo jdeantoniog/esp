@@ -8,18 +8,19 @@ Página de inicio estática. Orden en pantalla:
 4. Próximas fechas: 12 en 2 columnas (sale de los mismos datos que el calendario).
 5. Expresiones útiles en inglés: 20 al día (2 columnas de 10) de un total de 2.000, con modo repaso y marcado de aprendidas.
 6. Conversor de unidades.
-7. Cuenta atrás compacta (6 próximos eventos).
+7. Cuenta atrás compacta: todo lo de los próximos 31 días (fiestas y cumpleaños).
 
 ## Archivos
 
 | Archivo | Para qué sirve | ¿Se edita? |
 |---|---|---|
 | `index.html` | La página | No hace falta |
-| `config.js` | Tiempo, cumpleaños, mensajes, festivos, eventos y días señalados | Sí |
+| `config.js` | Tiempo, mensajes, festivos, eventos y días señalados | Sí |
+| `cumples.js` | Cumpleaños, una línea por persona: `["11-04", "Felipe"],` | Sí |
 | `palabras.js` | Frases del día y 2.000 expresiones en 23 bloques temáticos | Solo para añadir o quitar expresiones |
 | `santoral.js` | Santo de cada día (366 días) | Rara vez |
 
-Sube los cuatro archivos. Si falta `palabras.js` o `santoral.js`, la página carga igual pero sin expresiones o sin santoral, y no avisa.
+Sube los cinco archivos `.js` y el `index.html`. Si falta `palabras.js`, `santoral.js` o `cumples.js`, la página carga igual pero sin expresiones, santoral o cumpleaños, y no avisa.
 
 ## Qué se actualiza solo y qué no
 
@@ -52,7 +53,7 @@ Festivos cargados: **2026** (Decreto 75/2025) y **2027** (Decreto 82/2026; San I
 ## Publicar en GitHub Pages
 
 1. Crea un repositorio nuevo. Con cuenta gratuita debe ser **público**: cualquiera con el enlace puede ver nombres, cumpleaños y ubicación de `config.js`.
-2. Sube `index.html`, `config.js`, `palabras.js` y `santoral.js` a la raíz (*Add file > Upload files*).
+2. Sube `index.html`, `config.js`, `cumples.js`, `palabras.js` y `santoral.js` a la raíz (*Add file > Upload files*).
 3. *Settings > Pages* > *Deploy from a branch*, rama `main`, carpeta `/ (root)`, *Save*.
 4. En 1–2 minutos estará en `https://TU-USUARIO.github.io/NOMBRE-REPO/`.
 5. En el iPhone: Safari > *Compartir > Añadir a pantalla de inicio*.
@@ -62,10 +63,10 @@ Festivos cargados: **2026** (Decreto 75/2025) y **2027** (Decreto 82/2026; San I
 Edita `config.js` en GitHub (icono del lápiz).
 
 - Días de previsión a partir de mañana: `dias` dentro de `detalles` (de 1 a 15).
-- Eventos de la cuenta atrás: `cuentaAtras.maxEventos`.
+- Cuenta atrás: `cuentaAtras.maxDias` (31) y `maxEventos` (0 = sin límite).
 - Expresiones por día: `palabrasPorDia` (20 = 2 columnas de 10).
 - Número de próximas fechas: `mostrarFechas` (12 = 2 columnas de 6).
-- Cumpleaños: `mensajesEspeciales` (los que llevan `lista` salen en el calendario).
+- Cumpleaños: `cumples.js`, ordenados por mes. Para que no avise los días previos: `["02-28", "Carlota", { avisar: false }],`
 - Días señalados: `calendario.senalados`.
 - Si la página queda en blanco tras un cambio, falta una coma o una comilla.
 - GitHub Pages puede tardar hasta 10 minutos en mostrar los cambios.

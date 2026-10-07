@@ -17,6 +17,7 @@ window.CONFIG = {
      regla: festivos que cambian de día cada año
             { mes, diaSemana (0 domingo, 1 lunes ... 6 sábado), orden (1 a 5, o -1 = último) }
      lista: texto para "Próximas fechas" (si no se pone, no aparece en la lista).
+     LOS CUMPLEAÑOS VAN EN cumples.js (una línea por persona).
      avisar: true -> aviso arriba los días previos (ver avisoPrevioDias).
      confeti: true -> confeti en el aviso grande de ese día.
      nombre: cómo aparece en la cuenta atrás (si no, se usa "lista" o el texto).          */
@@ -26,38 +27,13 @@ window.CONFIG = {
   mensajesEspeciales: [
     { fecha: "01-01", nombre: "Año Nuevo", texto: "¡Feliz Año Nuevo! Un beso cariño, ¡qué pena que no estés aquí!" },
     { fecha: "01-06", nombre: "Reyes Magos", texto: "¡Felices Reyes Magos!" },
-    { fecha: "02-28", texto: "¡Felicita a Carlota!", lista: "Cumpleaños", confeti: true },
-    { fecha: "04-05", texto: "¡Felicita a Celia!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "05-16", texto: "¡Felicita a Valeria!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "07-18", texto: "¡Felicita a Javied y Nacho!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "09-27", texto: "¡Felicita a Belén!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "07-07", texto: "¡Felicita a Tito!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "01-03", texto: "¡Felicita a Elena!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "07-17", texto: "¡Felicita a Sara!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "10-03", texto: "¡Felicita a Papa y a Vero!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "09-10", texto: "¡Felicita a Fernon y Gorka!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "01-24", texto: "¡Felicita a Mamá!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "12-02", texto: "¡Felicita a Carreira!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "11-17", texto: "¡Felicita a Blanco!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "07-23", texto: "¡Felicita a Mario!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "06-08", texto: "¡Felicita a Clara Blanco!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "05-20", texto: "¡Felicita a Jordi!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "05-13", texto: "¡Felicita a Renieblas!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "01-30", texto: "¡Felicita a Vanessa!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "01-27", texto: "¡Felicita a Juane!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "01-23", texto: "¡Felicita a Patricia!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "01-14", texto: "¡Felicita a Ruben!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "12-08", texto: "¡Felicita a Carlota Leones!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "11-19", texto: "¡Felicita a Soni!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "11-14", texto: "¡Felicita a Ernesto!", lista: "Cumpleaños", avisar: true, confeti: true },
-    { fecha: "11-04", texto: "¡Felicita a Felipe!", lista: "Cumpleaños", avisar: true, confeti: true },
     { fecha: "12-25", nombre: "Navidad", texto: "¡Feliz Navidad Carlotis! ¡Te quiero cariño!" }
   ],
 
   /* ---------- Cuenta atrás (al final de la página) ----------
-     Muestra las próximas fechas de mensajesEspeciales: como máximo maxEventos,
-     y solo si caen dentro de maxDias. */
-  cuentaAtras: { maxEventos: 6, maxDias: 365 },
+     Muestra todas las fechas de mensajesEspeciales y cumples.js de los próximos maxDias.
+     maxEventos: 0 = sin límite. */
+  cuentaAtras: { maxEventos: 0, maxDias: 31 },
 
   /* ---------- Expresiones útiles ----------
      Cuántas se muestran cada día (2 columnas de 10). Rotan solas a medianoche de Madrid.
@@ -97,7 +73,7 @@ window.CONFIG = {
        fecha y, si dura varios días, hasta: "AAAA-MM-DD" · categoria · nota
        provisional: true -> fecha aún sin confirmar del todo.
        Revisarlos de vez en cuando: el deporte cambia fechas y horarios.
-     Los cumpleaños salen de mensajesEspeciales (los que tienen "lista").        */
+     Los cumpleaños salen de cumples.js.        */
   mostrarFechas: 12,   // 2 columnas de 6
   // Categorías de eventos que solo salen en el calendario, no en "Próximas fechas"
   proximasFechasExcluir: ["Fútbol", "UFC"],
