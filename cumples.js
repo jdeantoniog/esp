@@ -31,6 +31,8 @@ window.CUMPLES = [
   ["07-17", "Sara"],
   ["07-18", "Javier y Nacho"],
   ["07-23", "Mario"],
+  //Agosto
+["08-12","javier Lo."],
   // Septiembre
   ["09-10", "Fernon y Gorka"],
   ["09-27", "Belén"],
