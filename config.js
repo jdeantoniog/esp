@@ -19,8 +19,7 @@ window.CONFIG = {
      lista: texto para "Próximas fechas" (si no se pone, no aparece en la lista).
      LOS CUMPLEAÑOS VAN EN cumples.js (una línea por persona).
      avisar: true -> aviso arriba los días previos (ver avisoPrevioDias).
-     confeti: true -> confeti en el aviso grande de ese día.
-     nombre: cómo aparece en la cuenta atrás (si no, se usa "lista" o el texto).          */
+     confeti: true -> confeti en el aviso grande de ese día.          */
   avisoPrevioDias: 3,
   // Aviso grande a pantalla completa al abrir la página en un día con mensaje especial
   aviso: { activo: true, segundos: 5 },
@@ -29,11 +28,6 @@ window.CONFIG = {
     { fecha: "01-06", nombre: "Reyes Magos", texto: "¡Felices Reyes Magos!" },
     { fecha: "12-25", nombre: "Navidad", texto: "¡Feliz Navidad Carlotis! ¡Te quiero cariño!" }
   ],
-
-  /* ---------- Cuenta atrás (al final de la página) ----------
-     Muestra todas las fechas de mensajesEspeciales y cumples.js de los próximos maxDias.
-     maxEventos: 0 = sin límite. */
-  cuentaAtras: { maxEventos: 0, maxDias: 31 },
 
   /* ---------- Expresiones útiles ----------
      Cuántas se muestran cada día (2 columnas de 10). Rotan solas a medianoche de Madrid.
@@ -74,7 +68,10 @@ window.CONFIG = {
        provisional: true -> fecha aún sin confirmar del todo.
        Revisarlos de vez en cuando: el deporte cambia fechas y horarios.
      Los cumpleaños salen de cumples.js.        */
-  mostrarFechas: 12,   // 2 columnas de 6
+  // Próximas fechas con cuenta atrás: todo lo de los próximos proximasFechasDias días;
+  // si son menos de mostrarFechas, se completa con las siguientes.
+  proximasFechasDias: 31,
+  mostrarFechas: 12,
   // Categorías de eventos que solo salen en el calendario, no en "Próximas fechas"
   proximasFechasExcluir: ["Fútbol", "UFC"],
 

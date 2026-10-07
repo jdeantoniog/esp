@@ -5,10 +5,9 @@ Página de inicio estática. Orden en pantalla:
 1. Frase del día y hora en Madrid.
 2. Tiempo en Madrid: hoy (máxima, mínima y resumen), hoy hora a hora y los 6 días siguientes desde mañana (3 columnas x 2 filas).
 3. Calendario mensual con festivos, cumpleaños, calendario escolar, eventos (fútbol, UFC, Madrid) y días señalados; al tocar un día muestra lo marcado y el santoral. Avisa solo si falta algún dato.
-4. Próximas fechas: 12 en 2 columnas (sale de los mismos datos que el calendario).
+4. Próximas fechas con cuenta atrás en vivo: todo lo de los próximos 31 días (mínimo 12), en 2 columnas. Sale de los mismos datos que el calendario.
 5. Expresiones útiles en inglés: 20 al día (2 columnas de 10) de un total de 2.000, con modo repaso y marcado de aprendidas.
-6. Conversor de unidades.
-7. Cuenta atrás compacta: todo lo de los próximos 31 días (fiestas y cumpleaños).
+6. Conversor de unidades (al final).
 
 ## Archivos
 
@@ -63,9 +62,8 @@ Festivos cargados: **2026** (Decreto 75/2025) y **2027** (Decreto 82/2026; San I
 Edita `config.js` en GitHub (icono del lápiz).
 
 - Días de previsión a partir de mañana: `dias` dentro de `detalles` (de 1 a 15).
-- Cuenta atrás: `cuentaAtras.maxDias` (31) y `maxEventos` (0 = sin límite).
+- Próximas fechas: `proximasFechasDias` (31) y `mostrarFechas` (mínimo de fechas, 12).
 - Expresiones por día: `palabrasPorDia` (20 = 2 columnas de 10).
-- Número de próximas fechas: `mostrarFechas` (12 = 2 columnas de 6).
 - Cumpleaños: `cumples.js`, ordenados por mes. Para que no avise los días previos: `["02-28", "Carlota", { avisar: false }],`
 - Días señalados: `calendario.senalados`.
 - Si la página queda en blanco tras un cambio, falta una coma o una comilla.

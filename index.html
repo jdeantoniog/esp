@@ -289,16 +289,6 @@
   .x-es { display: block; color: var(--muted); font-size: 0.8rem; }
   @media (max-width: 520px) { .xlist { gap: 0 10px; } .x-en { font-size: 0.85rem; } .x-es { font-size: 0.75rem; } }
 
-  /* ---------- Cuenta atrás ---------- */
-  .cd-list { list-style: none; margin: 0; padding: 0; }
-  .cd-list li { padding: 7px 0; border-top: 1px solid var(--line); }
-  .cd-list li:first-child { border-top: 0; padding-top: 0; }
-  .cd-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-  .cd-name { font-weight: 700; font-size: 0.9rem; min-width: 0; }
-  .cd-date { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
-  .cd-line { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; margin-top: 1px; }
-  .cd-line b { color: var(--ink); font-weight: 700; }
-  .cd-today { font-weight: 800; color: var(--es-red); }
 
   /* ---------- Fechas (estilos) ---------- */
   .list li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--line); }
@@ -315,6 +305,8 @@
   .dlist .tag { margin-top: 1px; flex: none; }
   .d-txt { min-width: 0; line-height: 1.25; }
   .d-name { display: block; font-weight: 600; font-size: 0.9rem; overflow-wrap: anywhere; }
+  .d-cd { display: block; font-size: 0.75rem; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .d-cd.today { color: var(--es-red); font-weight: 800; }
   .d-when { display: block; font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
   @media (max-width: 520px) { .dlist { gap: 0 10px; } .d-name { font-size: 0.82rem; } .dlist .tag { font-size: 0.66rem; padding: 2px 5px; min-width: 0; } }
   .when { text-align: right; font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -412,12 +404,6 @@
       </div>
     </div>
     <p class="small muted" id="unit-note"></p>
-  </section>
-
-  <!-- Cuenta atrás a fechas significativas -->
-  <section class="card" id="cd-card" aria-labelledby="cd-title" hidden>
-    <h2 id="cd-title">Cuenta atrás</h2>
-    <ul class="cd-list" id="cd-list"></ul>
   </section>
 
   <footer>
@@ -1031,9 +1017,15 @@
   function renderCalendarToday() { var td = todayYMD(); loadOnlineSports(); marksCache = {}; goMonth(td[0], td[1]); renderCalStatus(); }
 
   /* ---------- Próximas fechas (misma fuente que el calendario) ---------- */
+  // Próximas fechas con cuenta atrás: todo lo de los próximos "proximasFechasDias" días
+  // y, si son menos de "mostrarFechas", se completa con las siguientes.
+  var datesDay = "";
   function renderDates() {
-    var td = todayYMD(), items = [], max = CFG.mostrarFechas || 12, excl = CFG.proximasFechasExcluir || [];
-    for (var k = 0; k < 400 && items.length < max; k++) {
+    var td = todayYMD(), items = [], min = CFG.mostrarFechas || 12, dias = CFG.proximasFechasDias || 31,
+        excl = CFG.proximasFechasExcluir || [];
+    datesDay = keyOf(td[0], td[1], td[2]);
+    for (var k = 0; k < 400; k++) {
+      if (k > dias && items.length >= min) break;
       var r = shiftDays(td[0], td[1], td[2], k);
       marksOn(r[0], r[1], r[2]).forEach(function (m) {
         if ((m.tipo === "evt" || m.tipo === "esc") && !m.inicio && k > 0) return;      // un rango aparece una vez
@@ -1041,7 +1033,6 @@
         items.push({ r: r, k: k, m: m });
       });
     }
-    items = items.slice(0, max);
     var ul = $("dates"), rows = Math.ceil(items.length / 2);
     ul.innerHTML = "";
     ul.style.gridTemplateRows = "repeat(" + Math.max(rows, 1) + ", auto)";
@@ -1050,13 +1041,31 @@
     items.forEach(function (x, i) {
       var li = document.createElement("li"), tag = tagOf(x.m);
       if (i === 0 || i === rows) li.className = "col-top";
-      li.innerHTML = '<span class="tag ' + tag + '">' + tagText(tag) + '</span><span class="d-txt"><span class="d-name"></span><span class="d-when"></span></span>';
+      li.innerHTML = '<span class="tag ' + tag + '">' + tagText(tag) + '</span><span class="d-txt"><span class="d-name"></span>' +
+        '<span class="d-when"></span><span class="d-cd"></span></span>';
       li.querySelector(".d-name").textContent = x.m.nombre + (x.m.provisional ? " (por confirmar)" : "");
-      li.querySelector(".d-when").textContent = dfmt.format(new Date(Date.UTC(x.r[0], x.r[1] - 1, x.r[2]))) + " · " +
-        (x.k === 0 ? (x.m.desde && !x.m.inicio ? "en curso" : "hoy") : x.k === 1 ? "mañana" : "en " + x.k + " días");
+      li.querySelector(".d-when").textContent = dfmt.format(new Date(Date.UTC(x.r[0], x.r[1] - 1, x.r[2])));
+      var cd = li.querySelector(".d-cd");
+      if (x.k === 0) { cd.textContent = x.m.desde && !x.m.inicio ? "En curso" : "¡Es hoy!"; cd.classList.add("today"); }
+      else cd.dataset.t = midnightIn(tzES, x.r[0], x.r[1], x.r[2]);
       ul.appendChild(li);
     });
+    tickDates();
   }
+  // Cuenta atrás en vivo: "4 días · 13:11:04" o "2 meses 3 días · 13:11:04"
+  function tickDates() {
+    var now = Date.now(), td = todayYMD();
+    if (keyOf(td[0], td[1], td[2]) !== datesDay) { renderDates(); return; }   // ha cambiado el día
+    Array.prototype.forEach.call(document.querySelectorAll("#dates .d-cd[data-t]"), function (el) {
+      var t = +el.dataset.t;
+      if (t <= now) { renderDates(); return; }
+      var b = breakdown(now, t), d = b[1] * 7 + b[2], txt = "";
+      if (b[0]) txt = b[0] + (b[0] === 1 ? " mes " : " meses ");
+      if (d || !b[0]) txt += d + (d === 1 ? " día" : " días");
+      el.textContent = txt.trim() + " · " + [b[3], b[4], b[5]].map(function (v) { return String(v).padStart(2, "0"); }).join(":");
+    });
+  }
+  setInterval(tickDates, 1000);
 
   /* ---------- Utilidades de hora local ---------- */
   function localParts(tz, d) {
@@ -1198,7 +1207,7 @@
     });
   })();
 
-  /* ---------- Cuenta atrás a fechas significativas (máximo 1 año) ---------- */
+  /* ---------- Utilidades de fechas para la cuenta atrás ---------- */
   // Medianoche (inicio del día) de una fecha en una zona horaria, como instante absoluto
   function midnightIn(tz, y, m, d) {
     var guess = Date.UTC(y, m - 1, d, 0, 0);
@@ -1213,31 +1222,6 @@
     var dim = new Date(Date.UTC(y, r.mes, 0)).getUTCDate(), days = [];
     for (var d = 1; d <= dim; d++) if (new Date(Date.UTC(y, r.mes - 1, d)).getUTCDay() === r.diaSemana) days.push(d);
     return r.orden === -1 ? days[days.length - 1] : days[r.orden - 1];
-  }
-  function nextOccurrences() {
-    var now = Date.now(), maxMs = (CFG.cuentaAtras && CFG.cuentaAtras.maxDias || 365) * 86400000, out = [];
-    var yNow = +localParts(tzES).year;
-    (CFG.mensajesEspeciales || []).forEach(function (x) {
-      var tz = tzES;
-      var cands = [];
-      if (x.fecha) {
-        var f = x.fecha.replace(/\s/g, "");
-        if (f.length === 10) cands.push([+f.slice(0, 4), +f.slice(5, 7), +f.slice(8, 10)]);
-        else [yNow, yNow + 1].forEach(function (y) { cands.push([y, +f.slice(0, 2), +f.slice(3, 5)]); });
-      } else if (x.regla) {
-        [yNow, yNow + 1].forEach(function (y) { cands.push([y, x.regla.mes, nthWeekday(y, x.regla)]); });
-      }
-      var best = null;
-      cands.forEach(function (c) {
-        var start = midnightIn(tz, c[0], c[1], c[2]);
-        var end = midnightIn(tz, c[0], c[1], c[2]) + 86400000;
-        if (end <= now || start - now > maxMs) return;
-        if (!best || start < best.start) best = { start: start, end: end, ymd: c };
-      });
-      if (best) out.push({ name: x.nombre || x.lista || x.texto, start: best.start, ymd: best.ymd, today: best.start <= now });
-    });
-    return out.sort(function (a, b) { return a.start - b.start; })
-      .slice(0, (CFG.cuentaAtras && CFG.cuentaAtras.maxEventos) || undefined);    // 0 = sin límite
   }
   function addMonths(t, n) {
     var d = new Date(t), day = d.getDate();
@@ -1257,51 +1241,13 @@
     var mins = Math.floor(rest / 60), secs = rest - mins * 60;
     return [months, weeks, days, hours, mins, secs];
   }
-  var cdItems = [];
-  var CD_LABELS = [["mes", "meses"], ["sem", "sem"], ["día", "días"], ["h", "h"], ["min", "min"], ["s", "s"]];
-  function buildCountdown() {
-    cdItems = nextOccurrences();
-    var ul = $("cd-list");
-    ul.innerHTML = "";
-    if (!cdItems.length) { $("cd-card").hidden = true; return; }
-    var dfmt = new Intl.DateTimeFormat("es-ES", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
-    cdItems.forEach(function (it, i) {
-      var li = document.createElement("li");
-      li.innerHTML = '<div class="cd-head"><span class="cd-name"></span><span class="cd-date"></span></div>' +
-        '<div class="cd-line" id="cd-' + i + '"></div>';
-      li.querySelector(".cd-name").textContent = it.name;
-      li.querySelector(".cd-date").textContent = dfmt.format(new Date(Date.UTC(it.ymd[0], it.ymd[1] - 1, it.ymd[2])));
-      ul.appendChild(li);
-    });
-    $("cd-card").hidden = false;
-    tickCountdown();
-  }
-  function tickCountdown() {
-    var now = Date.now(), rebuild = false;
-    cdItems.forEach(function (it, i) {
-      var el = $("cd-" + i);
-      if (!el) return;
-      if (it.start <= now) {
-        if (!it.today) rebuild = true;
-        el.innerHTML = '<span class="cd-today">¡Es hoy!</span>';
-        return;
-      }
-      // Formato compacto: "2 meses 1 sem 3 días · 13:05:42" (omite meses/semanas a cero)
-      var b = breakdown(now, it.start), parts = [];
-      for (var k = 0; k < 3; k++) if (b[k] || k === 2) parts.push("<b>" + b[k] + "</b> " + CD_LABELS[k][b[k] === 1 ? 0 : 1]);
-      el.innerHTML = parts.join(" ") + " · " + [b[3], b[4], b[5]].map(function (v) { return String(v).padStart(2, "0"); }).join(":");
-    });
-    if (rebuild) buildCountdown();
-  }
-  setInterval(function () { if (!$("cd-card").hidden) tickCountdown(); }, 1000);
-
   /* ---------- Carga y refresco ---------- */
   function loadWeatherAll() {
     loadDetail();
     $("updated").textContent = "Actualizado a las " + fmtTime(tzES) + " (" + CFG.espana.ciudadReloj + ")";
   }
   var lastLoad = Date.now();
-  function loadAll() { lastLoad = Date.now(); loadWeatherAll(); renderCalendarToday(); renderDates(); renderLove(); renderExpr(); buildCountdown(); }
+  function loadAll() { lastLoad = Date.now(); loadWeatherAll(); renderCalendarToday(); renderDates(); renderLove(); renderExpr(); }
   $("refresh").addEventListener("click", loadAll);
   loadAll();
   showSplash();
