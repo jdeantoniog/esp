@@ -79,6 +79,28 @@ window.CONFIG = {
        Revisarlos de vez en cuando: el deporte cambia fechas y horarios.
      Los cumpleaños salen de mensajesEspeciales (los que tienen "lista").        */
   mostrarFechas: 12,   // 2 columnas de 6
+  // Categorías de eventos que solo salen en el calendario, no en "Próximas fechas"
+  proximasFechasExcluir: ["Fútbol", "UFC"],
+
+  /* ---------- Datos online (se guardan en el navegador; si fallan, se usa config.js) ----------
+     festivos: si un año no está en calendario.festivos, se piden a Nager.Date
+               (nacionales + Comunidad de Madrid). Los locales de Madrid se marcan como previstos.
+     deportes: próximos partidos de los equipos y veladas UFC desde TheSportsDB (clave gratuita 123).
+               Solo aparecen en el calendario. Si el id de un equipo no funciona, se busca por nombre. */
+  online: {
+    festivos: true,
+    deportes: {
+      activo: true,
+      clave: "123",
+      horasCache: 12,
+      equipos: [
+        { nombre: "Real Madrid", id: "133738", buscar: "Real Madrid" },
+        { nombre: "Barcelona", id: "133739", buscar: "Barcelona" },
+        { nombre: "Atlético de Madrid", id: "133729", buscar: "Atletico Madrid" }
+      ],
+      ufcLiga: "4443"
+    }
+  },
   calendario: {
     festivos: {
       // Decreto 75/2025 (BOCM 25/09/2025) + Ayuntamiento de Madrid (pleno 30/09/2025)
@@ -146,7 +168,18 @@ window.CONFIG = {
       { fecha: "12-24", nombre: "Nochebuena" },
       { fecha: "12-28", nombre: "Día de los Santos Inocentes" },
       { fecha: "12-31", nombre: "Nochevieja" },
-      { fecha: "12-31", nombre: "San Silvestre Vallecana" }
+      { fecha: "12-31", nombre: "San Silvestre Vallecana" },
+      // Recordatorios de mantenimiento (la página también avisa sola si falta algo)
+      { fecha: "06-15", nombre: "Recordatorio: añadir el calendario escolar del curso siguiente" },
+      { fecha: "10-05", nombre: "Recordatorio: añadir los festivos del año siguiente (BOCM)" }
+    ],
+    // Calendario escolar de la Comunidad de Madrid, curso 2026-2027 (BOCM). Se marca en morado.
+    escolar: [
+      { fecha: "2026-12-23", hasta: "2027-01-10", nombre: "Vacaciones escolares de Navidad", nota: "vuelta a clase el lunes 11 de enero" },
+      { fecha: "2027-02-12", nombre: "Día no lectivo", nota: "colegios e institutos" },
+      { fecha: "2027-02-15", nombre: "Día no lectivo", nota: "colegios e institutos" },
+      { fecha: "2027-03-19", hasta: "2027-03-29", nombre: "Vacaciones escolares de Semana Santa", nota: "vuelta a clase el martes 30 de marzo" },
+      { fecha: "2027-06-18", nombre: "Último día de clase", nota: "Infantil, Primaria, ESO, Bachillerato y FP" }
     ],
     eventos: [
       // UFC (fuente: calendario oficial publicado a 7 oct 2026). Eventos en EE. UU./Canadá: en España, madrugada del domingo.

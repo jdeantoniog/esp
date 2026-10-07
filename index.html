@@ -156,6 +156,7 @@
   .today-range { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; min-width: 150px; flex: none; }
   .today-meta { margin: 8px 0 0; font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
   .today-meta strong { color: var(--ink); }
+  .stale { color: var(--mid); font-weight: 700; }
   .hours {
     position: relative; display: flex; gap: 4px; overflow-x: auto; margin: 12px 0 0; padding-bottom: 6px;
     scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; scrollbar-width: thin;
@@ -199,6 +200,11 @@
   .d-fam { background: var(--ok); }
   .d-sen { background: var(--oh-gold); }
   .d-evt { background: #3c6fd1; }
+  .d-esc { background: #8e4ab1; }
+  .tag.Esc { background: #8e4ab1; }
+  .cal-warn { margin: 0 0 10px; padding: 8px 10px; border-radius: 8px; background: var(--alert-bg); color: var(--ink); font-size: 0.82rem; border-left: 4px solid var(--warn); }
+  .cal-status { margin: 6px 0 0; font-size: 0.72rem; color: var(--muted); }
+  .cal-status:empty { display: none; }
   .cal-day.fest .d-fam { background: #ffffff; }
   .cal-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 10px 0 0; font-size: 0.78rem; color: var(--muted); }
   .cal-legend span { display: inline-flex; align-items: center; gap: 5px; }
@@ -265,6 +271,21 @@
   .xlist li { padding: 5px 0; border-top: 1px solid var(--line); min-width: 0; line-height: 1.25; }
   .xlist li.col-top { border-top: 0; }
   .x-en { display: block; font-weight: 700; font-size: 0.92rem; }
+  .x-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .x-head h2 { margin: 0; }
+  .chip[aria-pressed="true"] { background: var(--oh-accent-bg); border-color: var(--oh-accent-bg); color: var(--oh-on-accent); }
+  .xlist li { position: relative; padding-right: 26px; }
+  .x-chk { position: absolute; right: 0; top: 5px; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--line); background: transparent; color: transparent; font: inherit; font-size: 0.75rem; line-height: 1; cursor: pointer; padding: 0; }
+  .xlist li.learned .x-chk { background: var(--ok); border-color: var(--ok); color: #ffffff; }
+  .xlist li.learned .x-en { color: var(--muted); text-decoration: line-through; }
+  .repaso .x-es { color: transparent; background: var(--paper); border-radius: 4px; cursor: pointer; user-select: none; }
+  .repaso .x-es::after { content: "toca para ver"; color: var(--muted); font-size: 0.72rem; position: absolute; left: 0; bottom: 5px; }
+  .repaso li:not(.show) .x-es { white-space: nowrap; overflow: hidden; height: 1.15em; }
+  .repaso li.show .x-es { color: var(--muted); background: transparent; }
+  .repaso li.show .x-es::after { content: none; }
+  .repaso li { cursor: pointer; }
+  .x-foot { margin: 10px 0 0; }
+  .linkbtn { font: inherit; color: var(--focus); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
   .x-es { display: block; color: var(--muted); font-size: 0.8rem; }
   @media (max-width: 520px) { .xlist { gap: 0 10px; } .x-en { font-size: 0.85rem; } .x-es { font-size: 0.75rem; } }
 
@@ -344,14 +365,17 @@
       <div class="cal-month"><span id="cal-month" aria-live="polite"></span><button type="button" class="chip" id="cal-today" hidden>Hoy</button></div>
       <button type="button" class="cal-btn" id="cal-next" aria-label="Mes siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
+    <p class="cal-warn" id="cal-warn" hidden></p>
     <div class="cal-grid" id="cal-grid"></div>
     <div class="cal-legend" aria-hidden="true">
       <span><i class="sw fest"></i>Festivo</span>
       <span><i class="sw prov"></i>Festivo previsto</span>
       <span><i class="sw dot d-fam"></i>Familia</span>
       <span><i class="sw dot d-sen"></i>Día señalado</span>
+      <span><i class="sw dot d-esc"></i>Escolar</span>
       <span><i class="sw dot d-evt"></i>Evento</span>
     </div>
+    <p class="cal-status" id="cal-status"></p>
     <div class="cal-detail" id="cal-detail" aria-live="polite"></div>
   </section>
 
@@ -363,8 +387,12 @@
 
   <!-- Expresiones útiles de la época del año -->
   <section class="card" id="expr-card" aria-labelledby="expr-title" hidden>
-    <h2 id="expr-title">Expresiones útiles</h2>
+    <div class="x-head">
+      <h2 id="expr-title">Expresiones útiles</h2>
+      <button type="button" class="chip" id="expr-mode" aria-pressed="false">Repaso</button>
+    </div>
     <ul class="xlist" id="expr-list"></ul>
+    <p class="x-foot small muted"><span id="expr-count"></span> <button type="button" class="linkbtn" id="expr-reset" hidden>Reiniciar aprendidas</button></p>
   </section>
 
   <!-- Conversor de unidades -->
@@ -425,6 +453,15 @@
   function $(id) { return document.getElementById(id); }
 
   document.title = CFG.titulo || "Inicio";
+
+  /* ---------- Almacenamiento en el navegador (caché y preferencias) ---------- */
+  var STORE = "inicio:v1:";
+  function store(key, val) { try { localStorage.setItem(STORE + key, JSON.stringify(val)); } catch (e) {} }
+  function load(key) { try { var v = localStorage.getItem(STORE + key); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function ago(t) {
+    var m = Math.round((Date.now() - t) / 60000);
+    return m < 60 ? "hace " + Math.max(1, m) + " min" : m < 2880 ? "hace " + Math.round(m / 60) + " h" : "hace " + Math.round(m / 1440) + " días";
+  }
 
   /* ---------- Formatos ---------- */
   var nf2 = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -583,9 +620,63 @@
   }
   buildDetailCards();
 
+  // Pinta la previsión. Si los datos son de una copia guardada, empieza en el día de hoy dentro de esa copia.
+  function renderWeather(D, n, d, savedAt) {
+    var unit = D.unidad || "celsius", other = otherUnit(unit), both = D.mostrarAmbasUnidades;
+    var dl = d.daily, cur = d.current, hr = d.hourly, td = todayYMD(), todayStr = keyOf(td[0], td[1], td[2]);
+    var i0 = dl.time.indexOf(todayStr);
+    if (i0 < 0) return false;                      // la copia es demasiado antigua para hoy
+    var light = minutesOf(dl.sunset[i0]) - minutesOf(dl.sunrise[i0]), rain0 = dl.precipitation_probability_max[i0];
+    var nowTxt = savedAt
+      ? '<span class="stale">Sin conexión: previsión guardada ' + ago(savedAt) + "</span>"
+      : "Ahora <strong>" + t(cur.temperature_2m, unit) + "</strong>" +
+        (both ? " (" + t(cur.temperature_2m, other) + unitLetter(other) + ")" : "") + " · sensación " + t(cur.apparent_temperature, unit);
+    $("today-" + n).innerHTML =
+      '<div class="today-main"><div class="today-left"><span class="today-name">Hoy</span>' +
+      '<span class="today-ico">' + icon(dl.weather_code[i0], 1) + '</span>' +
+      '<span class="today-desc">' + (WMO[dl.weather_code[i0]] || "—") + '</span></div>' +
+      '<div class="today-range">' + rangeHTML(dl.temperature_2m_max[i0], dl.temperature_2m_min[i0], unit) + '</div></div>' +
+      '<p class="today-meta">' + nowTxt +
+      ' · lluvia ' + (rain0 == null ? "—" : rain0 + " %") +
+      ' · amanece ' + hhmm(dl.sunrise[i0]) + ' · anochece ' + hhmm(dl.sunset[i0]) +
+      ' · ' + Math.floor(light / 60) + ' h ' + (light % 60) + ' min de luz</p>';
+
+    // Hoy hora a hora (00 a 23)
+    var nowH = +localParts(D.zonaHoraria).hour, html = "";
+    hr.time.forEach(function (tm, i) {
+      if (tm.slice(0, 10) !== todayStr) return;
+      var h = +tm.slice(11, 13), p = hr.precipitation_probability[i];
+      html += '<div class="hour' + (h < nowH ? " past" : h === nowH ? " now" : "") + '">' +
+        '<span class="h-t">' + (h === nowH ? "Ahora" : String(h).padStart(2, "0") + " h") + '</span>' +
+        '<span class="h-i">' + icon(hr.weather_code[i], hr.is_day[i]) + '</span>' +
+        '<span class="h-v">' + t(hr.temperature_2m[i], unit) + '</span>' +
+        '<span class="h-r">' + (p ? p + " %" : "") + '</span></div>';
+    });
+    var box = $("hours-" + n);
+    box.innerHTML = html;
+    var nowEl = box.querySelector(".hour.now");
+    box.scrollLeft = nowEl ? Math.max(0, nowEl.offsetLeft - 4) : 0;
+
+    // Días siguientes: desde mañana
+    html = "";
+    var dias = Math.max(1, Math.min(15, D.dias || 6));
+    for (var i = i0 + 1; i < dl.time.length && i <= i0 + dias; i++) {
+      var snow = dl.snowfall_sum[i], rain = dl.precipitation_probability_max[i];
+      html += '<div class="day">' +
+        '<div class="day-head"><span class="day-name">' + dayLabel(dl.time[i], i - i0) + '</span><span class="day-ico">' + icon(dl.weather_code[i], 1) + "</span></div>" +
+        '<div class="day-temp">' + rangeHTML(dl.temperature_2m_max[i], dl.temperature_2m_min[i], unit) + "</div>" +
+        "<p>" + (WMO[dl.weather_code[i]] || "—") + "</p>" +
+        "<p>Sens. mín " + t(dl.apparent_temperature_min[i], unit) + "</p>" +
+        "<p>Lluvia " + (rain == null ? "—" : rain + " %") + "</p>" +
+        (snow > 0 ? '<p class="snow">Nieve ' + nf1.format(snow) + " cm</p>" : "<p>Sin nieve</p>") +
+        "</div>";
+    }
+    $("days-" + n).innerHTML = html;
+    return true;
+  }
+
   function loadDetail() {
     (CFG.detalles || []).forEach(function (D, n) {
-      var unit = D.unidad || "celsius", other = otherUnit(unit), both = D.mostrarAmbasUnidades;
       var dias = Math.max(1, Math.min(15, D.dias || 6));
       fetchJSON("https://api.open-meteo.com/v1/forecast?latitude=" + D.lat + "&longitude=" + D.lon +
         "&current=temperature_2m,apparent_temperature,weather_code,is_day" +
@@ -594,54 +685,13 @@
         "snowfall_sum,precipitation_probability_max,sunrise,sunset" +
         "&forecast_days=" + (dias + 1) + "&timezone=" + encodeURIComponent(D.zonaHoraria))
         .then(function (d) {
-          var dl = d.daily, cur = d.current, hr = d.hourly;
-          // Hoy: máxima, mínima y resumen
-          var light = minutesOf(dl.sunset[0]) - minutesOf(dl.sunrise[0]), rain0 = dl.precipitation_probability_max[0];
-          $("today-" + n).innerHTML =
-            '<div class="today-main"><div class="today-left"><span class="today-name">Hoy</span>' +
-            '<span class="today-ico">' + icon(dl.weather_code[0], 1) + '</span>' +
-            '<span class="today-desc">' + (WMO[dl.weather_code[0]] || "—") + '</span></div>' +
-            '<div class="today-range">' + rangeHTML(dl.temperature_2m_max[0], dl.temperature_2m_min[0], unit) + '</div></div>' +
-            '<p class="today-meta">Ahora <strong>' + t(cur.temperature_2m, unit) + '</strong>' +
-            (both ? " (" + t(cur.temperature_2m, other) + unitLetter(other) + ")" : "") +
-            ' · sensación ' + t(cur.apparent_temperature, unit) +
-            ' · lluvia ' + (rain0 == null ? "—" : rain0 + " %") +
-            ' · amanece ' + hhmm(dl.sunrise[0]) + ' · anochece ' + hhmm(dl.sunset[0]) +
-            ' · ' + Math.floor(light / 60) + ' h ' + (light % 60) + ' min de luz</p>';
-
-          // Hoy hora a hora (00 a 23)
-          var todayStr = dl.time[0], nowH = +localParts(D.zonaHoraria).hour, html = "";
-          hr.time.forEach(function (tm, i) {
-            if (tm.slice(0, 10) !== todayStr) return;
-            var h = +tm.slice(11, 13), p = hr.precipitation_probability[i];
-            html += '<div class="hour' + (h < nowH ? " past" : h === nowH ? " now" : "") + '" data-h="' + h + '">' +
-              '<span class="h-t">' + (h === nowH ? "Ahora" : String(h).padStart(2, "0") + " h") + '</span>' +
-              '<span class="h-i">' + icon(hr.weather_code[i], hr.is_day[i]) + '</span>' +
-              '<span class="h-v">' + t(hr.temperature_2m[i], unit) + '</span>' +
-              '<span class="h-r">' + (p ? p + " %" : "") + '</span></div>';
-          });
-          var box = $("hours-" + n);
-          box.innerHTML = html;
-          var nowEl = box.querySelector(".hour.now");
-          box.scrollLeft = nowEl ? Math.max(0, nowEl.offsetLeft - 4) : 0;
-
-          // Días siguientes: desde mañana
-          html = "";
-          for (var i = 1; i < dl.time.length; i++) {
-            var snow = dl.snowfall_sum[i], rain = dl.precipitation_probability_max[i];
-            html += '<div class="day">' +
-              '<div class="day-head"><span class="day-name">' + dayLabel(dl.time[i], i) + '</span><span class="day-ico">' + icon(dl.weather_code[i], 1) + "</span></div>" +
-              '<div class="day-temp">' + rangeHTML(dl.temperature_2m_max[i], dl.temperature_2m_min[i], unit) + "</div>" +
-              "<p>" + (WMO[dl.weather_code[i]] || "—") + "</p>" +
-              "<p>Sens. mín " + t(dl.apparent_temperature_min[i], unit) + "</p>" +
-              "<p>Lluvia " + (rain == null ? "—" : rain + " %") + "</p>" +
-              (snow > 0 ? '<p class="snow">Nieve ' + nf1.format(snow) + " cm</p>" : "<p>Sin nieve</p>") +
-              "</div>";
-          }
-          $("days-" + n).innerHTML = html;
+          if (!renderWeather(D, n, d, null)) throw new Error("datos sin el día de hoy");
+          store("tiempo:" + n, { t: Date.now(), d: d });
         })
         .catch(function () {
-          $("today-" + n).innerHTML = '<p class="status warn">No se ha podido cargar el tiempo. Pulsa Actualizar ahora.</p>';
+          var c = load("tiempo:" + n);
+          if (c && c.d && renderWeather(D, n, c.d, c.t)) return;
+          $("today-" + n).innerHTML = '<p class="status warn">No se ha podido cargar el tiempo y no hay una previsión guardada. Pulsa Actualizar ahora.</p>';
           $("hours-" + n).innerHTML = "";
           $("days-" + n).innerHTML = "";
         });
@@ -688,22 +738,150 @@
       ["12-08", "Inmaculada Concepción", "Nacional"], ["12-25", "Navidad", "Nacional"]
     ].map(function (h) { return { fecha: y + "-" + h[0], nombre: h[1], ambito: h[2], provisional: true, estimado: true }; });
   }
+  /* ---------- Datos online para el calendario (con caché y respaldo en config.js) ---------- */
+  var ONLINE = { fest: {}, sport: [], status: {} };     // festivos por año, eventos deportivos, estado por fuente
+  var OL = CFG.online || {};
+  function stripAcc(x) { return String(x || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
+  function teamKeys(txt) {
+    var x = stripAcc(txt), k = [];
+    if (/atletico|atleti/.test(x)) k.push("ATM");
+    if (/real madrid/.test(x)) k.push("RMA");
+    if (/barcelona|barca/.test(x)) k.push("FCB");
+    return k.sort().join("+");
+  }
+  // Fecha y hora de Madrid a partir de la hora UTC que da la fuente
+  function madridFromUTC(dateStr, timeStr, stamp) {
+    var iso = stamp ? String(stamp).replace(" ", "T") : (dateStr + "T" + (timeStr || "00:00:00"));
+    if (!/(Z|[+-]\d\d:?\d\d)$/.test(iso)) iso += "Z";
+    var dt = new Date(iso);
+    if (isNaN(dt)) return null;
+    var p = localParts(tzES, dt);
+    var known = !!(stamp || (timeStr && timeStr.slice(0, 5) !== "00:00"));
+    return { key: p.year + "-" + p.month + "-" + p.day, hora: known ? fmtTime(tzES, dt) : "" };
+  }
+  function refreshCalendarViews() { marksCache = {}; if (calY) renderCalendar(); renderDates(); renderCalStatus(); }
+
+  // Festivos: config.js manda; si un año no está, se piden a Nager.Date (nacionales + Comunidad de Madrid)
+  function loadOnlineHolidays(y) {
+    if (!OL.festivos || (CFG.calendario && CFG.calendario.festivos && CFG.calendario.festivos[y]) || ONLINE.fest[y]) return;
+    var key = "festivos:" + y, c = load(key);
+    if (c && c.list) { ONLINE.fest[y] = c.list; ONLINE.status.fest = { ok: true, t: c.t, y: y }; }
+    if (c && Date.now() - c.t < 7 * 86400000) return;
+    ONLINE.fest[y] = ONLINE.fest[y] || "cargando";
+    fetchJSON("https://date.nager.at/api/v3/PublicHolidays/" + y + "/ES")
+      .then(function (arr) {
+        var list = arr.filter(function (h) {
+          return (h.global || (h.counties || []).indexOf("ES-MD") !== -1) && (!h.types || h.types.indexOf("Public") !== -1);
+        }).map(function (h) {
+          return { fecha: h.date, nombre: h.localName || h.name, ambito: h.global ? "Nacional" : "Comunidad de Madrid", provisional: true, online: true };
+        });
+        if (!list.length) throw new Error("vacío");
+        ONLINE.fest[y] = list; store(key, { t: Date.now(), list: list });
+        ONLINE.status.fest = { ok: true, t: Date.now(), y: y };
+        refreshCalendarViews();
+      })
+      .catch(function () {
+        if (ONLINE.fest[y] === "cargando") delete ONLINE.fest[y];
+        ONLINE.status.fest = { ok: false, y: y };
+        renderCalStatus();
+      });
+  }
+
+  // Partidos (Real Madrid, Barça, Atlético) y UFC desde TheSportsDB
+  var TSDB = "https://www.thesportsdb.com/api/v1/json/" + ((OL.deportes && OL.deportes.clave) || "123") + "/";
+  function tsdbTeamEvents(team) {
+    var want = teamKeys(team.nombre);
+    function ok(evs) { return evs.filter(function (e) { return teamKeys(e.strEvent + " " + e.strHomeTeam + " " + e.strAwayTeam).indexOf(want) !== -1; }); }
+    function byId(id) { return fetchJSON(TSDB + "eventsnext.php?id=" + id).then(function (d) { return ok((d && d.events) || []); }); }
+    var cachedId = load("equipo:" + team.nombre) || team.id;
+    return byId(cachedId).then(function (evs) {
+      if (evs.length) return evs;
+      // El identificador no devuelve partidos del equipo: se busca por nombre y se guarda el bueno
+      return fetchJSON(TSDB + "searchteams.php?t=" + encodeURIComponent(team.buscar || team.nombre)).then(function (d) {
+        var t = ((d && d.teams) || []).filter(function (x) { return x.strSport === "Soccer" && /spain/i.test(x.strCountry || ""); })[0];
+        if (!t) return [];
+        store("equipo:" + team.nombre, t.idTeam);
+        return byId(t.idTeam);
+      });
+    });
+  }
+  function loadOnlineSports() {
+    var S = OL.deportes;
+    if (!S || !S.activo) return;
+    var c = load("deportes");
+    if (c && c.list) { ONLINE.sport = c.list; ONLINE.status.sport = { ok: true, t: c.t, cache: true }; }
+    if (c && Date.now() - c.t < (S.horasCache || 12) * 3600000) return;
+    var jobs = (S.equipos || []).map(function (tm) {
+      return tsdbTeamEvents(tm).then(function (evs) {
+        return evs.map(function (e) {
+          var w = madridFromUTC(e.dateEvent, e.strTime, e.strTimestamp);
+          return w && { id: e.idEvent, key: w.key, nombre: (e.strHomeTeam || "") + " - " + (e.strAwayTeam || ""), categoria: "Fútbol",
+            nota: [e.strLeague, w.hora ? w.hora + " h" : "hora por confirmar", e.strVenue].filter(Boolean).join(" · ") };
+        }).filter(Boolean);
+      }).catch(function () { return null; });
+    });
+    if (S.ufcLiga) jobs.push(fetchJSON(TSDB + "eventsnextleague.php?id=" + S.ufcLiga).then(function (d) {
+      return ((d && d.events) || []).filter(function (e) { return /ufc/i.test((e.strLeague || "") + (e.strEvent || "")); }).map(function (e) {
+        var w = madridFromUTC(e.dateEvent, e.strTime, e.strTimestamp);
+        return w && { id: e.idEvent, key: w.key, nombre: e.strEvent, categoria: "UFC",
+          nota: [w.hora ? "en España " + w.hora + " h" : "", e.strVenue || e.strCity].filter(Boolean).join(" · ") };
+      }).filter(Boolean);
+    }).catch(function () { return null; }));
+    Promise.all(jobs).then(function (res) {
+      if (res.every(function (r) { return r === null; })) throw new Error("sin respuesta");
+      var seen = {}, list = [];
+      res.forEach(function (r) { (r || []).forEach(function (e) { if (!seen[e.id]) { seen[e.id] = 1; list.push(e); } }); });
+      ONLINE.sport = list; store("deportes", { t: Date.now(), list: list });
+      ONLINE.status.sport = { ok: true, t: Date.now(), n: list.length };
+      refreshCalendarViews();
+    }).catch(function () {
+      ONLINE.status.sport = { ok: false, t: c && c.t };
+      renderCalStatus();
+    });
+  }
+
   var marksCache = {};
   function marksForYear(y) {
     if (marksCache[y]) return marksCache[y];
     var C = CFG.calendario || {}, map = {};
     function add(k, m) { (map[k] = map[k] || []).push(m); }
-    var fest = (C.festivos && C.festivos[y]) || defaultHolidays(y);
+    var official = C.festivos && C.festivos[y], online = Array.isArray(ONLINE.fest[y]) && ONLINE.fest[y];
+    if (!official) loadOnlineHolidays(y);
+    var fest = official || (online ? online.concat(defaultHolidays(y).filter(function (h) { return h.ambito === "Madrid capital"; })) : defaultHolidays(y));
     fest.forEach(function (f) {
-      add(f.fecha, { tipo: "fest", nombre: f.nombre, ambito: f.ambito, provisional: !!f.provisional, estimado: !!f.estimado });
+      add(f.fecha, { tipo: "fest", nombre: f.nombre, ambito: f.ambito, provisional: !!f.provisional, estimado: !!f.estimado, online: !!f.online });
     });
     (CFG.mensajesEspeciales || []).forEach(function (x) {
       if (!x.lista) return;
       var r = ymdOfRule(x, y);
       if (r) add(keyOf(r[0], r[1], r[2]), { tipo: "fam", nombre: x.lista });
     });
+    // Eventos online (fútbol y UFC). Sustituyen a los de config.js del mismo partido o velada (±1 día)
+    var onl = ONLINE.sport || [];
+    function dayNum(k) { var p = k.split("-"); return Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000; }
+    onl.forEach(function (e) {
+      if (+e.key.slice(0, 4) === y) add(e.key, { tipo: "evt", nombre: e.nombre, categoria: e.categoria, nota: e.nota, inicio: true, desde: e.key, online: true });
+    });
+    function coveredOnline(x) {
+      if (x.categoria !== "Fútbol" && x.categoria !== "UFC") return false;
+      var d0 = dayNum(x.fecha), tk = teamKeys(x.nombre);
+      return onl.some(function (e) {
+        if (e.categoria !== x.categoria || Math.abs(dayNum(e.key) - d0) > 1) return false;
+        return x.categoria === "UFC" || teamKeys(e.nombre) === tk;
+      });
+    }
+    // Calendario escolar (rangos)
+    (C.escolar || []).forEach(function (x) {
+      var a = x.fecha.split("-").map(Number), b = (x.hasta || x.fecha).split("-").map(Number);
+      for (var tt = Date.UTC(a[0], a[1] - 1, a[2]), t1 = Date.UTC(b[0], b[1] - 1, b[2]); tt <= t1; tt += 86400000) {
+        var dd = new Date(tt);
+        if (dd.getUTCFullYear() === y) add(keyOf(y, dd.getUTCMonth() + 1, dd.getUTCDate()),
+          { tipo: "esc", nombre: x.nombre, inicio: tt === Date.UTC(a[0], a[1] - 1, a[2]), desde: x.fecha, hasta: x.hasta, nota: x.nota });
+      }
+    });
     // Eventos con fecha concreta (pueden durar varios días con "hasta")
     (C.eventos || []).forEach(function (x) {
+      if (coveredOnline(x)) return;
       var a = x.fecha.split("-").map(Number), b = (x.hasta || x.fecha).split("-").map(Number);
       var t0 = Date.UTC(a[0], a[1] - 1, a[2]), t1 = Date.UTC(b[0], b[1] - 1, b[2]);
       for (var t = t0; t <= t1; t += 86400000) {
@@ -721,7 +899,7 @@
       var dup = (map[k] || []).some(function (m) { return m.tipo === "fest" && m.nombre.indexOf(x.nombre) === 0; });
       if (!dup) add(k, { tipo: "sen", nombre: x.nombre });
     });
-    var order = { fest: 0, fam: 1, evt: 2, sen: 3 };
+    var order = { fest: 0, fam: 1, esc: 2, evt: 3, sen: 4 };
     Object.keys(map).forEach(function (k) { map[k].sort(function (a, b) { return order[a.tipo] - order[b.tipo]; }); });
     return (marksCache[y] = map);
   }
@@ -731,18 +909,19 @@
   /* ---------- Calendario mensual ---------- */
   var calY, calM, calSel;
   var MONTHS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
-  function tagOf(m) { return m.tipo === "fest" ? "Fest" : m.tipo === "fam" ? "Fam" : m.tipo === "evt" ? "Evt" : "Dia"; }
-  function tagText(tag) { return tag === "Dia" ? "Día" : tag; }
+  function tagOf(m) { return m.tipo === "fest" ? "Fest" : m.tipo === "fam" ? "Fam" : m.tipo === "evt" ? "Evt" : m.tipo === "esc" ? "Esc" : "Dia"; }
+  function tagText(tag) { return tag === "Dia" ? "Día" : tag === "Esc" ? "Cole" : tag; }
   function shortDate(s) {
     var p = s.split("-");
     return new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])));
   }
   function evtMeta(m) {
     return [m.categoria || "Evento", m.hasta ? "del " + shortDate(m.desde) + " al " + shortDate(m.hasta) : "", m.nota || "",
-            m.provisional ? "fecha por confirmar" : ""].filter(Boolean).join(" · ");
+            m.provisional ? "fecha por confirmar" : "", m.online ? "dato online" : ""].filter(Boolean).join(" · ");
   }
   function festMeta(m) {
-    return "Festivo · " + m.ambito + (m.estimado ? " · previsto, sin calendario oficial cargado" : m.provisional ? " · pendiente de aprobación" : "");
+    return "Festivo · " + m.ambito + (m.online ? " · fuente online (Nager.Date), pendiente de confirmar con el BOCM" :
+      m.estimado ? " · previsto, sin calendario oficial cargado" : m.provisional ? " · pendiente de aprobación" : "");
   }
   function renderCalendar() {
     var td = todayYMD(), grid = $("cal-grid");
@@ -760,6 +939,7 @@
       if (f) cls += " fest" + (f.provisional ? " prov" : "");
       if (calY === td[0] && calM === td[1] && d === td[2]) { cls += " today"; label += ", hoy"; }
       if (marks.some(function (x) { return x.tipo === "fam"; })) dots += '<i class="d-fam"></i>';
+      if (marks.some(function (x) { return x.tipo === "esc"; })) dots += '<i class="d-esc"></i>';
       if (marks.some(function (x) { return x.tipo === "evt"; })) dots += '<i class="d-evt"></i>';
       if (marks.some(function (x) { return x.tipo === "sen"; })) dots += '<i class="d-sen"></i>';
       if (marks.length) label += ": " + marks.map(function (x) { return x.nombre; }).join(", ");
@@ -783,7 +963,7 @@
         li.innerHTML = '<span class="tag ' + tag + '">' + tagText(tag) + '</span><span><span class="nm"></span><span class="meta"></span></span>';
         li.querySelector(".nm").textContent = m.nombre;
         li.querySelector(".meta").textContent = m.tipo === "fest" ? festMeta(m) : m.tipo === "fam" ? "Familia" :
-          m.tipo === "evt" ? evtMeta(m) : "Día señalado";
+          m.tipo === "evt" ? evtMeta(m) : m.tipo === "esc" ? ["Calendario escolar", m.hasta ? "del " + shortDate(m.desde) + " al " + shortDate(m.hasta) : "", m.nota || ""].filter(Boolean).join(" · ") : "Día señalado";
         ul.appendChild(li);
       });
       box.appendChild(ul);
@@ -799,6 +979,26 @@
       box.appendChild(p);
     }
   }
+  // Avisos de datos caducados o a punto de caducar + estado de las fuentes online
+  function renderCalStatus() {
+    var C = CFG.calendario || {}, td = todayYMD(), y = td[0], warn = [], info = [];
+    var F = C.festivos || {};
+    if (!F[y]) warn.push("Faltan los festivos oficiales de " + y + " en config.js.");
+    if (td[1] >= 10 && !F[y + 1]) warn.push("Ya suele estar publicado el calendario laboral de " + (y + 1) + " (BOCM): añádelo a config.js.");
+    var todayK = keyOf(td[0], td[1], td[2]);
+    var escFuture = (C.escolar || []).some(function (x) { return (x.hasta || x.fecha) >= todayK; });
+    if (!escFuture) warn.push("Falta el calendario escolar del curso siguiente en config.js.");
+    var staticFuture = (C.eventos || []).some(function (x) { return (x.hasta || x.fecha) >= todayK && x.categoria !== "UFC" && x.categoria !== "Fútbol"; });
+    if (!staticFuture) warn.push("No quedan eventos de Madrid futuros en config.js.");
+    var st = ONLINE.status;
+    if (st.sport) info.push(st.sport.ok ? "Partidos y UFC online " + (st.sport.t ? ago(st.sport.t) : "") :
+      "Sin conexión con la fuente de partidos" + (st.sport.t ? ": se usa la copia de " + ago(st.sport.t).replace("hace ", "hace ") : ": se usan los de config.js"));
+    if (st.fest) info.push(st.fest.ok ? "Festivos " + st.fest.y + " desde fuente online" : "Sin conexión con la fuente de festivos " + st.fest.y);
+    var w = $("cal-warn"), s = $("cal-status");
+    w.hidden = !warn.length; w.textContent = warn.join(" ");
+    s.textContent = info.join(" · ");
+  }
+
   function goMonth(y, m, sel) {
     calY = y; calM = m;
     var td = todayYMD();
@@ -818,15 +1018,17 @@
     });
     renderCalDetail();
   });
-  function renderCalendarToday() { var td = todayYMD(); marksCache = {}; goMonth(td[0], td[1]); }
+  // Primero se carga la copia guardada de partidos (si la hay), luego se pinta y, si toca, se actualiza online
+  function renderCalendarToday() { var td = todayYMD(); loadOnlineSports(); marksCache = {}; goMonth(td[0], td[1]); renderCalStatus(); }
 
   /* ---------- Próximas fechas (misma fuente que el calendario) ---------- */
   function renderDates() {
-    var td = todayYMD(), items = [], max = CFG.mostrarFechas || 12;
+    var td = todayYMD(), items = [], max = CFG.mostrarFechas || 12, excl = CFG.proximasFechasExcluir || [];
     for (var k = 0; k < 400 && items.length < max; k++) {
       var r = shiftDays(td[0], td[1], td[2], k);
       marksOn(r[0], r[1], r[2]).forEach(function (m) {
-        if (m.tipo === "evt" && !m.inicio && k > 0) return;      // un evento de varios días aparece una vez
+        if ((m.tipo === "evt" || m.tipo === "esc") && !m.inicio && k > 0) return;      // un rango aparece una vez
+        if (m.tipo === "evt" && excl.indexOf(m.categoria) !== -1) return;              // fútbol y UFC solo en el calendario
         items.push({ r: r, k: k, m: m });
       });
     }
@@ -842,7 +1044,7 @@
       li.innerHTML = '<span class="tag ' + tag + '">' + tagText(tag) + '</span><span class="d-txt"><span class="d-name"></span><span class="d-when"></span></span>';
       li.querySelector(".d-name").textContent = x.m.nombre + (x.m.provisional ? " (por confirmar)" : "");
       li.querySelector(".d-when").textContent = dfmt.format(new Date(Date.UTC(x.r[0], x.r[1] - 1, x.r[2]))) + " · " +
-        (x.k === 0 ? (x.m.tipo === "evt" && !x.m.inicio ? "en curso" : "hoy") : x.k === 1 ? "mañana" : "en " + x.k + " días");
+        (x.k === 0 ? (x.m.desde && !x.m.inicio ? "en curso" : "hoy") : x.k === 1 ? "mañana" : "en " + x.k + " días");
       ul.appendChild(li);
     });
   }
@@ -934,10 +1136,12 @@
   function renderExpr() {
     var E = window.EXPRESIONES, card = $("expr-card");
     if (!E) { card.hidden = true; return; }
-    // Todas las listas mezcladas por turnos (una de cada bloque), así cada día sale variado
+    // Todas las listas mezcladas por turnos (una de cada bloque), así cada día sale variado.
+    // Las marcadas como aprendidas salen de la rotación (se guardan en este navegador).
+    var learned = load("aprendidas") || {}, total = 0;
     var groups = Object.keys(E).map(function (k) { return E[k] || []; }), list = [];
     var longest = Math.max.apply(null, groups.map(function (g) { return g.length; }));
-    for (var i = 0; i < longest; i++) groups.forEach(function (g) { if (g[i]) list.push(g[i]); });
+    for (var i = 0; i < longest; i++) groups.forEach(function (g) { if (g[i]) { total++; if (!learned[g[i].en]) list.push(g[i]); } });
     if (!list.length) { card.hidden = true; return; }
     $("expr-title").textContent = "Expresiones útiles";
     var ul = $("expr-list"), today = dailySlice(list, CFG.palabrasPorDia || 20), rows = Math.ceil(today.length / 2);
@@ -946,13 +1150,44 @@
     today.forEach(function (w, i) {
       var li = document.createElement("li");
       if (i === 0 || i === rows) li.className = "col-top";
-      li.innerHTML = '<span class="x-en"></span><span class="x-es"></span>';
+      li.innerHTML = '<span class="x-en"></span><span class="x-es"></span><button type="button" class="x-chk" aria-label="Marcar como aprendida">✓</button>';
       li.children[0].textContent = w.en;
       li.children[1].textContent = w.es;
+      li.dataset.en = w.en;
       ul.appendChild(li);
     });
+    var nL = Object.keys(learned).length;
+    $("expr-count").textContent = nL ? "Aprendidas: " + nL + " de " + total + "." : "Marca con el círculo las que ya sepas: dejarán de salir.";
+    $("expr-reset").hidden = !nL;
     card.hidden = false;
   }
+
+  // Modo repaso: oculta traducciones; tocar una fila la muestra. El círculo marca/desmarca como aprendida.
+  (function () {
+    var btn = $("expr-mode"), ul = $("expr-list");
+    function setMode(on) { btn.setAttribute("aria-pressed", String(on)); ul.classList.toggle("repaso", on); store("repaso", on); }
+    setMode(!!load("repaso"));
+    btn.addEventListener("click", function () { setMode(btn.getAttribute("aria-pressed") !== "true"); });
+    ul.addEventListener("click", function (e) {
+      var li = e.target.closest("li");
+      if (!li) return;
+      if (e.target.closest(".x-chk")) {
+        var L = load("aprendidas") || {};
+        if (L[li.dataset.en]) delete L[li.dataset.en]; else L[li.dataset.en] = Date.now();
+        store("aprendidas", L);
+        li.classList.toggle("learned", !!L[li.dataset.en]);
+        var n = Object.keys(L).length;
+        $("expr-count").textContent = n ? "Aprendidas: " + n + ". Desde mañana ya no saldrán." : "";
+        $("expr-reset").hidden = !n;
+        return;
+      }
+      if (ul.classList.contains("repaso")) li.classList.toggle("show");
+    });
+    $("expr-reset").addEventListener("click", function () {
+      if (!window.confirm("¿Volver a incluir todas las expresiones marcadas como aprendidas?")) return;
+      store("aprendidas", {}); renderExpr();
+    });
+  })();
 
   /* ---------- Cuenta atrás a fechas significativas (máximo 1 año) ---------- */
   // Medianoche (inicio del día) de una fecha en una zona horaria, como instante absoluto

@@ -4,9 +4,9 @@ Página de inicio estática. Orden en pantalla:
 
 1. Frase del día y hora en Madrid.
 2. Tiempo en Madrid: hoy (máxima, mínima y resumen), hoy hora a hora y los 6 días siguientes desde mañana (3 columnas x 2 filas).
-3. Calendario mensual con festivos, cumpleaños, eventos (fútbol, UFC, Madrid) y días señalados; al tocar un día muestra lo marcado y el santoral.
+3. Calendario mensual con festivos, cumpleaños, calendario escolar, eventos (fútbol, UFC, Madrid) y días señalados; al tocar un día muestra lo marcado y el santoral. Avisa solo si falta algún dato.
 4. Próximas fechas: 12 en 2 columnas (sale de los mismos datos que el calendario).
-5. Expresiones útiles en inglés: 20 al día (2 columnas de 10) de un total de 2.000.
+5. Expresiones útiles en inglés: 20 al día (2 columnas de 10) de un total de 2.000, con modo repaso y marcado de aprendidas.
 6. Conversor de unidades.
 7. Cuenta atrás compacta (6 próximos eventos).
 
@@ -21,22 +21,33 @@ Página de inicio estática. Orden en pantalla:
 
 Sube los cuatro archivos. Si falta `palabras.js` o `santoral.js`, la página carga igual pero sin expresiones o sin santoral, y no avisa.
 
-## Mantenimiento anual (importante)
+## Qué se actualiza solo y qué no
 
-Los festivos oficiales están cargados para **2026 y 2027** en `config.js` > `calendario.festivos`:
+| Dato | Fuente | Si falla |
+|---|---|---|
+| Tiempo | Open-Meteo, cada vez que se abre | Muestra la última previsión guardada en el navegador ("Sin conexión: previsión guardada hace X") |
+| Partidos de Real Madrid, Barça y Atlético | TheSportsDB (gratuita), cada 12 h | Usa la última copia guardada; si no hay, los partidos de `config.js` |
+| Veladas UFC | TheSportsDB, cada 12 h | Igual que los partidos |
+| Festivos de un año sin datos oficiales en `config.js` | Nager.Date (nacionales + Comunidad de Madrid) | Festivos habituales calculados, marcados como "previstos" |
+| Festivos locales de Madrid capital | Solo `config.js` | Se marcan como "previstos" |
+| Calendario escolar | Solo `config.js` | Aviso en el calendario |
+| Eventos de Madrid (maratón, tenis…) | Solo `config.js` | Aviso en el calendario cuando no queden futuros |
 
-- 2026: Decreto 75/2025 (BOCM 25/09/2025) y festivos locales del Ayuntamiento de Madrid.
-- 2027: Decreto 82/2026 (BOCM 01/10/2026). San Isidro y la Almudena están marcados como pendientes hasta que el Ayuntamiento apruebe los festivos locales de 2027. Cuando se publiquen, quita `provisional: true` o corrige la fecha.
+Los partidos y la UFC salen solo en el calendario, no en "Próximas fechas" (`proximasFechasExcluir` en `config.js`).
 
-Para años sin calendario cargado, la página marca los festivos habituales como "previstos" (borde rojo, sin relleno). Cada otoño, cuando la Comunidad de Madrid publique el calendario del año siguiente, añade un bloque `"2028": [ ... ]` copiando el formato de 2027.
+Los datos online, las expresiones aprendidas y el modo repaso se guardan en el navegador de cada dispositivo: no se comparten entre el móvil y el ordenador.
 
-### Eventos (fútbol, UFC, Madrid)
+## Mantenimiento (la página avisa sola)
 
-Están en `config.js` > `calendario.eventos`, con fecha fija. Revísalos cada mes:
+El calendario muestra un aviso rojo cuando:
 
-- Fútbol: LaLiga confirma día y hora unas semanas antes. Los partidos llevan `provisional: true` hasta entonces (salen como "por confirmar").
-- UFC: los carteles cambian a menudo. Los eventos en EE. UU. o Canadá se ven en España de madrugada del domingo.
-- Para añadir uno: `{ fecha: "2027-03-14", nombre: "…", categoria: "Fútbol", nota: "…" },`
+- Falta el calendario laboral del año en curso, o es octubre o más tarde y falta el del año siguiente (la Comunidad de Madrid lo publica a finales de septiembre o principios de octubre).
+- No hay calendario escolar para el curso siguiente (se publica en primavera-verano).
+- No quedan eventos de Madrid futuros en `config.js`.
+
+Además hay dos recordatorios en el calendario: 15 de junio (calendario escolar) y 5 de octubre (festivos).
+
+Festivos cargados: **2026** (Decreto 75/2025) y **2027** (Decreto 82/2026; San Isidro y la Almudena pendientes del Ayuntamiento). Para añadir 2028, copia el bloque `"2027": [ ... ]` y cambia las fechas.
 
 ## Publicar en GitHub Pages
 
@@ -62,6 +73,9 @@ Edita `config.js` en GitHub (icono del lápiz).
 ## Fuentes de datos
 
 - Tiempo: Open-Meteo (sin clave, gratuito para uso no comercial).
+- Partidos y UFC: TheSportsDB (clave gratuita 123).
+- Festivos de años sin datos oficiales: Nager.Date.
+- Calendario escolar: BOCM, curso 2026-2027.
 - Festivos: BOCM y Ayuntamiento de Madrid.
 - Eventos: calendarios oficiales de LaLiga, UEFA, UFC, Mutua Madrid Open y Maratón de Madrid (a 7 de octubre de 2026).
 - Santoral: orientativo, según el calendario católico y la tradición española; puede variar entre calendarios.
