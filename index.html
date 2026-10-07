@@ -198,6 +198,7 @@
   .cal-dots i { width: 6px; height: 6px; border-radius: 50%; display: block; }
   .d-fam { background: var(--ok); }
   .d-sen { background: var(--oh-gold); }
+  .d-evt { background: #3c6fd1; }
   .cal-day.fest .d-fam { background: #ffffff; }
   .cal-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 10px 0 0; font-size: 0.78rem; color: var(--muted); }
   .cal-legend span { display: inline-flex; align-items: center; gap: 5px; }
@@ -262,7 +263,7 @@
     grid-template-columns: 1fr 1fr; grid-template-rows: repeat(6, auto); grid-auto-flow: column; gap: 0 14px;
   }
   .xlist li { padding: 5px 0; border-top: 1px solid var(--line); min-width: 0; line-height: 1.25; }
-  .xlist li:nth-child(6n+1) { border-top: 0; }
+  .xlist li.col-top { border-top: 0; }
   .x-en { display: block; font-weight: 700; font-size: 0.92rem; }
   .x-es { display: block; color: var(--muted); font-size: 0.8rem; }
   @media (max-width: 520px) { .xlist { gap: 0 10px; } .x-en { font-size: 0.85rem; } .x-es { font-size: 0.75rem; } }
@@ -285,6 +286,16 @@
   .tag.Fest { background: var(--es-red); }
   .tag.Dia { background: var(--muted); }
   .tag.Fam { background: var(--ok); }
+  .tag.Evt { background: var(--deep-blue); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tag.Evt { background: #3c6fd1; } }
+  .dlist { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: column; gap: 0 14px; }
+  .dlist li { display: flex; gap: 8px; align-items: flex-start; padding: 6px 0; border-top: 1px solid var(--line); min-width: 0; }
+  .dlist li.col-top { border-top: 0; }
+  .dlist .tag { margin-top: 1px; flex: none; }
+  .d-txt { min-width: 0; line-height: 1.25; }
+  .d-name { display: block; font-weight: 600; font-size: 0.9rem; overflow-wrap: anywhere; }
+  .d-when { display: block; font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  @media (max-width: 520px) { .dlist { gap: 0 10px; } .d-name { font-size: 0.82rem; } .dlist .tag { font-size: 0.66rem; padding: 2px 5px; min-width: 0; } }
   .when { text-align: right; font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
   footer { margin-top: 24px; text-align: center; font-size: 0.8rem; color: var(--muted); }
@@ -339,6 +350,7 @@
       <span><i class="sw prov"></i>Festivo previsto</span>
       <span><i class="sw dot d-fam"></i>Familia</span>
       <span><i class="sw dot d-sen"></i>Día señalado</span>
+      <span><i class="sw dot d-evt"></i>Evento</span>
     </div>
     <div class="cal-detail" id="cal-detail" aria-live="polite"></div>
   </section>
@@ -346,7 +358,7 @@
   <!-- Fechas -->
   <section class="card" aria-labelledby="dates-title">
     <h2 id="dates-title">Próximas fechas</h2>
-    <ul class="list" id="dates"></ul>
+    <ul class="dlist" id="dates"></ul>
   </section>
 
   <!-- Expresiones útiles de la época del año -->
@@ -690,6 +702,17 @@
       var r = ymdOfRule(x, y);
       if (r) add(keyOf(r[0], r[1], r[2]), { tipo: "fam", nombre: x.lista });
     });
+    // Eventos con fecha concreta (pueden durar varios días con "hasta")
+    (C.eventos || []).forEach(function (x) {
+      var a = x.fecha.split("-").map(Number), b = (x.hasta || x.fecha).split("-").map(Number);
+      var t0 = Date.UTC(a[0], a[1] - 1, a[2]), t1 = Date.UTC(b[0], b[1] - 1, b[2]);
+      for (var t = t0; t <= t1; t += 86400000) {
+        var d = new Date(t);
+        if (d.getUTCFullYear() !== y) continue;
+        add(keyOf(y, d.getUTCMonth() + 1, d.getUTCDate()), { tipo: "evt", nombre: x.nombre, categoria: x.categoria, nota: x.nota,
+          inicio: t === t0, desde: x.fecha, hasta: x.hasta, provisional: !!x.provisional });
+      }
+    });
     (C.senalados || []).forEach(function (x) {
       var r = ymdOfRule(x, y);
       if (!r || r[0] !== y) return;
@@ -698,7 +721,7 @@
       var dup = (map[k] || []).some(function (m) { return m.tipo === "fest" && m.nombre.indexOf(x.nombre) === 0; });
       if (!dup) add(k, { tipo: "sen", nombre: x.nombre });
     });
-    var order = { fest: 0, fam: 1, sen: 2 };
+    var order = { fest: 0, fam: 1, evt: 2, sen: 3 };
     Object.keys(map).forEach(function (k) { map[k].sort(function (a, b) { return order[a.tipo] - order[b.tipo]; }); });
     return (marksCache[y] = map);
   }
@@ -708,6 +731,16 @@
   /* ---------- Calendario mensual ---------- */
   var calY, calM, calSel;
   var MONTHS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  function tagOf(m) { return m.tipo === "fest" ? "Fest" : m.tipo === "fam" ? "Fam" : m.tipo === "evt" ? "Evt" : "Dia"; }
+  function tagText(tag) { return tag === "Dia" ? "Día" : tag; }
+  function shortDate(s) {
+    var p = s.split("-");
+    return new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])));
+  }
+  function evtMeta(m) {
+    return [m.categoria || "Evento", m.hasta ? "del " + shortDate(m.desde) + " al " + shortDate(m.hasta) : "", m.nota || "",
+            m.provisional ? "fecha por confirmar" : ""].filter(Boolean).join(" · ");
+  }
   function festMeta(m) {
     return "Festivo · " + m.ambito + (m.estimado ? " · previsto, sin calendario oficial cargado" : m.provisional ? " · pendiente de aprobación" : "");
   }
@@ -727,6 +760,7 @@
       if (f) cls += " fest" + (f.provisional ? " prov" : "");
       if (calY === td[0] && calM === td[1] && d === td[2]) { cls += " today"; label += ", hoy"; }
       if (marks.some(function (x) { return x.tipo === "fam"; })) dots += '<i class="d-fam"></i>';
+      if (marks.some(function (x) { return x.tipo === "evt"; })) dots += '<i class="d-evt"></i>';
       if (marks.some(function (x) { return x.tipo === "sen"; })) dots += '<i class="d-sen"></i>';
       if (marks.length) label += ": " + marks.map(function (x) { return x.nombre; }).join(", ");
       html += '<button type="button" class="' + cls + '" data-d="' + d + '" aria-pressed="' + (d === calSel) + '" aria-label="' +
@@ -745,10 +779,11 @@
       var ul = document.createElement("ul");
       ul.className = "cal-marks";
       marks.forEach(function (m) {
-        var li = document.createElement("li"), tag = m.tipo === "fest" ? "Fest" : m.tipo === "fam" ? "Fam" : "Dia";
-        li.innerHTML = '<span class="tag ' + tag + '">' + (tag === "Dia" ? "Día" : tag) + '</span><span><span class="nm"></span><span class="meta"></span></span>';
+        var li = document.createElement("li"), tag = tagOf(m);
+        li.innerHTML = '<span class="tag ' + tag + '">' + tagText(tag) + '</span><span><span class="nm"></span><span class="meta"></span></span>';
         li.querySelector(".nm").textContent = m.nombre;
-        li.querySelector(".meta").textContent = m.tipo === "fest" ? festMeta(m) : m.tipo === "fam" ? "Familia" : "Día señalado";
+        li.querySelector(".meta").textContent = m.tipo === "fest" ? festMeta(m) : m.tipo === "fam" ? "Familia" :
+          m.tipo === "evt" ? evtMeta(m) : "Día señalado";
         ul.appendChild(li);
       });
       box.appendChild(ul);
@@ -787,25 +822,27 @@
 
   /* ---------- Próximas fechas (misma fuente que el calendario) ---------- */
   function renderDates() {
-    var td = todayYMD(), items = [], max = CFG.mostrarFechas || 6;
+    var td = todayYMD(), items = [], max = CFG.mostrarFechas || 12;
     for (var k = 0; k < 400 && items.length < max; k++) {
       var r = shiftDays(td[0], td[1], td[2], k);
-      marksOn(r[0], r[1], r[2]).forEach(function (m) { items.push({ r: r, k: k, m: m }); });
+      marksOn(r[0], r[1], r[2]).forEach(function (m) {
+        if (m.tipo === "evt" && !m.inicio && k > 0) return;      // un evento de varios días aparece una vez
+        items.push({ r: r, k: k, m: m });
+      });
     }
     items = items.slice(0, max);
-    var ul = $("dates");
+    var ul = $("dates"), rows = Math.ceil(items.length / 2);
     ul.innerHTML = "";
-    if (!items.length) {
-      ul.innerHTML = '<li><span></span><span class="muted">No hay fechas próximas.</span><span></span></li>';
-      return;
-    }
+    ul.style.gridTemplateRows = "repeat(" + Math.max(rows, 1) + ", auto)";
+    if (!items.length) { ul.innerHTML = '<li class="col-top"><span class="muted">No hay fechas próximas.</span></li>'; return; }
     var dfmt = new Intl.DateTimeFormat("es-ES", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
-    items.forEach(function (x) {
-      var li = document.createElement("li"), tag = x.m.tipo === "fest" ? "Fest" : x.m.tipo === "fam" ? "Fam" : "Dia";
-      li.innerHTML = '<span class="tag ' + tag + '">' + (tag === "Dia" ? "Día" : tag) + "</span><span></span>" +
-        '<span class="when">' + dfmt.format(new Date(Date.UTC(x.r[0], x.r[1] - 1, x.r[2]))) + "<br>" +
-        (x.k === 0 ? "hoy" : x.k === 1 ? "mañana" : "en " + x.k + " días") + "</span>";
-      li.children[1].textContent = x.m.nombre + (x.m.tipo === "fest" && x.m.provisional ? " (previsto)" : "");
+    items.forEach(function (x, i) {
+      var li = document.createElement("li"), tag = tagOf(x.m);
+      if (i === 0 || i === rows) li.className = "col-top";
+      li.innerHTML = '<span class="tag ' + tag + '">' + tagText(tag) + '</span><span class="d-txt"><span class="d-name"></span><span class="d-when"></span></span>';
+      li.querySelector(".d-name").textContent = x.m.nombre + (x.m.provisional ? " (por confirmar)" : "");
+      li.querySelector(".d-when").textContent = dfmt.format(new Date(Date.UTC(x.r[0], x.r[1] - 1, x.r[2]))) + " · " +
+        (x.k === 0 ? (x.m.tipo === "evt" && !x.m.inicio ? "en curso" : "hoy") : x.k === 1 ? "mañana" : "en " + x.k + " días");
       ul.appendChild(li);
     });
   }
@@ -903,10 +940,12 @@
     for (var i = 0; i < longest; i++) groups.forEach(function (g) { if (g[i]) list.push(g[i]); });
     if (!list.length) { card.hidden = true; return; }
     $("expr-title").textContent = "Expresiones útiles";
-    var ul = $("expr-list");
+    var ul = $("expr-list"), today = dailySlice(list, CFG.palabrasPorDia || 20), rows = Math.ceil(today.length / 2);
     ul.innerHTML = "";
-    dailySlice(list, CFG.palabrasPorDia || 12).forEach(function (w) {
+    ul.style.gridTemplateRows = "repeat(" + rows + ", auto)";
+    today.forEach(function (w, i) {
       var li = document.createElement("li");
+      if (i === 0 || i === rows) li.className = "col-top";
       li.innerHTML = '<span class="x-en"></span><span class="x-es"></span>';
       li.children[0].textContent = w.en;
       li.children[1].textContent = w.es;

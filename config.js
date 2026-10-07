@@ -40,9 +40,9 @@ window.CONFIG = {
   cuentaAtras: { maxEventos: 6, maxDias: 365 },
 
   /* ---------- Expresiones útiles ----------
-     Cuántas se muestran cada día (2 columnas de 6). Rotan solas a medianoche de Madrid.
-     La lista está en palabras.js: las 500 se mezclan, sin depender de la estación. */
-  palabrasPorDia: 12,
+     Cuántas se muestran cada día (2 columnas de 10). Rotan solas a medianoche de Madrid.
+     La lista está en palabras.js: 2.000 en bloques temáticos, se mezclan un poco de cada uno. */
+  palabrasPorDia: 20,
 
   /* ---------- Tiempo (una tarjeta por lugar) ----------
      Hoy hora a hora + los "dias" siguientes a partir de mañana (de 1 a 15). */
@@ -73,8 +73,12 @@ window.CONFIG = {
      senalados: días clave que no son festivos.
        fecha: "MM-DD" (cada año) · regla: { mes, diaSemana, orden, desplazamiento }
        pascua: días respecto al Domingo de Resurrección (-47 = martes de Carnaval)
+     eventos: citas con fecha concreta de un año (deporte, Madrid, cultura).
+       fecha y, si dura varios días, hasta: "AAAA-MM-DD" · categoria · nota
+       provisional: true -> fecha aún sin confirmar del todo.
+       Revisarlos de vez en cuando: el deporte cambia fechas y horarios.
      Los cumpleaños salen de mensajesEspeciales (los que tienen "lista").        */
-  mostrarFechas: 6,
+  mostrarFechas: 12,   // 2 columnas de 6
   calendario: {
     festivos: {
       // Decreto 75/2025 (BOCM 25/09/2025) + Ayuntamiento de Madrid (pleno 30/09/2025)
@@ -130,6 +134,9 @@ window.CONFIG = {
       { pascua: 60, nombre: "Corpus Christi" },
       { fecha: "06-23", nombre: "Noche de San Juan" },
       { fecha: "07-01", nombre: "Empiezan las rebajas de verano" },
+      { fecha: "08-07", nombre: "Verbena de San Cayetano" },
+      { fecha: "08-10", nombre: "Verbena de San Lorenzo" },
+      { fecha: "08-15", nombre: "Fiestas de la Virgen de la Paloma" },
       { regla: { mes: 10, diaSemana: 0, orden: -1 }, nombre: "Cambio de hora: a las 3:00 serán las 2:00" },
       { fecha: "10-31", nombre: "Halloween" },
       { fecha: "11-01", nombre: "Todos los Santos" },
@@ -138,7 +145,30 @@ window.CONFIG = {
       { fecha: "12-22", nombre: "Sorteo de la Lotería de Navidad" },
       { fecha: "12-24", nombre: "Nochebuena" },
       { fecha: "12-28", nombre: "Día de los Santos Inocentes" },
-      { fecha: "12-31", nombre: "Nochevieja" }
+      { fecha: "12-31", nombre: "Nochevieja" },
+      { fecha: "12-31", nombre: "San Silvestre Vallecana" }
+    ],
+    eventos: [
+      // UFC (fuente: calendario oficial publicado a 7 oct 2026). Eventos en EE. UU./Canadá: en España, madrugada del domingo.
+      { fecha: "2026-10-10", nombre: "UFC Fight Night: Allen vs. Duncan", categoria: "UFC", nota: "Las Vegas · madrugada del domingo en España" },
+      { fecha: "2026-10-17", nombre: "UFC Fight Night: Buckley vs. Malott", categoria: "UFC", nota: "Edmonton · madrugada del domingo en España" },
+      { fecha: "2026-10-24", nombre: "UFC 333: Volkanovski vs. Evloev", categoria: "UFC", nota: "Abu Dabi · título pluma" },
+      { fecha: "2026-10-31", nombre: "UFC Fight Night: Moicano vs. Nolan", categoria: "UFC", nota: "Las Vegas · madrugada del domingo en España" },
+      { fecha: "2026-11-07", nombre: "UFC Fight Night: Bonfim vs. Brady", categoria: "UFC", nota: "Las Vegas · madrugada del domingo en España" },
+      { fecha: "2026-11-14", nombre: "UFC 334: Gane vs. Hokit", categoria: "UFC", nota: "Madison Square Garden, Nueva York · título pesado" },
+      { fecha: "2026-11-21", nombre: "UFC Fight Night: Prochazka vs. Stirling", categoria: "UFC", nota: "Doha" },
+      { fecha: "2026-12-12", nombre: "UFC 335: Oliveira vs. Lopes", categoria: "UFC", nota: "Las Vegas · madrugada del domingo en España" },
+      // Fútbol: LaLiga fija día y hora pocas semanas antes; la fecha es la del fin de semana de la jornada
+      { fecha: "2026-10-25", nombre: "Clásico: Barcelona - Real Madrid", categoria: "Fútbol", nota: "LaLiga, jornada 10 · fin de semana 24-25 oct", provisional: true },
+      { fecha: "2026-11-08", nombre: "Atlético de Madrid - Barcelona", categoria: "Fútbol", nota: "LaLiga, jornada 12", provisional: true },
+      { fecha: "2027-02-07", nombre: "Barcelona - Atlético de Madrid", categoria: "Fútbol", nota: "LaLiga, jornada 23", provisional: true },
+      { fecha: "2027-04-04", nombre: "Derbi: Real Madrid - Atlético de Madrid", categoria: "Fútbol", nota: "LaLiga, jornada 30 · fin de semana 3-4 abr", provisional: true },
+      { fecha: "2027-05-09", nombre: "Clásico: Real Madrid - Barcelona", categoria: "Fútbol", nota: "LaLiga, jornada 35 · fin de semana 8-9 may", provisional: true },
+      { fecha: "2027-05-30", nombre: "Última jornada de LaLiga", categoria: "Fútbol" },
+      { fecha: "2027-06-05", nombre: "Final de la Champions League", categoria: "Fútbol", nota: "Estadio Metropolitano, Madrid" },
+      // Madrid
+      { fecha: "2027-04-19", hasta: "2027-05-02", nombre: "Mutua Madrid Open de tenis", categoria: "Tenis", nota: "Caja Mágica" },
+      { fecha: "2027-04-25", nombre: "Maratón de Madrid", categoria: "Madrid", nota: "Zurich Rock 'n' Roll Running Series · cortes de tráfico en el centro" }
     ]
   }
 };
