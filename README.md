@@ -3,12 +3,12 @@
 Página de inicio estática. Orden en pantalla:
 
 1. Frase del día y hora en Madrid.
-2. Tiempo en Madrid: hoy (máxima, mínima y resumen), hoy hora a hora y los 6 días siguientes desde mañana.
-3. Cuenta atrás (3 próximos eventos).
-4. Expresiones útiles en inglés de la época del año (12 al día, 2 columnas).
-5. Calendario mensual con festivos, cumpleaños y días señalados; al tocar un día muestra lo marcado y el santoral.
-6. Próximas fechas (sale de los mismos datos que el calendario).
-7. Conversor de unidades.
+2. Tiempo en Madrid: hoy (máxima, mínima y resumen), hoy hora a hora y los 6 días siguientes desde mañana (3 columnas x 2 filas).
+3. Calendario mensual con festivos, cumpleaños y días señalados; al tocar un día muestra lo marcado y el santoral.
+4. Próximas fechas (sale de los mismos datos que el calendario).
+5. Expresiones útiles en inglés (12 al día de las 500, mezcladas).
+6. Conversor de unidades.
+7. Cuenta atrás compacta (6 próximos eventos).
 
 ## Archivos
 
@@ -16,7 +16,7 @@ Página de inicio estática. Orden en pantalla:
 |---|---|---|
 | `index.html` | La página | No hace falta |
 | `config.js` | Tiempo, cumpleaños, mensajes, festivos y días señalados | Sí |
-| `palabras.js` | Frases del día y 500 expresiones (125 por estación) | Solo para añadir o quitar expresiones |
+| `palabras.js` | Frases del día y 500 expresiones | Solo para añadir o quitar expresiones |
 | `santoral.js` | Santo de cada día (366 días) | Rara vez |
 
 Sube los cuatro archivos. Si falta `palabras.js` o `santoral.js`, la página carga igual pero sin expresiones o sin santoral, y no avisa.

@@ -269,20 +269,14 @@
 
   /* ---------- Cuenta atrás ---------- */
   .cd-list { list-style: none; margin: 0; padding: 0; }
-  .cd-list li { padding: 12px 0; border-top: 1px solid var(--line); }
+  .cd-list li { padding: 7px 0; border-top: 1px solid var(--line); }
   .cd-list li:first-child { border-top: 0; padding-top: 0; }
-  .cd-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
-  .cd-name { font-weight: 700; }
-  .cd-date { font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
-  .cd-units { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
-  .cd-u { background: var(--paper); border-radius: 8px; padding: 6px 2px; text-align: center; font-variant-numeric: tabular-nums; }
-  .cd-u b { display: block; font-size: 1.15rem; font-weight: 800; line-height: 1.1; }
-  .cd-u i { display: block; font-style: normal; font-size: 0.68rem; color: var(--muted); }
-  .cd-u.zero b { color: var(--muted); font-weight: 600; }
-  .cd-list li:first-child .cd-u { background: var(--oh-accent-bg); }
-  .cd-list li:first-child .cd-u b, .cd-list li:first-child .cd-u.zero b { color: var(--oh-on-accent); }
-  .cd-list li:first-child .cd-u i { color: var(--oh-on-accent); opacity: 0.75; }
-  .cd-today { grid-column: 1 / -1; font-weight: 800; color: var(--es-red); font-size: 1.15rem; }
+  .cd-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .cd-name { font-weight: 700; font-size: 0.9rem; min-width: 0; }
+  .cd-date { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+  .cd-line { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; margin-top: 1px; }
+  .cd-line b { color: var(--ink); font-weight: 700; }
+  .cd-today { font-weight: 800; color: var(--es-red); }
 
   /* ---------- Fechas (estilos) ---------- */
   .list li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--line); }
@@ -331,18 +325,6 @@
   <!-- Tiempo: una tarjeta por cada lugar de "detalles" en config.js -->
   <div id="details"></div>
 
-  <!-- Cuenta atrás a fechas significativas -->
-  <section class="card" id="cd-card" aria-labelledby="cd-title" hidden>
-    <h2 id="cd-title">Cuenta atrás</h2>
-    <ul class="cd-list" id="cd-list"></ul>
-  </section>
-
-  <!-- Expresiones útiles de la época del año -->
-  <section class="card" id="expr-card" aria-labelledby="expr-title" hidden>
-    <h2 id="expr-title">Expresiones útiles</h2>
-    <ul class="xlist" id="expr-list"></ul>
-  </section>
-
   <!-- Calendario -->
   <section class="card" id="cal-card" aria-labelledby="cal-title">
     <h2 id="cal-title">Calendario</h2>
@@ -367,6 +349,12 @@
     <ul class="list" id="dates"></ul>
   </section>
 
+  <!-- Expresiones útiles de la época del año -->
+  <section class="card" id="expr-card" aria-labelledby="expr-title" hidden>
+    <h2 id="expr-title">Expresiones útiles</h2>
+    <ul class="xlist" id="expr-list"></ul>
+  </section>
+
   <!-- Conversor de unidades -->
   <section class="card" aria-labelledby="units-title">
     <h2 id="units-title">Conversor de unidades</h2>
@@ -384,6 +372,12 @@
       </div>
     </div>
     <p class="small muted" id="unit-note"></p>
+  </section>
+
+  <!-- Cuenta atrás a fechas significativas -->
+  <section class="card" id="cd-card" aria-labelledby="cd-title" hidden>
+    <h2 id="cd-title">Cuenta atrás</h2>
+    <ul class="cd-list" id="cd-list"></ul>
   </section>
 
   <footer>
@@ -903,12 +897,12 @@
   function renderExpr() {
     var E = window.EXPRESIONES, card = $("expr-card");
     if (!E) { card.hidden = true; return; }
-    var m = +localParts(tzES).month;
-    var key = m >= 3 && m <= 5 ? "primavera" : m >= 6 && m <= 8 ? "verano" : m >= 9 && m <= 11 ? "otono" : "invierno";
-    var names = { primavera: "primavera", verano: "verano", otono: "otoño", invierno: "invierno" };
-    var list = E[key] || [];
+    // Todas las listas mezcladas por turnos (una de cada bloque), así cada día sale variado
+    var groups = Object.keys(E).map(function (k) { return E[k] || []; }), list = [];
+    var longest = Math.max.apply(null, groups.map(function (g) { return g.length; }));
+    for (var i = 0; i < longest; i++) groups.forEach(function (g) { if (g[i]) list.push(g[i]); });
     if (!list.length) { card.hidden = true; return; }
-    $("expr-title").textContent = "Expresiones útiles de " + names[key];
+    $("expr-title").textContent = "Expresiones útiles";
     var ul = $("expr-list");
     ul.innerHTML = "";
     dailySlice(list, CFG.palabrasPorDia || 12).forEach(function (w) {
@@ -991,7 +985,7 @@
     cdItems.forEach(function (it, i) {
       var li = document.createElement("li");
       li.innerHTML = '<div class="cd-head"><span class="cd-name"></span><span class="cd-date"></span></div>' +
-        '<div class="cd-units" id="cd-' + i + '"></div>';
+        '<div class="cd-line" id="cd-' + i + '"></div>';
       li.querySelector(".cd-name").textContent = it.name;
       li.querySelector(".cd-date").textContent = dfmt.format(new Date(Date.UTC(it.ymd[0], it.ymd[1] - 1, it.ymd[2])));
       ul.appendChild(li);
@@ -1009,12 +1003,10 @@
         el.innerHTML = '<span class="cd-today">¡Es hoy!</span>';
         return;
       }
-      var b = breakdown(now, it.start), html = "";
-      b.forEach(function (v, k) {
-        html += '<span class="cd-u' + (v === 0 && k < 3 ? " zero" : "") + '"><b>' + (k >= 3 ? String(v).padStart(2, "0") : v) +
-                "</b><i>" + CD_LABELS[k][v === 1 ? 0 : 1] + "</i></span>";
-      });
-      el.innerHTML = html;
+      // Formato compacto: "2 meses 1 sem 3 días · 13:05:42" (omite meses/semanas a cero)
+      var b = breakdown(now, it.start), parts = [];
+      for (var k = 0; k < 3; k++) if (b[k] || k === 2) parts.push("<b>" + b[k] + "</b> " + CD_LABELS[k][b[k] === 1 ? 0 : 1]);
+      el.innerHTML = parts.join(" ") + " · " + [b[3], b[4], b[5]].map(function (v) { return String(v).padStart(2, "0"); }).join(":");
     });
     if (rebuild) buildCountdown();
   }

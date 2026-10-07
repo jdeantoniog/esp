@@ -34,14 +34,14 @@ window.CONFIG = {
     { fecha: "12-25", nombre: "Navidad", texto: "¡Feliz Navidad Carlotis! ¡Te quiero cariño!" }
   ],
 
-  /* ---------- Cuenta atrás (debajo de la previsión) ----------
+  /* ---------- Cuenta atrás (al final de la página) ----------
      Muestra las próximas fechas de mensajesEspeciales: como máximo maxEventos,
      y solo si caen dentro de maxDias. */
-  cuentaAtras: { maxEventos: 3, maxDias: 365 },
+  cuentaAtras: { maxEventos: 6, maxDias: 365 },
 
   /* ---------- Expresiones útiles ----------
      Cuántas se muestran cada día (2 columnas de 6). Rotan solas a medianoche de Madrid.
-     La lista está en palabras.js (125 por estación). */
+     La lista está en palabras.js: las 500 se mezclan, sin depender de la estación. */
   palabrasPorDia: 12,
 
   /* ---------- Tiempo (una tarjeta por lugar) ----------
