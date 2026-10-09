@@ -27,15 +27,22 @@ window.CUMPLES = [
   // Junio
   ["06-08", "Clara Blanco"],
   // Julio
+  ["07-03", "Paco"],  
   ["07-07", "Tito"],
   ["07-17", "Sara"],
   ["07-18", "Javier y Nacho"],
   ["07-23", "Mario"],
+  // Agosto
+  ["08-12", "Javier Loeches"], 
   // Septiembre
+  ["09-05", "Nati"],
   ["09-10", "Fernon y Gorka"],
   ["09-27", "Belén"],
   // Octubre
   ["10-03", "Papá y Vero"],
+  ["10-14", "Marta"],
+  ["10-18", "Marina"],
+  ["10-20", "Elisa"],
   // Noviembre
   ["11-04", "Felipe"],
   ["11-14", "Ernesto"],
