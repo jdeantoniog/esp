@@ -1,5 +1,5 @@
 /* =============================================================
-   CONFIGURACIÓN · INICIO (solo España) 
+   CONFIGURACIÓN · INICIO (solo España)
    Edita solo este archivo para cambiar lugares, fechas o textos.
    - Fechas siempre "AAAA-MM-DD" (o "MM-DD" si se repite cada año).
    - Respeta comas y comillas: un error aquí deja la página en blanco.
@@ -14,7 +14,8 @@ window.CONFIG = {
   /* ---------- España ---------- */
   pais: {
     nombre: "España",
-    bandera: "ES",
+    bandera: "ES",                 // se usa para los colores del calendario y del confeti
+    mostrarBandera: false,         // sin bandera en la cabecera
     ciudadReloj: "Madrid",
     zonaHoraria: "Europe/Madrid",
     // Tarjeta fija del tiempo (y de "Sol y aire")

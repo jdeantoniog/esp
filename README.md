@@ -1,11 +1,11 @@
 # Inicio (solo España)
 
-Página de inicio de un solo país (Madrid). Usa el **mismo código** (`index.html`) que el resto de versiones: al no tener bloque `usa` en `config.js`, se muestra con una sola bandera y sin comparaciones.
+Página de inicio de un solo país (Madrid). Usa el **mismo código** (`index.html`) que el resto de versiones: al no tener bloque `usa` en `config.js`, se muestra sin comparaciones con otro país.
 
 ## Orden en pantalla
 
 1. Frase del día (o mensaje especial y aviso de cumpleaños).
-2. Bandera de España con hora, día y tiempo actual de Madrid.
+2. Hora, día y tiempo actual de Madrid (sin bandera; se vuelve a poner con `mostrarBandera: true`).
 3. Tiempo en Madrid (Ciudad Lineal): hoy, hora a hora y 6 días.
 4. **Tiempo en otro lugar**: buscador de municipios de España y ciudades de todo el mundo, y botón **Mi ubicación**. El lugar elegido se recuerda en cada móvil; **Quitar** lo borra.
 5. **Avisos meteorológicos** oficiales de AEMET para Madrid capital (zona "Metropolitana y Henares").

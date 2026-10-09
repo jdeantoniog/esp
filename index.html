@@ -152,6 +152,7 @@
   .gap strong { display: block; color: var(--ink); font-size: 1.1rem; }
   .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: none; }
   /* ---------- Cambio de versión (menú al tocar la bandera del país) ---------- */
+  .flag-btn[hidden], .flag-block[hidden] { display: none; }
   .flag-btn { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 6px; position: relative; }
   .flag-btn .flag-hint { position: absolute; right: 4px; bottom: 4px; width: 22px; height: 22px; border-radius: 50%;
     background: rgba(0,0,0,0.55); color: #ffffff; font-size: 0.8rem; line-height: 22px; text-align: center; }
@@ -996,6 +997,8 @@
   document.documentElement.style.setProperty("--c-pais", P.color || FP.color);
   $("leg-p").textContent = tx("festivoDe", countryName("pais"));
   $("leg-u").textContent = tx("festivoDe", countryName("usa"));
+  // pais.mostrarBandera: false -> sin bandera (queda la hora, el lugar, el día y el tiempo actual)
+  if (P.mostrarBandera === false) $("flag-p-btn").hidden = true;
   if (SOLO) {
     $("flag-u").closest(".flag-block").hidden = true; $("leg-u").parentNode.hidden = true;
     $("gap").hidden = true; $("gap").parentNode.classList.add("n1");
