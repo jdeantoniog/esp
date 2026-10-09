@@ -1,3 +1,5 @@
+> Documento histórico del traspaso (octubre de 2026). La página ya usa el código común: ver README.md.
+
 # Traspaso: página "Inicio" (versión España)
 
 Paquete para continuar el desarrollo en otra conversación y unificarlo con otra versión.

@@ -25,6 +25,8 @@
     --oh-on-accent: #f4c446;     /* texto sobre fondo de acento */
     --oh-accent-bg: #0e0e10;     /* fondo de acento */
     --es-red: #aa151b;
+    --c-pais: #aa151b;          /* se ajusta desde la bandera del país en config.js */
+    --c-usa: #0a3161;
     --es-yellow: #f1bf00;
     --deep-blue: #0a3161;
     --warn: #b31942;
@@ -56,6 +58,7 @@
       --mid: #e0a43a;
       --alert-bg: #3a1a20;
       --cloud: #8590a6;
+      --c-usa: #2f5fa8;
     }
   }
   *, *::before, *::after { box-sizing: inherit; }
@@ -83,40 +86,82 @@
   .small { font-size: 0.85rem; }
   .num { font-variant-numeric: tabular-nums; }
 
-  /* ---------- Reloj ---------- */
-  .clock-block { text-align: center; }
+  /* ---------- Banderas, relojes y tiempo actual ---------- */
+  .flags { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: 12px; }
+  .flag-block { text-align: center; min-width: 0; }
+  .flag {
+    display: block; width: 100%; aspect-ratio: 3 / 2; height: auto;
+    border-radius: 6px; box-shadow: 0 0 0 1px var(--line);
+  }
   .clock {
     font-size: clamp(2rem, 9vw, 3.6rem); font-weight: 800; letter-spacing: -0.03em;
-    line-height: 1; margin-top: 4px; font-variant-numeric: tabular-nums;
+    line-height: 1; margin-top: 12px; font-variant-numeric: tabular-nums;
+    display: flex; justify-content: center; align-items: center; gap: 0.18em;
   }
-  .clock { display: flex; justify-content: center; align-items: center; gap: 0.18em; }
+  .wx-ico { display: inline-flex; width: 0.8em; height: 0.8em; flex: none; }
+  .wx-ico:empty { display: none; }
+  .wx-ico svg { width: 100%; height: 100%; display: block; }
   .clock-place { font-weight: 600; margin-top: 4px; }
   .clock-date { color: var(--muted); font-size: 0.9rem; }
+  .clock-wx {
+    font-size: 0.85rem; font-weight: 600; margin-top: 2px; font-variant-numeric: tabular-nums;
+    line-height: 1.3; min-height: 1.3em;
+  }
+  .gap[hidden] { display: none; }
+  .flags.no-gap { grid-template-columns: 1fr 1fr; gap: 20px; }
+  .flags.n1 { grid-template-columns: minmax(0, 260px); justify-content: center; }
+  /* Tres banderas (país, lugar extra y segundo país) */
+  .flags.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .flags.n3 .clock { font-size: clamp(1.45rem, 7.4vw, 3rem); gap: 0.12em; }
+  .flags.n3 .clock-place { font-size: 0.9rem; }
+  .flags.n3 .clock-date, .flags.n3 .clock-wx { font-size: 0.74rem; }
+  /* Buscador de lugar del tiempo */
+  .place-search { display: flex; gap: 6px; margin: 2px 0 8px; }
+  .place-search input {
+    flex: 1; min-width: 0; font: inherit; font-size: 16px; color: var(--ink); background: var(--paper);
+    border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px;
+  }
+  .place-search input:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .ps-list { list-style: none; margin: 0 0 10px; padding: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .ps-list li + li { border-top: 1px solid var(--line); }
+  .ps-list li.muted, .ps-list li.status { padding: 8px 10px; }
+  .ps-opt { display: block; width: 100%; text-align: left; font: inherit; color: var(--ink); background: var(--paper); border: 0; padding: 8px 10px; cursor: pointer; }
+  .ps-opt b { display: block; }
+  .ps-opt span { font-size: 0.8rem; color: var(--muted); }
+  .ps-msg { margin: 0 0 8px; font-size: 0.85rem; color: var(--muted); }
+  .ps-msg:empty { display: none; }
+  /* Avisos meteorológicos */
+  .alert-zone + .alert-zone { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+  .alert-zone h3 { margin: 0 0 6px; font-size: 0.95rem; }
+  .alert-list { list-style: none; margin: 0; padding: 0; }
+  .alert-list li { display: flex; gap: 8px; align-items: baseline; padding: 4px 0; }
+  .alert-dot { width: 12px; height: 12px; border-radius: 50%; flex: none; transform: translateY(1px); }
+  .alert-dot.amarillo { background: #f2c500; } .alert-dot.naranja { background: #f18b00; } .alert-dot.rojo { background: #e53210; }
+  .alert-when { display: block; font-size: 0.78rem; color: var(--muted); }
+  /* Noticias */
+  .news-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+  .news-tabs[hidden] { display: none; }
+  .news-tabs .chip[aria-pressed="true"] { background: var(--oh-accent-bg); color: var(--oh-on-accent); border-color: var(--oh-accent-bg); }
+  .news-list { list-style: none; margin: 0; padding: 0; }
+  .news-list li { padding: 9px 0; border-top: 1px solid var(--line); }
+  .news-list li:first-child { border-top: 0; }
+  .news-list a { color: var(--ink); text-decoration: none; font-weight: 600; line-height: 1.3; }
+  .news-list a:hover, .news-list a:focus-visible { text-decoration: underline; }
+  .news-meta { display: block; font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+  .gap { align-self: center; color: var(--muted); font-size: 0.85rem; text-align: center; white-space: nowrap; }
+  .gap strong { display: block; color: var(--ink); font-size: 1.1rem; }
   .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: none; }
-  /* ---------- Formularios comunes ---------- */
-  .conv-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; }
-  .field label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
-  .box {
-    display: flex; align-items: baseline; border: 1px solid var(--line);
-    border-radius: 10px; padding: 8px 12px; background: var(--paper);
-  }
-  .box:focus-within { outline: 2px solid var(--focus); outline-offset: 1px; }
-  .sym { font-weight: 700; color: var(--muted); margin-right: 6px; white-space: nowrap; }
-  input, select {
-    width: 100%; min-width: 0; border: 0; background: transparent; color: var(--ink);
-    font: inherit; font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; outline: none;
-  }
-  select {
-    font-size: 1rem; font-weight: 600; border: 1px solid var(--line); border-radius: 10px;
-    padding: 10px 12px; background: var(--paper); -webkit-appearance: none; appearance: none;
-  }
-  select:focus-visible { outline: 2px solid var(--focus); }
-  .equals { font-size: 1.4rem; color: var(--muted); padding-top: 20px; }
+  /* ---------- Cambio de versión (menú al tocar la bandera del país) ---------- */
+  .flag-btn { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 6px; position: relative; }
+  .flag-btn .flag-hint { position: absolute; right: 4px; bottom: 4px; width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(0,0,0,0.55); color: #ffffff; font-size: 0.8rem; line-height: 22px; text-align: center; }
+  .ver-menu { margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .ver-menu[hidden] { display: none; }
+  .ver-opt { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-weight: 700; font-size: 0.9rem; color: var(--ink);
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 6px; cursor: pointer; }
+  .ver-opt svg { width: 30px; height: 20px; border-radius: 3px; box-shadow: 0 0 0 1px var(--line); }
+  .ver-opt[aria-current="true"] { background: var(--oh-accent-bg); color: var(--oh-on-accent); border-color: var(--oh-accent-bg); }
 
-  .chip {
-    font: inherit; font-weight: 600; color: var(--ink); background: var(--paper);
-    border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; cursor: pointer;
-  }
   /* ---------- Conversor: botones en 2 columnas a la izquierda, resultados a la derecha ---------- */
   .conv { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 12px; align-items: start; }
   .conv-btns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
@@ -144,9 +189,29 @@
   .rate.warn { color: var(--warn); font-weight: 600; }
   @media (max-width: 520px) { .conv { gap: 8px; } .conv-btn { font-size: 0.75rem; padding: 8px 2px; } .box input { font-size: 1.15rem; } .box { padding: 6px 8px; } }
 
+  /* ---------- Sol y aire ---------- */
+  .uv-bar { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; }
+  .uv-cell { text-align: center; font-variant-numeric: tabular-nums; }
+  .uv-val { display: block; border-radius: 6px; padding: 8px 0; font-weight: 800; font-size: 1.05rem; color: #ffffff; }
+  .uv-cell.now .uv-val { outline: 2px solid var(--ink); outline-offset: 1px; }
+  .uv-hour { display: block; font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
+  .uv-cell.now .uv-hour { color: var(--ink); font-weight: 700; }
+  .uv0 { background: #3ea72d; } .uv1 { background: #e8c100; color: #1b2233 !important; }
+  .uv2 { background: #f18b00; } .uv3 { background: #e53210; } .uv4 { background: #8e4ab1; }
+  .uv-note { margin: 8px 0 0; }
+  .uv-place + .uv-place { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .uv-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .uv-head strong { font-size: 1rem; }
+  .aq { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.85rem; }
+  .aq.a0 .dot { background: #3ea72d; } .aq.a1 .dot { background: #e8c100; } .aq.a2 .dot { background: #f18b00; }
+  .aq.a3 .dot { background: #e53210; } .aq.a4 .dot { background: #8e4ab1; } .aq.a5 .dot { background: #7e0023; }
+
+  .chip {
+    font: inherit; font-weight: 600; color: var(--ink); background: var(--paper);
+    border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; cursor: pointer;
+  }
 
   /* ---------- Previsión: bloques de temperatura ---------- */
-  .list { list-style: none; margin: 0; padding: 0; }
   .tr { display: flex; align-items: baseline; justify-content: center; gap: 5px; border-radius: 8px; padding: 4px 6px; background: var(--paper); font-variant-numeric: tabular-nums; }
   .tr i { font-style: normal; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
   .tr b { font-size: 1.15rem; font-weight: 800; line-height: 1.1; }
@@ -214,11 +279,15 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-variant-numeric: tabular-nums;
   }
   .cal-day.empty { visibility: hidden; }
-  .cal-day.sun { color: var(--es-red); }
-  .cal-day.fest { background: var(--es-red); color: #ffffff; }
-  .cal-day.fest.prov { background: transparent; color: var(--es-red); box-shadow: inset 0 0 0 2px var(--es-red); }
+  .cal-day.sun { color: var(--c-pais); }
+  .cal-day.fest-p { background: var(--c-pais); color: #ffffff; }
+  .cal-day.fest-u { background: var(--c-usa); color: #ffffff; }
+  .cal-day.fest-p.fest-u { background: linear-gradient(135deg, var(--c-pais) 50%, var(--c-usa) 50%); }
+  .cal-day.prov-p { box-shadow: inset 0 0 0 2px var(--c-pais); }
+  .cal-day.prov-u { box-shadow: inset 0 0 0 2px var(--c-usa); }
+  .cal-day.prov-p.prov-u { box-shadow: inset 0 0 0 2px var(--c-usa), inset 0 0 0 4px var(--c-pais); }
   .cal-day.today { box-shadow: inset 0 0 0 2px var(--ink); }
-  .cal-day.fest.today { box-shadow: inset 0 0 0 2px var(--ink), inset 0 0 0 4px #ffffff; }
+  .cal-day.fest-p.today, .cal-day.fest-u.today { box-shadow: inset 0 0 0 2px var(--ink), inset 0 0 0 4px #ffffff; }
   .cal-day[aria-pressed="true"] { outline: 3px solid var(--focus); outline-offset: 1px; }
   .cal-dots { display: flex; gap: 3px; height: 6px; }
   .cal-dots i { width: 6px; height: 6px; border-radius: 50%; display: block; }
@@ -230,12 +299,13 @@
   .cal-warn { margin: 0 0 10px; padding: 8px 10px; border-radius: 8px; background: var(--alert-bg); color: var(--ink); font-size: 0.82rem; border-left: 4px solid var(--warn); }
   .cal-status { margin: 6px 0 0; font-size: 0.72rem; color: var(--muted); }
   .cal-status:empty { display: none; }
-  .cal-day.fest .d-fam { background: #ffffff; }
+  .cal-day.fest-p .d-fam, .cal-day.fest-u .d-fam { background: #ffffff; }
   .cal-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 10px 0 0; font-size: 0.78rem; color: var(--muted); }
   .cal-legend span { display: inline-flex; align-items: center; gap: 5px; }
   .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
-  .sw.fest { background: var(--es-red); }
-  .sw.prov { box-shadow: inset 0 0 0 2px var(--es-red); }
+  .sw.fest-p { background: var(--c-pais); }
+  .sw.fest-u { background: var(--c-usa); }
+  .sw.prov { box-shadow: inset 0 0 0 2px var(--muted); }
   .sw.dot { border-radius: 50%; width: 8px; height: 8px; }
   .cal-detail { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
   .cal-date { font-weight: 800; margin: 0 0 6px; }
@@ -285,7 +355,7 @@
   .love-es { display: block; }
   .love-es:empty { display: none; }
   .love.special #love-en { font-style: normal; font-weight: 700; font-size: 0.9rem; color: var(--ink); }
-  .love-pre { display: block; font-style: normal; font-weight: 600; color: var(--es-red); margin-top: 4px; }
+  .love-pre { display: block; font-style: normal; font-weight: 600; color: var(--c-pais); margin-top: 4px; }
   .love-pre:empty { display: none; }
 
   /* ---------- Expresiones útiles: 2 columnas x 6 ---------- */
@@ -304,7 +374,7 @@
   .xlist li.learned .x-chk { background: var(--ok); border-color: var(--ok); color: #ffffff; }
   .xlist li.learned .x-en { color: var(--muted); text-decoration: line-through; }
   .repaso .x-es { color: transparent; background: var(--paper); border-radius: 4px; cursor: pointer; user-select: none; }
-  .repaso .x-es::after { content: "toca para ver"; color: var(--muted); font-size: 0.72rem; position: absolute; left: 0; bottom: 5px; }
+  .repaso .x-es::after { content: var(--toca-ver, "toca para ver"); color: var(--muted); font-size: 0.72rem; position: absolute; left: 0; bottom: 5px; }
   .repaso li:not(.show) .x-es { white-space: nowrap; overflow: hidden; height: 1.15em; }
   .repaso li.show .x-es { color: var(--muted); background: transparent; }
   .repaso li.show .x-es::after { content: none; }
@@ -316,14 +386,12 @@
 
 
   /* ---------- Fechas (estilos) ---------- */
-  .list li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--line); }
-  .list li:first-child { border-top: 0; }
   .tag { font-size: 0.75rem; font-weight: 700; border-radius: 6px; padding: 2px 7px; color: #ffffff; min-width: 2.6em; text-align: center; }
-  .tag.Fest { background: var(--es-red); }
+  .tag.Fest { background: var(--c-pais); }
+  .tag.FestU { background: var(--c-usa); }
   .tag.Dia { background: var(--muted); }
   .tag.Fam { background: var(--ok); }
-  .tag.Evt { background: var(--deep-blue); }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tag.Evt { background: #3c6fd1; } }
+  .tag.Evt { background: #3c6fd1; }
   .dlist { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: column; gap: 0 14px; }
   .dlist li { display: flex; gap: 8px; align-items: flex-start; padding: 6px 0; border-top: 1px solid var(--line); min-width: 0; }
   .dlist li.col-top { border-top: 0; }
@@ -331,10 +399,9 @@
   .d-txt { min-width: 0; line-height: 1.25; }
   .d-name { display: block; font-weight: 600; font-size: 0.9rem; overflow-wrap: anywhere; }
   .d-cd { display: block; font-size: 0.75rem; font-variant-numeric: tabular-nums; color: var(--ink); }
-  .d-cd.today { color: var(--es-red); font-weight: 800; }
+  .d-cd.today { color: var(--c-pais); font-weight: 800; }
   .d-when { display: block; font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
   @media (max-width: 520px) { .dlist { gap: 0 10px; } .d-name { font-size: 0.82rem; } .dlist .tag { font-size: 0.66rem; padding: 2px 5px; min-width: 0; } }
-  .when { text-align: right; font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
   footer { margin-top: 24px; text-align: center; font-size: 0.8rem; color: var(--muted); }
   footer button {
@@ -347,8 +414,9 @@
     main { padding: 14px 10px 32px; }
     .clock-date { font-size: 0.8rem; }
     .card { padding: 14px 12px; }
-    .conv-row { grid-template-columns: 1fr; }
-    .equals { display: none; }
+    .flags { gap: 8px; }
+    .gap { font-size: 0.75rem; }
+    .clock-wx { font-size: 0.78rem; }
     .days { gap: 5px; }
     .day { padding: 6px; }
     .day-name { font-size: 0.85rem; }
@@ -361,20 +429,35 @@
 </head>
 <body>
 <main>
-  <!-- Frase cariñosa del día -->
+  <!-- 1. Frase del día (o mensaje especial y aviso de próximos cumpleaños) -->
   <p class="love" id="love" hidden><span id="love-en"></span><span class="love-es" id="love-es"></span><span class="love-pre" id="love-pre"></span></p>
 
-  <!-- Hora -->
-  <section class="clock-block" aria-label="Hora local">
-    <div class="clock"><span id="clock-es">--:--</span></div>
-    <div class="clock-place" id="place-es"></div>
-    <div class="clock-date" id="date-es"></div>
+  <!-- 2. Banderas: país (izquierda) y EE. UU. (derecha). Debajo, hora, lugar, día y tiempo actual -->
+  <section id="hora-local" aria-label="Hora local">
+    <div class="flags">
+      <div class="flag-block">
+        <button type="button" class="flag-btn" id="flag-p-btn" aria-expanded="false" aria-controls="ver-menu" disabled><svg class="flag" id="flag-p" viewBox="0 0 750 500" role="img"></svg></button>
+        <div class="clock"><span class="wx-ico" id="ico-p" aria-hidden="true"></span><span id="clock-p">--:--</span></div>
+        <div class="clock-place" id="place-p"></div>
+        <div class="clock-date" id="date-p"></div>
+        <div class="clock-wx" id="wx-p"></div>
+      </div>
+      <div class="gap" id="gap"></div>
+      <div class="flag-block">
+        <svg class="flag" id="flag-u" viewBox="0 0 750 500" role="img"></svg>
+        <div class="clock"><span class="wx-ico" id="ico-u" aria-hidden="true"></span><span id="clock-u">--:--</span></div>
+        <div class="clock-place" id="place-u"></div>
+        <div class="clock-date" id="date-u"></div>
+        <div class="clock-wx" id="wx-u"></div>
+      </div>
+    </div>
+    <div class="ver-menu" id="ver-menu" hidden></div>
   </section>
 
-  <!-- Tiempo: una tarjeta por cada lugar de "detalles" en config.js -->
+  <!-- 3. Tiempo: una tarjeta por lugar, en el orden de "ordenTiempo" en config.js -->
   <div id="details"></div>
 
-  <!-- Calendario -->
+  <!-- 4. Calendario -->
   <section class="card" id="cal-card" aria-labelledby="cal-title">
     <h2 id="cal-title">Calendario</h2>
     <div class="cal-nav">
@@ -385,34 +468,25 @@
     <p class="cal-warn" id="cal-warn" hidden></p>
     <div class="cal-grid" id="cal-grid"></div>
     <div class="cal-legend" aria-hidden="true">
-      <span><i class="sw fest"></i>Festivo</span>
-      <span><i class="sw prov"></i>Festivo previsto</span>
-      <span><i class="sw dot d-fam"></i>Familia</span>
-      <span><i class="sw dot d-sen"></i>Día señalado</span>
-      <span><i class="sw dot d-esc"></i>Escolar</span>
-      <span><i class="sw dot d-evt"></i>Evento</span>
+      <span><i class="sw fest-p"></i><span id="leg-p">Festivo</span></span>
+      <span><i class="sw fest-u"></i><span id="leg-u">Festivo EE. UU.</span></span>
+      <span><i class="sw prov"></i><span id="leg-prev">Festivo previsto</span></span>
+      <span><i class="sw dot d-fam"></i><span id="leg-fam">Familia</span></span>
+      <span><i class="sw dot d-sen"></i><span id="leg-sen">Día señalado</span></span>
+      <span><i class="sw dot d-esc"></i><span id="leg-esc">Escolar</span></span>
+      <span><i class="sw dot d-evt"></i><span id="leg-evt">Evento</span></span>
     </div>
     <p class="cal-status" id="cal-status"></p>
     <div class="cal-detail" id="cal-detail" aria-live="polite"></div>
   </section>
 
-  <!-- Fechas -->
-  <section class="card" aria-labelledby="dates-title">
+  <!-- 5. Próximas fechas con cuenta atrás (misma fuente que el calendario) -->
+  <section class="card" id="dates-card" aria-labelledby="dates-title">
     <h2 id="dates-title">Próximas fechas</h2>
     <ul class="dlist" id="dates"></ul>
   </section>
 
-  <!-- Expresiones útiles de la época del año -->
-  <section class="card" id="expr-card" aria-labelledby="expr-title" hidden>
-    <div class="x-head">
-      <h2 id="expr-title">Expresiones útiles</h2>
-      <button type="button" class="chip" id="expr-mode" aria-pressed="false">Repaso</button>
-    </div>
-    <ul class="xlist" id="expr-list"></ul>
-    <p class="x-foot small muted"><span id="expr-count"></span> <button type="button" class="linkbtn" id="expr-reset" hidden>Reiniciar aprendidas</button></p>
-  </section>
-
-  <!-- Conversor: dólares y euros (principal) + medidas de EE. UU. -->
+  <!-- Conversor: dólares y moneda del país (principal) + unidades -->
   <section class="card" id="conv-card" aria-labelledby="conv-title">
     <h2 id="conv-title">Conversor</h2>
     <div class="conv">
@@ -432,6 +506,37 @@
     <p class="rate" id="conv-note"></p>
   </section>
 
+  <!-- Sol y aire: índice UV por hora y calidad del aire, un bloque por lugar del tiempo -->
+  <section class="card" id="uv-card" aria-labelledby="uv-title">
+    <h2 id="uv-title">Sol y aire</h2>
+    <div id="uv-wrap"></div>
+  </section>
+
+  <!-- Expresiones útiles -->
+  <section class="card" id="expr-card" aria-labelledby="expr-title" hidden>
+    <div class="x-head">
+      <h2 id="expr-title">Expresiones útiles</h2>
+      <button type="button" class="chip" id="expr-mode" aria-pressed="false">Repaso</button>
+    </div>
+    <ul class="xlist" id="expr-list"></ul>
+    <p class="x-foot small muted"><span id="expr-count"></span> <button type="button" class="linkbtn" id="expr-reset" hidden>Reiniciar aprendidas</button></p>
+  </section>
+
+  <!-- Avisos meteorológicos oficiales (MeteoAlarm / AEMET) -->
+  <section class="card" id="alerts-card" aria-labelledby="alerts-title" hidden>
+    <h2 id="alerts-title">Avisos meteorológicos</h2>
+    <div id="alerts-body" aria-live="polite"></div>
+    <p class="small muted" id="alerts-foot"></p>
+  </section>
+
+  <!-- Noticias políticas -->
+  <section class="card" id="news-card" aria-labelledby="news-title" hidden>
+    <h2 id="news-title">Noticias políticas</h2>
+    <div class="news-tabs" id="news-tabs" role="group" aria-label="País"></div>
+    <ul class="news-list" id="news-list" aria-live="polite"></ul>
+    <p class="small muted" id="news-foot"></p>
+  </section>
+
   <footer>
     <p id="updated"></p>
     <button type="button" id="refresh">Actualizar ahora</button>
@@ -443,11 +548,12 @@
   <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
   <div class="splash-inner">
     <p class="splash-text" id="splash-text"></p>
-    <p class="splash-hint">Toca para cerrar</p>
+    <p class="splash-hint" id="splash-hint">Toca para cerrar</p>
   </div>
   <div class="splash-bar" aria-hidden="true"><span id="splash-bar"></span></div>
 </div>
 
+<script src="idioma.js"></script>
 <script src="config.js"></script>
 <script src="cumples.js"></script>
 <script src="palabras.js"></script>
@@ -457,163 +563,511 @@
 (function () {
   "use strict";
 
+  /* ---------- Textos: español por defecto; idioma.js (window.TEXTOS) los sustituye ---------- */
+  var T = {"locale": "es-ES",
+    "errConfig": "No se ha podido leer config.js. Revisa comas y comillas en ese archivo.",
+    "horaLocal": "Hora local",
+    "cambiarVersion": "Cambiar de país",
+    "bandera": "Bandera de {0}",
+    "calendario": "Calendario",
+    "mesAnt": "Mes anterior",
+    "mesSig": "Mes siguiente",
+    "hoy": "Hoy",
+    "manana": "Mañana",
+    "festivoDe": "Festivo {0}",
+    "legPrev": "Festivo previsto",
+    "familia": "Familia",
+    "diaSenalado": "Día señalado",
+    "evento": "Evento",
+    "escolar": "Escolar",
+    "proximas": "Próximas fechas",
+    "expresiones": "Expresiones útiles",
+    "repaso": "Repaso",
+    "reiniciar": "Reiniciar aprendidas",
+    "actualizar": "Actualizar ahora",
+    "actualizado": "Actualizado a las {0} ({1})",
+    "tocaCerrar": "Toca para cerrar",
+    "conversor": "Conversor",
+    "queConvertir": "Qué convertir",
+    "solAire": "Sol y aire",
+    "deDiferencia": "de diferencia",
+    "mismaHora": "misma hora",
+    "sinConexion": "Sin conexión",
+    "sinDatos": "Sin datos",
+    "horaEn": "{0} en {1}",
+    "horaEnPais": "{0} en {1}",
+    "haceMin": "hace {0} min",
+    "haceH": "hace {0} h",
+    "haceDias": "hace {0} días",
+    "wmo": {"0": "Despejado",
+    "1": "Casi despejado",
+    "2": "Parcialmente nuboso",
+    "3": "Cubierto",
+    "45": "Niebla",
+    "48": "Niebla con escarcha",
+    "51": "Llovizna débil",
+    "53": "Llovizna",
+    "55": "Llovizna intensa",
+    "56": "Llovizna helada",
+    "57": "Llovizna helada intensa",
+    "61": "Lluvia débil",
+    "63": "Lluvia",
+    "65": "Lluvia intensa",
+    "66": "Lluvia helada",
+    "67": "Lluvia helada intensa",
+    "71": "Nieve débil",
+    "73": "Nieve",
+    "75": "Nieve intensa",
+    "77": "Granos de nieve",
+    "80": "Chubascos débiles",
+    "81": "Chubascos",
+    "82": "Chubascos fuertes",
+    "85": "Chubascos de nieve",
+    "86": "Chubascos de nieve fuertes",
+    "95": "Tormenta",
+    "96": "Tormenta con granizo",
+    "99": "Tormenta con granizo fuerte"}, "max": "Máx",
+    "min": "Mín",
+    "ahora": "Ahora",
+    "sensacion": "sensación",
+    "lluvia": "lluvia",
+    "lluviaDia": "Lluvia",
+    "amanece": "amanece",
+    "anochece": "anochece",
+    "deLuz": "{0} h {1} min de luz",
+    "sensMin": "Sens. mín",
+    "sinNieve": "Sin nieve",
+    "nieve": "Nieve",
+    "tiempoEn": "Tiempo en {0}",
+    "cargandoTiempo": "Cargando el tiempo…",
+    "horaAHora": "Hoy hora a hora",
+    "proximosDias": "Próximos días",
+    "prevGuardada": "Sin conexión: previsión guardada {0}",
+    "errTiempo": "No se ha podido cargar el tiempo y no hay una previsión guardada. Pulsa Actualizar ahora.",
+    "meses": ["enero",
+    "febrero",
+    "marzo",
+    "abril",
+    "mayo",
+    "junio",
+    "julio",
+    "agosto",
+    "septiembre",
+    "octubre",
+    "noviembre",
+    "diciembre"], "iniciales": ["L",
+    "M",
+    "X",
+    "J",
+    "V",
+    "S",
+    "D"], "diaDe": "{0} de {1}",
+    "esHoyAria": ", hoy",
+    "tagFest": "Fest",
+    "tagFam": "Fam",
+    "tagEvt": "Evt",
+    "tagEsc": "Cole",
+    "tagDia": "Día",
+    "rango": "del {0} al {1}",
+    "fechaConfirmar": "fecha por confirmar",
+    "datoOnline": "dato online",
+    "porConfirmar": "por confirmar",
+    "horaConfirmar": "hora por confirmar",
+    "fuenteOnline": " · fuente online (Nager.Date)",
+    "pendConfirmar": ", pendiente de confirmar",
+    "pendConfirmarCon": ", pendiente de confirmar con {0}",
+    "previsto": " · previsto, sin calendario oficial cargado",
+    "pendAprob": " · pendiente de aprobación",
+    "calEscolar": "Calendario escolar",
+    "nadaMarcado": "Nada marcado para este día.",
+    "santoral": "Santoral:",
+    "warnFestivos": "Faltan los festivos oficiales de {0} de {1} en config.js.",
+    "warnFestivosSig": "Ya suele estar publicado el calendario laboral de {0} ({1}): añádelo a config.js.",
+    "warnEscolar": "Falta el calendario escolar{0} del curso siguiente en config.js.",
+    "deX": " de {0}",
+    "warnEventos": "No quedan eventos futuros en config.js.",
+    "warnPartidos": "No quedan partidos de {0}: añade el calendario de la nueva temporada a config.js.",
+    "stPartidos": "Partidos online {0}",
+    "stPartidosCopia": "Sin conexión con la fuente de partidos: se usa la copia de {0}",
+    "stPartidosConfig": "Sin conexión con la fuente de partidos: se usan los de config.js",
+    "stFestivos": "Festivos de {0} {1} online",
+    "stSinFestivos": "Sin conexión con la fuente de festivos de {0} {1}",
+    "cambioAdelanta": "Cambio de hora en {0}: se adelanta una hora",
+    "cambioRetrasa": "Cambio de hora en {0}: se retrasa una hora",
+    "desdeHoyDif": "desde hoy, {0} h de diferencia",
+    "desdeHoyMisma": "desde hoy, misma hora",
+    "yConj": " y ",
+    "noticias": "Noticias políticas",
+    "tiempoOtroLugar": "Tiempo en otro lugar",
+    "buscarLugar": "Buscar municipio o ciudad…",
+    "miUbicacion": "Mi ubicación",
+    "quitar": "Quitar",
+    "buscaLugar": "Busca un municipio o una ciudad, o pulsa Mi ubicación.",
+    "sinResultados": "Sin resultados.",
+    "errBuscar": "No se ha podido buscar: revisa la conexión.",
+    "sinGeo": "Este navegador no permite usar la ubicación.",
+    "buscandoUbicacion": "Buscando tu ubicación…",
+    "geoDenegada": "Permiso de ubicación denegado. Puedes activarlo en los ajustes del navegador.",
+    "geoError": "No se ha podido obtener la ubicación.",
+    "tuUbicacion": "Tu ubicación",
+    "aquiNombre": "{0} (tu ubicación)",
+    "avisos": "Avisos meteorológicos",
+    "sinAvisos": "Sin avisos activos.",
+    "cargandoAvisos": "Consultando avisos…",
+    "avisoNivel": ["amarillo", "naranja", "rojo"],
+    "avisoDesdeHasta": "del {0} al {1}",
+    "avisosFuente": "Avisos oficiales de AEMET publicados en MeteoAlarm. Consultado {0}.",
+    "avisosGuardados": "Sin conexión: avisos consultados {0}.",
+    "errAvisos": "No se han podido consultar los avisos. Pulsa Actualizar ahora.",
+    "cargandoNoticias": "Cargando noticias…",
+    "sinNoticias": "No se han podido cargar las noticias. Pulsa Actualizar ahora.",
+    "noticiasGuardadas": "Sin conexión: titulares guardados {0}.",
+    "noticiasActualizadas": "Titulares actualizados {0}.",
+    "noticiasFuente": "Cada titular abre la noticia en su medio.",
+    "fuentes": "Fuentes: ",
+    "sinRespuesta": "sin respuesta",
+    "noFechas": "No hay fechas próximas.",
+    "porConfirmarParen": " (por confirmar)",
+    "esHoy": "¡Es hoy!",
+    "enCurso": "En curso",
+    "mes": "mes",
+    "mesesN": "meses",
+    "dia": "día",
+    "dias": "días",
+    "recuerda": "Recuerda. ",
+    "enNDias": "En {0} días",
+    "felicita": "¡Felicita a {0}!",
+    "cumpleDe": "Cumpleaños de {0}",
+    "aprendidasDe": "Aprendidas: {0} de {1}.",
+    "marcaCirculo": "Marca con el círculo las que ya sepas: dejarán de salir.",
+    "marcarAprendida": "Marcar como aprendida",
+    "aprendidasManana": "Aprendidas: {0}. Desde mañana ya no saldrán.",
+    "confirmReiniciar": "¿Volver a incluir todas las expresiones marcadas como aprendidas?",
+    "tocaVer": "toca para ver",
+    "dolares": "Dólares",
+    "millas": "Millas",
+    "kilometros": "Kilómetros",
+    "fahrenheit": "Fahrenheit",
+    "celsius": "Celsius",
+    "libras": "Libras",
+    "kilos": "Kilos",
+    "onzas": "Onzas",
+    "gramos": "Gramos",
+    "pulgadas": "Pulgadas",
+    "centimetros": "Centímetros",
+    "mph": "Millas por hora",
+    "kmh": "Km por hora",
+    "bMillas": "Millas / km",
+    "bYardas": "Yardas / m",
+    "bTazas": "Tazas / ml",
+    "tazas": "Tazas",
+    "mililitros": "Mililitros",
+    "notaTaza": "Taza de cocina de EE. UU. En las etiquetas nutricionales se redondea a 240 ml.",
+    "bGalones": "Galones / litros",
+    "galones": "Galones",
+    "litros": "Litros",
+    "notaGalon": "Galón de EE. UU. (gasolina, leche). El galón británico son 4,55 litros.",
+    "yardas": "Yardas",
+    "metros": "Metros",
+    "bLibras": "Libras / kilos",
+    "bOnzas": "Onzas / gramos",
+    "bPulgadas": "Pulgadas / cm",
+    "notaOnza": "Onza de peso. La onza líquida (fl oz) son 29,57 ml.",
+    "cargandoCambio": "Cargando tipo de cambio…",
+    "bce": "tipo de referencia del BCE",
+    "tasaGuardada": "sin conexión: tasa guardada {0}",
+    "tasaManual": "sin conexión: tasa manual de config.js, revísala",
+    "sinCambio": "Sin tipo de cambio: no hay conexión.",
+    "uvTxt": ["bajo",
+    "moderado",
+    "alto",
+    "muy alto",
+    "extremo"], "aqTxt": ["Buena",
+    "Moderada",
+    "Mala para personas sensibles",
+    "Mala",
+    "Muy mala",
+    "Peligrosa"], "cargandoAire": "Cargando aire…",
+    "cargandoUV": "Cargando índice UV…",
+    "errUV": "No se ha podido cargar el índice UV.",
+    "aire": "Aire {0} · {1}",
+    "aireSinDatos": "Aire: sin datos",
+    "uvMax": "UV máximo {0} ({1}) hacia las {2} h. ",
+    "protSi": "Protección solar en las horas amarillas o superiores.",
+    "protNo": "No hace falta protección solar especial.",
+    "datosGuardados": "Sin conexión: datos guardados {0}. ",
+    "uvAria": "Índice UV por hora en {0}"};
+  (function () { var X = window.TEXTOS || {}; for (var k in X) T[k] = X[k]; })();
+  // T.x con {0}, {1}… sustituidos
+  function tx(key) { var a = arguments; return String(T[key]).replace(/\{(\d)\}/g, function (m, i) { return a[+i + 1]; }); }
+  var LOC = T.locale, LANG = LOC.slice(0, 2);
+  var LEARN = (window.CONFIG && window.CONFIG.idiomaAprender) || "en";      // idioma de frases y expresiones
+  function learnTxt(w) { return w[LEARN] != null ? w[LEARN] : w.en; }
+  var LEARNED_KEY = "aprendidas" + (LEARN === "en" ? "" : ":" + LEARN);
+  document.documentElement.lang = LANG;
+
   var CFG = window.CONFIG;
-  // Cumpleaños de cumples.js: se convierten en mensajes especiales (calendario, próximas fechas, cuenta atrás, aviso y confeti)
+  if (!CFG || !CFG.pais) {
+    document.body.insertAdjacentHTML("afterbegin", "<p style='padding:16px'>" + T.errConfig + "</p>");
+    return;
+  }
+
+  // Textos fijos del HTML
+  [["alerts-title", "avisos"], ["news-title", "noticias"], ["cal-title", "calendario"], ["cal-today", "hoy"], ["dates-title", "proximas"], ["expr-title", "expresiones"], ["expr-mode", "repaso"],
+   ["expr-reset", "reiniciar"], ["refresh", "actualizar"], ["conv-title", "conversor"], ["uv-title", "solAire"], ["splash-hint", "tocaCerrar"],
+   ["leg-prev", "legPrev"], ["leg-fam", "familia"], ["leg-sen", "diaSenalado"], ["leg-evt", "evento"]].forEach(function (x) {
+    var el = document.getElementById(x[0]); if (el) el.textContent = T[x[1]];
+  });
+  [["cal-prev", "mesAnt"], ["cal-next", "mesSig"], ["conv-btns", "queConvertir"], ["hora-local", "horaLocal"]].forEach(function (x) {
+    var el = document.getElementById(x[0]); if (el) el.setAttribute("aria-label", T[x[1]]);
+  });
+  document.documentElement.style.setProperty("--toca-ver", JSON.stringify(T.tocaVer));
+  function $(id) { return document.getElementById(id); }
+
+  var U = CFG.usa, P = CFG.pais;
+  // Sin bloque "usa": página de un solo país (una bandera, sin diferencia horaria ni festivos de otro país)
+  var SOLO = !U;
+  if (SOLO) U = { nombre: "", nombreCorto: "", zonaHoraria: P.zonaHoraria, ciudadReloj: P.ciudadReloj, oculto: true };
+  var tzU = U.zonaHoraria, tzP = P.zonaHoraria;
+  var mainIsPais = CFG.zonaPrincipal === "pais";
+  var tzMain = mainIsPais ? tzP : tzU, cityMain = mainIsPais ? P.ciudadReloj : U.ciudadReloj;
+  function countryName(which) { return which === "usa" ? (U.nombreCorto || "EE. UU.") : (P.nombreCorto || P.nombre); }
+
+  // Cumpleaños de cumples.js: se convierten en mensajes especiales (calendario, próximas fechas, aviso y confeti).
+  // Por defecto zona "ambas": se ven desde que empieza el día en el país hasta que acaba en EE. UU.
   CFG.mensajesEspeciales = (CFG.mensajesEspeciales || []).concat((window.CUMPLES || []).filter(function (c) {
     return c && /^\d\d-\d\d$/.test(c[0]) && c[1];
   }).map(function (c) {
     var o = c[2] || {};
-    return { fecha: c[0], texto: o.texto || "¡Felicita a " + c[1] + "!", lista: "Cumpleaños de " + c[1],
-             avisar: o.avisar !== false, confeti: o.confeti !== false };
+    return { fecha: c[0], texto: o.texto || tx("felicita", c[1]), lista: o.lista || tx("cumpleDe", c[1]),
+             avisar: o.avisar !== false, confeti: o.confeti !== false, zona: o.zona || "ambas" };
   }));
-  if (!CFG) {
-    document.body.insertAdjacentHTML("afterbegin",
-      "<p style='padding:16px'>No se ha podido leer config.js. Revisa comas y comillas en ese archivo.</p>");
-    return;
-  }
-  function $(id) { return document.getElementById(id); }
 
   document.title = CFG.titulo || "Inicio";
 
-  /* ---------- Almacenamiento en el navegador (caché y preferencias) ---------- */
-  var STORE = "inicio:v1:";
-  function store(key, val) { try { localStorage.setItem(STORE + key, JSON.stringify(val)); } catch (e) {} }
-  function load(key) { try { var v = localStorage.getItem(STORE + key); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  // Orden de las secciones debajo del tiempo (config.js > ordenSecciones)
+  (function () {
+    var IDS = { calendario: "cal-card", proximasFechas: "dates-card", conversor: "conv-card", solAire: "uv-card", expresiones: "expr-card", noticias: "news-card", avisos: "alerts-card" };
+    var foot = document.querySelector("footer");
+    (CFG.ordenSecciones || []).forEach(function (k) { var el = IDS[k] && $(IDS[k]); if (el) foot.parentNode.insertBefore(el, foot); });
+    // Las que no estén en la lista se ocultan
+    if (CFG.ordenSecciones) Object.keys(IDS).forEach(function (k) {
+      if (CFG.ordenSecciones.indexOf(k) === -1 && $(IDS[k])) { $(IDS[k]).hidden = true; $(IDS[k]).dataset.off = "1"; }
+    });
+  })();
+
+  /* ---------- Almacenamiento en el navegador ----------
+     Todas las páginas de GitHub Pages de un mismo usuario comparten navegador (mismo dominio).
+     La caché lleva el identificador de la versión para que la de EE. UU.-España no pise a la de EE. UU.-Italia.
+     Las expresiones aprendidas y el modo repaso se comparten entre versiones. */
+  var STORE = "inicio:" + (CFG.version || "base") + ":v1:", SHARED = "inicio:v1:";
+  function store(key, val, shared) { try { localStorage.setItem((shared ? SHARED : STORE) + key, JSON.stringify(val)); } catch (e) {} }
+  function load(key, shared) { try { var v = localStorage.getItem((shared ? SHARED : STORE) + key); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
   function ago(t) {
     var m = Math.round((Date.now() - t) / 60000);
-    return m < 60 ? "hace " + Math.max(1, m) + " min" : m < 2880 ? "hace " + Math.round(m / 60) + " h" : "hace " + Math.round(m / 1440) + " días";
+    return m < 60 ? tx("haceMin", Math.max(1, m)) : m < 2880 ? tx("haceH", Math.round(m / 60)) : tx("haceDias", Math.round(m / 1440));
   }
 
-  /* ---------- Formatos ---------- */
-  var nf2 = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  var nfMax2 = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 2 });
-  var nf1 = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  function parseNum(s) {
-    s = String(s).replace(/\s/g, "");
-    if (s === "") return NaN;
-    if (s.indexOf(",") !== -1) s = s.replace(/\./g, "").replace(",", ".");
-    return parseFloat(s);
-  }
-  function selectOnFocus(el) { el.addEventListener("focus", function () { el.select(); }); }
+  var nf1 = new Intl.NumberFormat(LOC, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
-  /* ---------- Reloj ---------- */
-  var tzES = CFG.espana.zonaHoraria;
-  $("place-es").textContent = CFG.espana.ciudadReloj;
+  /* ---------- Utilidades de hora local ---------- */
+  var FMTS = {};
+  function localParts(tz, d) {
+    var f = FMTS[tz] || (FMTS[tz] = new Intl.DateTimeFormat("en-US", {
+      timeZone: tz, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit"
+    }));
+    var p = {};
+    f.formatToParts(d || new Date()).forEach(function (x) { p[x.type] = x.value; });
+    if (p.hour === "24") p.hour = "00";
+    return p;
+  }
+  // Minutos de diferencia de una zona con UTC en un instante
+  function offsetMinutes(tz, d) {
+    d = d || new Date();
+    var p = localParts(tz, d), base = Math.floor(d.getTime() / 60000) * 60000;
+    return Math.round((Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute) - base) / 60000);
+  }
+  // Instante absoluto de una fecha y hora expresadas en una zona horaria
+  function zonedTime(tz, y, m, d, h, mi) {
+    var want = Date.UTC(y, m - 1, d, h || 0, mi || 0), guess = want;
+    for (var i = 0; i < 3; i++) guess = want - offsetMinutes(tz, new Date(guess)) * 60000;
+    return guess;
+  }
+  function midnightIn(tz, y, m, d) { return zonedTime(tz, y, m, d, 0, 0); }
+  function todayIn(tz) { var p = localParts(tz); return [+p.year, +p.month, +p.day]; }
+  function todayYMD() { return todayIn(tzMain); }
 
   function fmtTime(tz, d) {
-    return new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit", timeZone: tz }).format(d || new Date());
+    return new Intl.DateTimeFormat(LOC, { hour: "2-digit", minute: "2-digit", timeZone: tz }).format(d || new Date());
   }
   function fmtDate(tz) {
-    return new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "short", timeZone: tz }).format(new Date());
+    return new Intl.DateTimeFormat(LOC, { weekday: "long", day: "numeric", month: "short", timeZone: tz }).format(new Date());
   }
+  // "13:00 en West Branch · 19:00 en España"
+  function bothTimes(dt) {
+    if (SOLO) return tx("horaEnPais", fmtTime(tzP, dt), countryName("pais"));
+    return tx("horaEn", fmtTime(tzU, dt), U.ciudadReloj) + " · " + tx("horaEnPais", fmtTime(tzP, dt), countryName("pais"));
+  }
+
+  /* ---------- Banderas (3:2, dibujadas sin dependencias) ---------- */
+  var FLAGS = {
+    ES: { color: "#aa151b", confeti: ["#aa151b", "#f1bf00"], svg: function () {
+      return '<rect width="750" height="500" fill="#aa151b"/><rect y="125" width="750" height="250" fill="#f1bf00"/>'; } },
+    // Comunidad de Madrid: rojo carmesí con siete estrellas blancas de cinco puntas (4 arriba y 3 abajo)
+    MD: { color: "#c8102e", confeti: ["#c8102e", "#d9d9d9"], svg: function (pos) {
+      pos = pos || { cx: 375, cy: 252, s: 1 };     // centro y escala de las estrellas (en la diagonal van a su triángulo)
+      function star(cx, cy, R) {
+        var pts = [];
+        for (var k = 0; k < 10; k++) {
+          var r = k % 2 === 0 ? R : R * 0.382, a = -Math.PI / 2 + k * Math.PI / 5;
+          pts.push((cx + r * Math.cos(a)).toFixed(1) + "," + (cy + r * Math.sin(a)).toFixed(1));
+        }
+        return '<polygon fill="#ffffff" points="' + pts.join(" ") + '"/>';
+      }
+      var html = '<rect width="750" height="500" fill="#c8102e"/>', R = 42 * pos.s, dx = 110 * pos.s, dy = 47 * pos.s;
+      for (var i = 0; i < 4; i++) html += star(pos.cx + (i - 1.5) * dx, pos.cy - dy, R);
+      for (var j = 0; j < 3; j++) html += star(pos.cx + (j - 1) * dx, pos.cy + dy, R);
+      return html; } },
+    // Playa de Somo (diseño propio, no oficial): cielo, sol, mar con olas de surf y arena
+    SOMO: { color: "#1f78b4", confeti: ["#1f78b4", "#f4c95d", "#8fd3f4"], svg: function () {
+      return '<rect width="750" height="500" fill="#8fd3f4"/>' +
+        '<circle cx="590" cy="105" r="62" fill="#ffd23f"/>' +
+        '<path d="M0 205 Q95 170 190 205 T380 205 T570 205 T760 205 V500 H0 Z" fill="#1f78b4"/>' +
+        '<path d="M0 262 Q95 232 190 262 T380 262 T570 262 T760 262" fill="none" stroke="#ffffff" stroke-width="13" stroke-linecap="round"/>' +
+        '<path d="M-20 318 Q75 290 170 318 T360 318 T550 318 T740 318" fill="none" stroke="#bfe6fb" stroke-width="10" stroke-linecap="round"/>' +
+        '<path d="M0 372 Q125 345 250 372 T500 372 T760 372 V500 H0 Z" fill="#f4d58d"/>' +
+        '<path d="M0 372 Q125 345 250 372 T500 372 T760 372" fill="none" stroke="#ffffff" stroke-width="7"/>'; } },
+    // Cantabria (bandera civil, sin escudo): blanco arriba y rojo abajo
+    CB: { color: "#d52b1e", confeti: ["#d52b1e", "#d9d9d9"], svg: function () {
+      return '<rect width="750" height="250" fill="#ffffff"/><rect y="250" width="750" height="250" fill="#d52b1e"/>'; } },
+    FR: { color: "#002654", confeti: ["#002654", "#ce1126"], svg: function () {
+      return '<rect width="250" height="500" fill="#002654"/><rect x="250" width="250" height="500" fill="#ffffff"/><rect x="500" width="250" height="500" fill="#ce1126"/>'; } },
+    IT: { color: "#008c45", confeti: ["#008c45", "#cd212a"], svg: function () {
+      return '<rect width="250" height="500" fill="#008c45"/><rect x="250" width="250" height="500" fill="#f4f5f0"/><rect x="500" width="250" height="500" fill="#cd212a"/>'; } },
+    PL: { color: "#dc143c", confeti: ["#dc143c", "#d9d9d9"], svg: function () {
+      return '<rect width="750" height="250" fill="#ffffff"/><rect y="250" width="750" height="250" fill="#dc143c"/>'; } },
+    BR: { color: "#009c3b", confeti: ["#009c3b", "#ffdf00", "#002776"], svg: function () {
+      var stars = [[318, 292, 6], [352, 318, 5], [384, 300, 6], [410, 326, 5], [436, 296, 6], [372, 344, 5], [338, 270, 4], [456, 318, 4]]
+        .map(function (s) { return '<circle cx="' + s[0] + '" cy="' + s[1] + '" r="' + s[2] + '" fill="#ffffff"/>'; }).join("");
+      return '<rect width="750" height="500" fill="#009c3b"/><polygon points="64,250 375,42 686,250 375,458" fill="#ffdf00"/>' +
+        '<defs><clipPath id="br-globe"><circle cx="375" cy="250" r="131"/></clipPath></defs>' +
+        '<circle cx="375" cy="250" r="131" fill="#002776"/>' +
+        '<path d="M232 226 Q380 176 516 290" fill="none" stroke="#ffffff" stroke-width="24" clip-path="url(#br-globe)"/>' + stars; } },
+    US: { color: "#0a3161", confeti: ["#b31942", "#0a3161"], svg: function () {
+      var W = 750, H = 500, stripe = H / 13, cw = W * 0.4, ch = stripe * 7, html = "", R = H * 0.0308;
+      for (var i = 0; i < 13; i++) html += '<rect y="' + (i * stripe) + '" width="' + W + '" height="' + (stripe + 0.5) + '" fill="' + (i % 2 === 0 ? "#b31942" : "#ffffff") + '"/>';
+      html += '<rect width="' + cw + '" height="' + ch + '" fill="#0a3161"/>';
+      function star(cx, cy) {
+        var pts = [];
+        for (var k = 0; k < 10; k++) {
+          var r = k % 2 === 0 ? R : R * 0.382, a = -Math.PI / 2 + k * Math.PI / 5;
+          pts.push((cx + r * Math.cos(a)).toFixed(2) + "," + (cy + r * Math.sin(a)).toFixed(2));
+        }
+        return '<polygon fill="#ffffff" points="' + pts.join(" ") + '"/>';
+      }
+      for (var row = 0; row < 9; row++) {
+        var y = (row + 1) * ch / 10, n = row % 2 === 0 ? 6 : 5;
+        for (var c = 0; c < n; c++) html += star(row % 2 === 0 ? (2 * c + 1) * cw / 12 : (2 * c + 2) * cw / 12, y);
+      }
+      return html; } }
+  };
+  // Bandera partida: "ES+CB" en vertical (mitad izquierda y mitad derecha); "MD/CB" en diagonal
+  var flagSeq = 0;
+  function flagOf(code) {
+    var raw = String(code || "").toUpperCase(), diag = raw.indexOf("/") !== -1, parts = raw.split(diag ? "/" : "+");
+    if (parts.length === 2 && FLAGS[parts[0]] && FLAGS[parts[1]]) {
+      var A = FLAGS[parts[0]], B = FLAGS[parts[1]];
+      return { color: A.color, confeti: A.confeti.concat(B.confeti), svg: function () {
+        var id = "fl" + (++flagSeq);
+        var ca = diag ? '<polygon points="0,0 750,0 0,500"/>' : '<rect width="375" height="500"/>';
+        var cb = diag ? '<polygon points="750,0 750,500 0,500"/>' : '<rect x="375" width="375" height="500"/>';
+        return '<defs><clipPath id="' + id + 'a">' + ca + '</clipPath><clipPath id="' + id + 'b">' + cb + '</clipPath></defs>' +
+          '<g clip-path="url(#' + id + 'a)">' + A.svg(diag ? { cx: 215, cy: 150, s: 0.62 } : null) + '</g>' +
+          '<g clip-path="url(#' + id + 'b)">' + B.svg() + '</g>' +
+          (diag ? '<line x1="750" y1="0" x2="0" y2="500" stroke="#ffffff" stroke-width="8"/>' : ''); } };
+    }
+    return FLAGS[String(code || "").toUpperCase()] || { color: "#5c5c60", confeti: ["#5c5c60", "#a3a3a8"], svg: function () {
+      return '<rect width="750" height="500" fill="#e0e0dd"/><text x="375" y="290" text-anchor="middle" font-size="140" font-weight="700" fill="#5c5c60">' +
+        String(code || "?").replace(/[<>&"]/g, "") + "</text>"; } };
+  }
+  var FP = flagOf(P.bandera), FU = SOLO ? FP : flagOf(U.bandera || "US");
+  $("flag-p").innerHTML = FP.svg(); $("flag-p").setAttribute("aria-label", tx("bandera", P.nombreBandera || P.nombre));
+  $("flag-u").innerHTML = FU.svg(); $("flag-u").setAttribute("aria-label", tx("bandera", U.nombre));
+  document.documentElement.style.setProperty("--c-pais", P.color || FP.color);
+  $("leg-p").textContent = tx("festivoDe", countryName("pais"));
+  $("leg-u").textContent = tx("festivoDe", countryName("usa"));
+  if (SOLO) {
+    $("flag-u").closest(".flag-block").hidden = true; $("leg-u").parentNode.hidden = true;
+    $("gap").hidden = true; $("gap").parentNode.classList.add("n1");
+  }
+  $("leg-esc").textContent = (CFG.calendario && CFG.calendario.nombreEscolar) || T.escolar;
+
+  /* ---------- Versiones: menú en la bandera del país y última versión vista ----------
+     config.js > versiones: [{ id, bandera, nombre, url }]. Todas las versiones comparten navegador
+     (mismo dominio de GitHub Pages), así que se guarda aquí cuál se ha visto la última. */
+  if ((CFG.versiones || []).length) try { localStorage.setItem(SHARED + "ultima", JSON.stringify({ id: CFG.version, url: location.href.split("#")[0], t: Date.now() })); } catch (e) {}
+  (function () {
+    var V = CFG.versiones || [], btn = $("flag-p-btn"), menu = $("ver-menu");
+    if (V.length < 2) return;
+    btn.disabled = false;
+    btn.insertAdjacentHTML("beforeend", '<span class="flag-hint" aria-hidden="true">⇄</span>');
+    btn.setAttribute("aria-label", T.cambiarVersion);
+    V.forEach(function (v) {
+      var a = document.createElement("button");
+      a.type = "button"; a.className = "ver-opt";
+      if (v.id === CFG.version) a.setAttribute("aria-current", "true");
+      a.innerHTML = '<svg viewBox="0 0 750 500" aria-hidden="true">' + flagOf(v.bandera).svg() + "</svg><span></span>";
+      a.querySelector("span").textContent = v.nombre;
+      a.addEventListener("click", function () { if (v.id !== CFG.version && v.url) location.href = v.url; else toggle(false); });
+      menu.appendChild(a);
+    });
+    function toggle(on) { menu.hidden = !on; btn.setAttribute("aria-expanded", String(on)); }
+    btn.addEventListener("click", function () { toggle(menu.hidden); });
+  })();
+
+  /* ---------- Banderas adicionales: lugaresExtra con "bandera" (van entre las dos principales) ---------- */
+  var EXTRA_FLAGS = (CFG.lugaresExtra || []).map(function (L, i) { return { L: L, key: "x" + i }; }).filter(function (x) { return x.L.bandera; });
+  (function () {
+    if (!EXTRA_FLAGS.length) return;
+    var gap = $("gap"), box = gap.parentNode;
+    EXTRA_FLAGS.forEach(function (x) {
+      var k = x.key, div = document.createElement("div");
+      div.className = "flag-block";
+      div.innerHTML = '<svg class="flag" id="flag-' + k + '" viewBox="0 0 750 500" role="img"></svg>' +
+        '<div class="clock"><span class="wx-ico" id="ico-' + k + '" aria-hidden="true"></span><span id="clock-' + k + '">--:--</span></div>' +
+        '<div class="clock-place" id="place-' + k + '"></div><div class="clock-date" id="date-' + k + '"></div><div class="clock-wx" id="wx-' + k + '"></div>';
+      box.insertBefore(div, gap);
+      $("flag-" + k).innerHTML = flagOf(x.L.bandera).svg();
+      $("flag-" + k).setAttribute("aria-label", tx("bandera", x.L.nombreBandera || x.L.nombre));
+      $("place-" + k).textContent = x.L.ciudadReloj || x.L.nombre;
+    });
+    gap.hidden = true;                                   // con tres banderas no cabe la diferencia horaria
+    box.classList.add("n3");
+  })();
+
+  /* ---------- Relojes ---------- */
+  $("place-p").textContent = P.ciudadReloj;
+  $("place-u").textContent = U.ciudadReloj;
   function tickClocks() {
-    $("clock-es").textContent = fmtTime(tzES);
-    $("date-es").textContent = fmtDate(tzES);
+    $("clock-p").textContent = fmtTime(tzP);
+    if (!SOLO) $("clock-u").textContent = fmtTime(tzU);
+    $("date-p").textContent = fmtDate(tzP);
+    if (!SOLO) $("date-u").textContent = fmtDate(tzU);
+    EXTRA_FLAGS.forEach(function (x) {
+      var tz = x.L.zonaHoraria || tzMain;
+      $("clock-" + x.key).textContent = fmtTime(tz); $("date-" + x.key).textContent = fmtDate(tz);
+    });
+    if (EXTRA_FLAGS.length || SOLO) return;
+    if (CFG.mostrarDiferencia === false) { $("gap").hidden = true; $("gap").parentNode.classList.add("no-gap"); return; }
+    var diff = Math.abs(offsetMinutes(tzP) - offsetMinutes(tzU)) / 60;
+    $("gap").innerHTML = diff ? "<strong>" + (Number.isInteger(diff) ? diff : nf1.format(diff)) + " h</strong>" + T.deDiferencia : "<strong>=</strong>" + T.mismaHora;
   }
   tickClocks();
   setInterval(tickClocks, 15000);
-
   setInterval(function () { if (typeof renderLove === "function") renderLove(); }, 15 * 60 * 1000);
 
-  /* ---------- Conversor: botones (mismo formato que la versión de EE. UU.) ----------
-     Dólares / euros es el principal; el resto son medidas de EE. UU. */
-  function lin(f) { return { toB: function (x) { return x * f; }, toA: function (x) { return x / f; } }; }
-  var nf4 = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 4, maximumFractionDigits: 4 });
-  var MON = CFG.moneda || { codigo: "EUR", simbolo: "€", nombre: "Euros", tasaRespaldo: 0.87 };
-  var rate = null, rateTxt = "Cargando tipo de cambio…", rateWarn = false;     // euros por 1 dólar
-  var CONV = [
-    { id: "money", btn: "Dólares / " + MON.nombre.toLowerCase(), main: true, a: "Dólares", sa: "$", b: MON.nombre, sb: MON.simbolo, money: true,
-      conv: { toB: function (x) { return rate ? x * rate : NaN; }, toA: function (x) { return rate ? x / rate : NaN; } } },
-    { id: "mi", btn: "Millas / km", a: "Millas", sa: "mi", b: "Kilómetros", sb: "km", conv: lin(1.609344) },
-    { id: "yd", btn: "Yardas / m", a: "Yardas", sa: "yd", b: "Metros", sb: "m", conv: lin(0.9144) },
-    { id: "f", btn: "°F / °C", a: "Fahrenheit", sa: "°F", b: "Celsius", sb: "°C",
-      conv: { toB: function (x) { return (x - 32) * 5 / 9; }, toA: function (x) { return x * 9 / 5 + 32; } } },
-    { id: "lb", btn: "Libras / kilos", a: "Libras", sa: "lb", b: "Kilos", sb: "kg", conv: lin(0.45359237) },
-    { id: "oz", btn: "Onzas / gramos", a: "Onzas", sa: "oz", b: "Gramos", sb: "g", conv: lin(28.349523125),
-      note: "Onza de peso. La onza líquida (fl oz) tiene su propio botón." },
-    { id: "cup", btn: "Tazas / ml", a: "Tazas", sa: "cup", b: "Mililitros", sb: "ml", conv: lin(236.5882365),
-      note: "Taza de cocina de EE. UU. En las etiquetas nutricionales se redondea a 240 ml." },
-    { id: "in", btn: "Pulgadas / cm", a: "Pulgadas", sa: "in", b: "Centímetros", sb: "cm", conv: lin(2.54) },
-    { id: "gal", btn: "Galones / litros", a: "Galones", sa: "gal", b: "Litros", sb: "l", conv: lin(3.785411784),
-      note: "Galón de EE. UU. (gasolina, leche). El galón británico son 4,55 litros." },
-    { id: "mph", btn: "mph / km/h", a: "Millas por hora", sa: "mph", b: "Km por hora", sb: "km/h", conv: lin(1.609344) },
-    // Solo en esta versión (ya estaban en el desplegable anterior)
-    { id: "floz", btn: "Onzas líquidas / ml", a: "Onzas líquidas", sa: "fl oz", b: "Mililitros", sb: "ml", conv: lin(29.5735295625) },
-    { id: "tbsp", btn: "Cucharadas / ml", a: "Cucharadas", sa: "tbsp", b: "Mililitros", sb: "ml", conv: lin(14.78676478125) },
-    { id: "ft", btn: "Pies / m", a: "Pies", sa: "ft", b: "Metros", sb: "m", conv: lin(0.3048) }
-  ];
-  var convCur = CONV[0], convA = $("conv-a"), convB = $("conv-b");
-  CONV.forEach(function (u) {
-    var b = document.createElement("button");
-    b.type = "button"; b.className = "conv-btn" + (u.main ? " main" : ""); b.textContent = u.btn; b.dataset.id = u.id;
-    b.setAttribute("aria-pressed", String(u === convCur));
-    $("conv-btns").appendChild(b);
-  });
-  $("conv-btns").addEventListener("click", function (e) {
-    var b = e.target.closest(".conv-btn");
-    if (!b) return;
-    var u = CONV.filter(function (x) { return x.id === b.dataset.id; })[0];
-    if (u === convCur) return;
-    convCur = u;
-    Array.prototype.forEach.call(this.children, function (x) { x.setAttribute("aria-pressed", String(x === b)); });
-    convA.value = u.money ? "20" : "1";
-    setConv("a");
-  });
-  function setConv(from) {
-    var u = convCur, fmt = u.money ? nf2 : nfMax2;
-    $("conv-a-label").textContent = u.a; $("conv-a-sym").textContent = u.sa;
-    $("conv-b-label").textContent = u.b; $("conv-b-sym").textContent = u.sb;
-    if (from === "a") { var r = u.conv.toB(parseNum(convA.value)); convB.value = isNaN(r) ? "" : fmt.format(r); }
-    else { var r2 = u.conv.toA(parseNum(convB.value)); convA.value = isNaN(r2) ? "" : fmt.format(r2); }
-    var note = $("conv-note");
-    note.className = "rate" + (u.money && rateWarn ? " warn" : "");
-    note.textContent = u.money ? rateTxt : (u.note || "");
-  }
-  convA.addEventListener("input", function () { setConv("a"); });
-  convB.addEventListener("input", function () { setConv("b"); });
-  selectOnFocus(convA); selectOnFocus(convB);
-
-  // Tipo de cambio: BCE (Frankfurter) > ExchangeRate-API > última tasa guardada > tasa manual
-  function showRate(r, txt, warn) {
-    rate = r; rateWarn = !!warn;
-    rateTxt = "1 $ = " + nf4.format(r) + " " + MON.simbolo + " · 1 " + MON.simbolo + " = " + nf4.format(1 / r) + " $ · " + txt;
-    setConv("a");
-  }
-  function loadRate() {
-    var to = MON.codigo;
-    fetchJSON("https://api.frankfurter.app/latest?from=USD&to=" + to)
-      .then(function (d) { return { r: d.rates[to], src: "tipo de referencia del BCE", fecha: String(d.date || "").split("-").reverse().join("/") }; })
-      .catch(function () {
-        return fetchJSON("https://open.er-api.com/v6/latest/USD")
-          .then(function (d) { return { r: d.rates[to], src: "ExchangeRate-API", fecha: (d.time_last_update_utc || "").slice(5, 16) }; });
-      })
-      .then(function (x) {
-        if (!(x.r > 0)) throw new Error("sin tasa");
-        store("cambio:" + to, { t: Date.now(), r: x.r });
-        showRate(x.r, x.src + (x.fecha ? " (" + x.fecha + ")" : ""), false);
-      })
-      .catch(function () {
-        var c = load("cambio:" + to);
-        if (c && c.r) showRate(c.r, "sin conexión: tasa guardada " + ago(c.t), Date.now() - c.t > 3 * 86400000);
-        else if (MON.tasaRespaldo) showRate(MON.tasaRespaldo, "sin conexión: tasa manual de config.js, revísala", true);
-        else { rate = null; rateWarn = true; rateTxt = "Sin tipo de cambio: no hay conexión."; setConv("a"); }
-      });
-  }
-  setConv("a");
-  loadRate();
-  setInterval(loadRate, 30 * 60 * 1000);
-
   /* ---------- Tiempo (Open-Meteo) ---------- */
-  var WMO = {
-    0: "Despejado", 1: "Casi despejado", 2: "Parcialmente nuboso", 3: "Cubierto",
-    45: "Niebla", 48: "Niebla con escarcha",
-    51: "Llovizna débil", 53: "Llovizna", 55: "Llovizna intensa", 56: "Llovizna helada", 57: "Llovizna helada intensa",
-    61: "Lluvia débil", 63: "Lluvia", 65: "Lluvia intensa", 66: "Lluvia helada", 67: "Lluvia helada intensa",
-    71: "Nieve débil", 73: "Nieve", 75: "Nieve intensa", 77: "Granos de nieve",
-    80: "Chubascos débiles", 81: "Chubascos", 82: "Chubascos fuertes", 85: "Chubascos de nieve", 86: "Chubascos de nieve fuertes",
-    95: "Tormenta", 96: "Tormenta con granizo", 99: "Tormenta con granizo fuerte"
-  };
-  /* Iconos del tiempo (SVG propio, sin dependencias) */
+  var WMO = T.wmo;
   var CLOUD = '<path d="M9 25h15a6 6 0 0 0 0-12a8 8 0 0 0-15 2a5 5 0 0 0 0 10z" fill="var(--cloud)"/>';
   var CLOUD_UP = '<g transform="translate(0,-5)">' + CLOUD + "</g>";
   function sunSvg(cx, cy, r) {
@@ -645,69 +1099,90 @@
     else b = CLOUD;
     return '<svg viewBox="0 0 32 32" aria-hidden="true">' + b + "</svg>";
   }
-
   function toF(c) { return c * 9 / 5 + 32; }
   function t(c, unit) { return c == null ? "—" : Math.round(unit === "fahrenheit" ? toF(c) : c) + "°"; }
-  // Máxima y mínima en dos bloques: etiqueta pequeña y número grande, en color cálido y frío
   function rangeHTML(max, min, unit) {
-    return '<span class="tr tmax"><i>Máx</i><b>' + t(max, unit) + "</b></span>" +
-           '<span class="tr tmin"><i>Mín</i><b>' + t(min, unit) + "</b></span>";
+    return '<span class="tr tmax"><i>' + T.max + '</i><b>' + t(max, unit) + "</b></span>" +
+           '<span class="tr tmin"><i>' + T.min + '</i><b>' + t(min, unit) + "</b></span>";
   }
   function otherUnit(u) { return u === "fahrenheit" ? "celsius" : "fahrenheit"; }
   function unitLetter(u) { return u === "fahrenheit" ? "F" : "C"; }
-
   function fetchJSON(url) {
     return fetch(url).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); });
   }
-
-  /* ---------- Previsión detallada ---------- */
   function hhmm(iso) { return iso ? iso.slice(11, 16) : "—"; }
   function minutesOf(iso) { var p = iso.slice(11, 16).split(":"); return +p[0] * 60 + +p[1]; }
   function dayLabel(dateStr, i) {
-    if (i === 0) return "Hoy";
-    if (i === 1) return "Mañana";
+    if (i === 0) return T.hoy;
+    if (i === 1) return T.manana;
     var p = dateStr.split("-");
-    var s = new Intl.DateTimeFormat("es-ES", { weekday: "long", timeZone: "UTC" }).format(new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])));
+    var s = new Intl.DateTimeFormat(LOC, { weekday: "long", timeZone: "UTC" }).format(new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])));
     return s.charAt(0).toUpperCase() + s.slice(1);
   }
-  function buildDetailCards() {
+
+  // Lugares del tiempo, en el orden de "ordenTiempo" (por defecto EE. UU. arriba y el país debajo)
+  var DETAILS = (CFG.ordenTiempo || (SOLO ? ["pais"] : ["usa", "pais"])).map(function (k) {
+    var X = k === "pais" ? P : U, W = X.tiempo || {};
+    return { key: k === "pais" ? "p" : "u", nombre: W.nombre || X.ciudadReloj, lat: W.lat, lon: W.lon, zonaHoraria: X.zonaHoraria,
+             unidad: W.unidad || "celsius", mostrarAmbasUnidades: !!W.mostrarAmbasUnidades, dias: CFG.diasTiempo || 6 };
+  }).concat((CFG.lugaresExtra || []).map(function (L, i) {
+    // Lugares de tiempo adicionales (sin bandera ni reloj): config.js > lugaresExtra
+    return { key: "x" + i, nombre: L.nombre, lat: L.lat, lon: L.lon, zonaHoraria: L.zonaHoraria || tzMain,
+             unidad: L.unidad || "celsius", mostrarAmbasUnidades: !!L.mostrarAmbasUnidades, dias: CFG.diasTiempo || 6 };
+  }));
+  // Tarjeta de tiempo con buscador (config.js > buscadorTiempo). El lugar elegido se recuerda en este navegador.
+  var BUS = !!(CFG.buscadorTiempo && CFG.buscadorTiempo.activo !== false);
+  if (BUS) {
+    var sv = load("lugar") || {};
+    DETAILS.push({ key: "s", buscador: true, nombre: sv.nombre || "", lat: sv.lat, lon: sv.lon, zonaHoraria: sv.zonaHoraria || tzMain,
+                   unidad: "celsius", mostrarAmbasUnidades: false, dias: CFG.diasTiempo || 6 });
+  }
+  function setFlagWx(key, ico, txt) { var a = $("ico-" + key), b = $("wx-" + key); if (a) a.innerHTML = ico; if (b) b.textContent = txt; }
+  (function buildDetailCards() {
     var wrap = $("details");
     wrap.className = "details";
-    wrap.innerHTML = "";
-    (CFG.detalles || []).forEach(function (D, n) {
+    DETAILS.forEach(function (D, n) {
       var sec = document.createElement("section");
       sec.className = "card";
       sec.innerHTML = '<h2 id="detail-title-' + n + '"></h2>' +
-        '<div id="today-' + n + '"><p class="status">Cargando el tiempo…</p></div>' +
-        '<div class="hours" id="hours-' + n + '" aria-label="Hoy hora a hora"></div>' +
-        '<h3 class="sub">Próximos días</h3>' +
+        (D.buscador ? '<div class="place-search"><input id="ps-input" type="search" autocomplete="off" enterkeyhint="search"></div>' +
+          '<ul class="ps-list" id="ps-list" hidden></ul>' +
+          '<div class="news-tabs"><button type="button" class="chip" id="ps-geo"></button><button type="button" class="chip" id="ps-clear" hidden></button></div>' +
+          '<p class="ps-msg" id="ps-msg"></p>' : '') +
+        '<div id="today-' + n + '"><p class="status">' + T.cargandoTiempo + '</p></div>' +
+        '<div class="hours" id="hours-' + n + '" aria-label="' + T.horaAHora + '"></div>' +
+        '<h3 class="sub">' + T.proximosDias + '</h3>' +
         '<div class="days" id="days-' + n + '"></div>';
       wrap.appendChild(sec);
-      $("detail-title-" + n).textContent = "Tiempo en " + D.nombre;
+      $("detail-title-" + n).textContent = D.buscador && !D.nombre ? T.tiempoOtroLugar : tx("tiempoEn", D.nombre);
     });
-  }
-  buildDetailCards();
+  })();
 
-  // Pinta la previsión. Si los datos son de una copia guardada, empieza en el día de hoy dentro de esa copia.
+  // Pinta la previsión. "Hoy" es el día local de cada lugar, no el de la otra ciudad.
   function renderWeather(D, n, d, savedAt) {
-    var unit = D.unidad || "celsius", other = otherUnit(unit), both = D.mostrarAmbasUnidades;
-    var dl = d.daily, cur = d.current, hr = d.hourly, td = todayYMD(), todayStr = keyOf(td[0], td[1], td[2]);
+    var unit = D.unidad, other = otherUnit(unit), both = D.mostrarAmbasUnidades;
+    var dl = d.daily, cur = d.current, hr = d.hourly, td = todayIn(D.zonaHoraria), todayStr = keyOf(td[0], td[1], td[2]);
     var i0 = dl.time.indexOf(todayStr);
     if (i0 < 0) return false;                      // la copia es demasiado antigua para hoy
     var light = minutesOf(dl.sunset[i0]) - minutesOf(dl.sunrise[i0]), rain0 = dl.precipitation_probability_max[i0];
     var nowTxt = savedAt
-      ? '<span class="stale">Sin conexión: previsión guardada ' + ago(savedAt) + "</span>"
-      : "Ahora <strong>" + t(cur.temperature_2m, unit) + "</strong>" +
-        (both ? " (" + t(cur.temperature_2m, other) + unitLetter(other) + ")" : "") + " · sensación " + t(cur.apparent_temperature, unit);
+      ? '<span class="stale">' + tx("prevGuardada", ago(savedAt)) + "</span>"
+      : T.ahora + " <strong>" + t(cur.temperature_2m, unit) + "</strong>" +
+        (both ? " (" + t(cur.temperature_2m, other) + unitLetter(other) + ")" : "") + " · " + T.sensacion + " " + t(cur.apparent_temperature, unit);
     $("today-" + n).innerHTML =
-      '<div class="today-main"><div class="today-left"><span class="today-name">Hoy</span>' +
+      '<div class="today-main"><div class="today-left"><span class="today-name">' + T.hoy + '</span>' +
       '<span class="today-ico">' + icon(dl.weather_code[i0], 1) + '</span>' +
       '<span class="today-desc">' + (WMO[dl.weather_code[i0]] || "—") + '</span></div>' +
       '<div class="today-range">' + rangeHTML(dl.temperature_2m_max[i0], dl.temperature_2m_min[i0], unit) + '</div></div>' +
       '<p class="today-meta">' + nowTxt +
-      ' · lluvia ' + (rain0 == null ? "—" : rain0 + " %") +
-      ' · amanece ' + hhmm(dl.sunrise[i0]) + ' · anochece ' + hhmm(dl.sunset[i0]) +
-      ' · ' + Math.floor(light / 60) + ' h ' + (light % 60) + ' min de luz</p>';
+      ' · ' + T.lluvia + ' ' + (rain0 == null ? "—" : rain0 + " %") +
+      ' · ' + T.amanece + ' ' + hhmm(dl.sunrise[i0]) + ' · ' + T.anochece + ' ' + hhmm(dl.sunset[i0]) +
+      ' · ' + tx("deLuz", Math.floor(light / 60), light % 60) + '</p>';
+
+    // Tiempo actual debajo de la bandera
+    if (savedAt) setFlagWx(D.key, "", T.sinConexion);
+    else setFlagWx(D.key, icon(cur.weather_code, cur.is_day), t(cur.temperature_2m, unit) +
+      (both ? " (" + t(cur.temperature_2m, other) + unitLetter(other) + ")" : "") + " · " + (WMO[cur.weather_code] || ""));
 
     // Hoy hora a hora (00 a 23)
     var nowH = +localParts(D.zonaHoraria).hour, html = "";
@@ -715,7 +1190,7 @@
       if (tm.slice(0, 10) !== todayStr) return;
       var h = +tm.slice(11, 13), p = hr.precipitation_probability[i];
       html += '<div class="hour' + (h < nowH ? " past" : h === nowH ? " now" : "") + '">' +
-        '<span class="h-t">' + (h === nowH ? "Ahora" : String(h).padStart(2, "0") + " h") + '</span>' +
+        '<span class="h-t">' + (h === nowH ? T.ahora : String(h).padStart(2, "0") + " h") + '</span>' +
         '<span class="h-i">' + icon(hr.weather_code[i], hr.is_day[i]) + '</span>' +
         '<span class="h-v">' + t(hr.temperature_2m[i], unit) + '</span>' +
         '<span class="h-r">' + (p ? p + " %" : "") + '</span></div>';
@@ -727,49 +1202,129 @@
 
     // Días siguientes: desde mañana
     html = "";
-    var dias = Math.max(1, Math.min(15, D.dias || 6));
+    var dias = Math.max(1, Math.min(15, D.dias));
     for (var i = i0 + 1; i < dl.time.length && i <= i0 + dias; i++) {
       var snow = dl.snowfall_sum[i], rain = dl.precipitation_probability_max[i];
       html += '<div class="day">' +
         '<div class="day-head"><span class="day-name">' + dayLabel(dl.time[i], i - i0) + '</span><span class="day-ico">' + icon(dl.weather_code[i], 1) + "</span></div>" +
         '<div class="day-temp">' + rangeHTML(dl.temperature_2m_max[i], dl.temperature_2m_min[i], unit) + "</div>" +
         "<p>" + (WMO[dl.weather_code[i]] || "—") + "</p>" +
-        "<p>Sens. mín " + t(dl.apparent_temperature_min[i], unit) + "</p>" +
-        "<p>Lluvia " + (rain == null ? "—" : rain + " %") + "</p>" +
-        (snow > 0 ? '<p class="snow">Nieve ' + nf1.format(snow) + " cm</p>" : "<p>Sin nieve</p>") +
+        "<p>" + T.sensMin + " " + t(dl.apparent_temperature_min[i], unit) + "</p>" +
+        "<p>" + T.lluviaDia + " " + (rain == null ? "—" : rain + " %") + "</p>" +
+        (snow > 0 ? '<p class="snow">' + T.nieve + ' ' + nf1.format(snow) + " cm</p>" : "<p>" + T.sinNieve + "</p>") +
         "</div>";
     }
     $("days-" + n).innerHTML = html;
     return true;
   }
 
-  function loadDetail() {
-    (CFG.detalles || []).forEach(function (D, n) {
-      var dias = Math.max(1, Math.min(15, D.dias || 6));
-      fetchJSON("https://api.open-meteo.com/v1/forecast?latitude=" + D.lat + "&longitude=" + D.lon +
-        "&current=temperature_2m,apparent_temperature,weather_code,is_day" +
-        "&hourly=temperature_2m,weather_code,precipitation_probability,is_day" +
-        "&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_min," +
-        "snowfall_sum,precipitation_probability_max,sunrise,sunset" +
-        "&forecast_days=" + (dias + 1) + "&timezone=" + encodeURIComponent(D.zonaHoraria))
-        .then(function (d) {
-          if (!renderWeather(D, n, d, null)) throw new Error("datos sin el día de hoy");
-          store("tiempo:" + n, { t: Date.now(), d: d });
-        })
-        .catch(function () {
-          var c = load("tiempo:" + n);
-          if (c && c.d && renderWeather(D, n, c.d, c.t)) return;
-          $("today-" + n).innerHTML = '<p class="status warn">No se ha podido cargar el tiempo y no hay una previsión guardada. Pulsa Actualizar ahora.</p>';
-          $("hours-" + n).innerHTML = "";
-          $("days-" + n).innerHTML = "";
-        });
-    });
+  function loadDetailOne(D, n, after) {
+    if (D.lat == null) {                                     // tarjeta del buscador sin lugar elegido
+      $("today-" + n).innerHTML = '<p class="status">' + T.buscaLugar + '</p>';
+      $("hours-" + n).innerHTML = ""; $("days-" + n).innerHTML = "";
+      return;
+    }
+    var dias = Math.max(1, Math.min(15, D.dias));
+    fetchJSON("https://api.open-meteo.com/v1/forecast?latitude=" + D.lat + "&longitude=" + D.lon +
+      "&current=temperature_2m,apparent_temperature,weather_code,is_day" +
+      "&hourly=temperature_2m,weather_code,precipitation_probability,is_day" +
+      "&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_min," +
+      "snowfall_sum,precipitation_probability_max,sunrise,sunset" +
+      "&forecast_days=" + (dias + 1) + "&timezone=" + encodeURIComponent(D.zonaHoraria))
+      .then(function (d) {
+        // "auto": la zona horaria la decide Open-Meteo según las coordenadas (lugar buscado o ubicación)
+        if (D.zonaHoraria === "auto" && d.timezone) { D.zonaHoraria = d.timezone; if (D.buscador) saveLugar(D); }
+        if (!renderWeather(D, n, d, null)) throw new Error("datos sin el día de hoy");
+        store("tiempo:" + D.key, { t: Date.now(), d: d, lat: D.lat, lon: D.lon });
+        if (after) after();
+      })
+      .catch(function () {
+        var c = load("tiempo:" + D.key);
+        if (c && c.d && (!D.buscador || (c.lat === D.lat && c.lon === D.lon)) && renderWeather(D, n, c.d, c.t)) return;
+        $("today-" + n).innerHTML = '<p class="status warn">' + T.errTiempo + '</p>';
+        $("hours-" + n).innerHTML = "";
+        $("days-" + n).innerHTML = "";
+        setFlagWx(D.key, "", T.sinDatos);
+      });
   }
+  function loadDetail() { DETAILS.forEach(function (D, n) { loadDetailOne(D, n); }); }
+  function saveLugar(D) { store("lugar", D.lat == null ? null : { nombre: D.nombre, lat: D.lat, lon: D.lon, zonaHoraria: D.zonaHoraria }); }
+  function setLugar(n, L) {
+    var D = DETAILS[n];
+    D.nombre = L ? L.nombre : ""; D.lat = L ? L.lat : null; D.lon = L ? L.lon : null; D.zonaHoraria = L ? (L.zonaHoraria || "auto") : tzMain;
+    saveLugar(D);
+    $("detail-title-" + n).textContent = L ? tx("tiempoEn", D.nombre) : T.tiempoOtroLugar;
+    if ($("uv-name-" + n)) $("uv-name-" + n).textContent = D.nombre || T.tiempoOtroLugar;
+    $("ps-clear").hidden = !L;
+    if (L) $("today-" + n).innerHTML = '<p class="status">' + T.cargandoTiempo + '</p>';
+    loadDetailOne(D, n, function () { loadUVOne(D, n); });
+    if (!L) loadUVOne(D, n);
+  }
+  // Buscador (Open-Meteo Geocoding) y botón "Mi ubicación" (geolocalización del navegador + nombre con BigDataCloud)
+  (function () {
+    var n = -1;
+    DETAILS.forEach(function (D, i) { if (D.buscador) n = i; });
+    if (n < 0) return;
+    var inp = $("ps-input"), list = $("ps-list"), msg = $("ps-msg"), timer, seq = 0;
+    var homeCC = (P.festivosOnline && P.festivosOnline.pais) || "ES";
+    inp.placeholder = T.buscarLugar; inp.setAttribute("aria-label", T.buscarLugar);
+    $("ps-geo").textContent = T.miUbicacion; $("ps-clear").textContent = T.quitar;
+    $("ps-clear").hidden = DETAILS[n].lat == null;
+    function hide() { list.hidden = true; list.innerHTML = ""; }
+    function note(t, cls) { list.innerHTML = '<li class="' + cls + '"></li>'; list.firstChild.textContent = t; list.hidden = false; }
+    inp.addEventListener("input", function () {
+      clearTimeout(timer);
+      var q = inp.value.trim();
+      if (q.length < 2) { hide(); return; }
+      timer = setTimeout(function () {
+        var my = ++seq;
+        fetchJSON("https://geocoding-api.open-meteo.com/v1/search?name=" + encodeURIComponent(q) + "&count=8&language=" + LANG + "&format=json")
+          .then(function (d) {
+            if (my !== seq) return;
+            var r = (d && d.results) || [];
+            if (!r.length) { note(T.sinResultados, "muted"); return; }
+            list.innerHTML = "";
+            r.forEach(function (x) {
+              var li = document.createElement("li"), b = document.createElement("button");
+              b.type = "button"; b.className = "ps-opt"; b.innerHTML = "<b></b><span></span>";
+              b.firstChild.textContent = x.name;
+              b.lastChild.textContent = [x.admin2 && x.admin2 !== x.name ? x.admin2 : "", x.admin1 && x.admin1 !== x.admin2 ? x.admin1 : "", x.country].filter(Boolean).join(", ");
+              b.addEventListener("click", function () {
+                hide(); inp.value = ""; inp.blur(); msg.textContent = "";
+                var foreign = x.country_code && x.country_code !== homeCC;
+                setLugar(n, { nombre: x.name + (foreign && x.country ? " (" + x.country + ")" : ""), lat: x.latitude, lon: x.longitude, zonaHoraria: x.timezone || "auto" });
+              });
+              li.appendChild(b); list.appendChild(li);
+            });
+            list.hidden = false;
+          })
+          .catch(function () { if (my === seq) note(T.errBuscar, "status warn"); });
+      }, 350);
+    });
+    inp.addEventListener("keydown", function (e) { if (e.key === "Escape") { hide(); inp.value = ""; } });
+    $("ps-clear").addEventListener("click", function () { msg.textContent = ""; setLugar(n, null); });
+    $("ps-geo").addEventListener("click", function () {
+      if (!navigator.geolocation) { msg.textContent = T.sinGeo; return; }
+      msg.textContent = T.buscandoUbicacion;
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        var la = +pos.coords.latitude.toFixed(4), lo = +pos.coords.longitude.toFixed(4);
+        fetchJSON("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + la + "&longitude=" + lo + "&localityLanguage=" + LANG)
+          .then(function (d) { return (d && (d.city || d.locality || d.principalSubdivision)) || ""; }, function () { return ""; })
+          .then(function (name) {
+            msg.textContent = "";
+            setLugar(n, { nombre: name ? tx("aquiNombre", name) : T.tuUbicacion, lat: la, lon: lo, zonaHoraria: "auto" });
+          });
+      }, function (err) {
+        msg.textContent = err && err.code === 1 ? T.geoDenegada : T.geoError;
+      }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 });
+    });
+  })();
 
-  /* ---------- Calendario: marcas por día (festivos, familia, días señalados) ---------- */
+  /* ---------- Fechas: utilidades ---------- */
   function pad2(n) { return (n < 10 ? "0" : "") + n; }
   function keyOf(y, m, d) { return y + "-" + pad2(m) + "-" + pad2(d); }
   function shiftDays(y, m, d, k) { var x = new Date(Date.UTC(y, m - 1, d + k)); return [x.getUTCFullYear(), x.getUTCMonth() + 1, x.getUTCDate()]; }
+  function dayNum(k) { var p = k.split("-"); return Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000; }
   function easterSunday(y) {           // algoritmo gregoriano anónimo (Meeus/Jones/Butcher)
     var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4,
         f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30,
@@ -777,6 +1332,12 @@
         mes = Math.floor((h + l - 7 * m + 114) / 31), dia = ((h + l - 7 * m + 114) % 31) + 1;
     return [y, mes, dia];
   }
+  function nthWeekday(y, r) {
+    var dim = new Date(Date.UTC(y, r.mes, 0)).getUTCDate(), days = [];
+    for (var d = 1; d <= dim; d++) if (new Date(Date.UTC(y, r.mes - 1, d)).getUTCDay() === r.diaSemana) days.push(d);
+    return r.orden === -1 ? days[days.length - 1] : days[r.orden - 1];
+  }
+  // fecha "MM-DD" o "AAAA-MM-DD", regla { mes, diaSemana, orden, desplazamiento } o pascua (días respecto al Domingo de Resurrección)
   function ymdOfRule(x, y) {
     if (x.pascua != null) { var e = easterSunday(y); return shiftDays(e[0], e[1], e[2], x.pascua); }
     if (x.regla) {
@@ -792,109 +1353,118 @@
     }
     return null;
   }
-  // Festivos habituales cuando el año no tiene calendario oficial cargado en config.js
-  function defaultHolidays(y) {
-    var e = easterSunday(y), js = shiftDays(e[0], e[1], e[2], -3), vs = shiftDays(e[0], e[1], e[2], -2);
-    return [
-      ["01-01", "Año Nuevo", "Nacional"], ["01-06", "Epifanía del Señor (Reyes)", "Nacional"],
-      [pad2(js[1]) + "-" + pad2(js[2]), "Jueves Santo", "Comunidad de Madrid"],
-      [pad2(vs[1]) + "-" + pad2(vs[2]), "Viernes Santo", "Nacional"],
-      ["05-01", "Fiesta del Trabajo", "Nacional"], ["05-02", "Fiesta de la Comunidad de Madrid", "Comunidad de Madrid"],
-      ["05-15", "San Isidro Labrador", "Madrid capital"], ["08-15", "Asunción de la Virgen", "Nacional"],
-      ["10-12", "Fiesta Nacional de España", "Nacional"], ["11-01", "Todos los Santos", "Nacional"],
-      ["11-09", "Nuestra Señora de la Almudena", "Madrid capital"], ["12-06", "Día de la Constitución", "Nacional"],
-      ["12-08", "Inmaculada Concepción", "Nacional"], ["12-25", "Navidad", "Nacional"]
-    ].map(function (h) { return { fecha: y + "-" + h[0], nombre: h[1], ambito: h[2], provisional: true, estimado: true }; });
-  }
-  /* ---------- Datos online para el calendario (con caché y respaldo en config.js) ---------- */
-  var ONLINE = { fest: {}, sport: [], status: {} };     // festivos por año, eventos deportivos, estado por fuente
-  var OL = CFG.online || {};
   function stripAcc(x) { return String(x || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
-  function teamKeys(txt) {
-    var x = stripAcc(txt), k = [];
-    if (/atletico|atleti/.test(x)) k.push("ATM");
-    if (/real madrid/.test(x)) k.push("RMA");
-    if (/barcelona|barca/.test(x)) k.push("FCB");
-    return k.sort().join("+");
+
+  /* ---------- Datos online para el calendario (con caché y respaldo en config.js) ---------- */
+  var ONLINE = { fest: { usa: {}, pais: {} }, sport: [], status: { fest: {}, sport: null } };
+  var OL = CFG.online || {};
+  var SP = OL.deportes || {};
+  var SPORT_CATS = (SP.equipos || []).map(function (e) { return e.categoria || e.nombre; })
+    .concat((SP.ligas || []).map(function (l) { return l.categoria; }));
+  function refreshCalendarViews() { marksCache = {}; if (calY) renderCalendar(); renderDates(); renderCalStatus(); }
+  function src(which) { return which === "pais" ? P : U; }
+
+  // Festivos: los oficiales de config.js mandan; si un año no está, se piden a Nager.Date (nacionales + región)
+  function loadOnlineHolidays(which, y) {
+    var X = src(which), N = X.festivosOnline;
+    if (!OL.festivos || !N || (X.festivos && X.festivos[y]) || ONLINE.fest[which][y]) return;
+    var key = "festivos:" + N.pais + ":" + y, c = load(key);
+    if (c && c.list) { ONLINE.fest[which][y] = c.list; ONLINE.status.fest[which] = { ok: true, t: c.t, y: y }; }
+    if (c && Date.now() - c.t < 7 * 86400000) return;
+    ONLINE.fest[which][y] = ONLINE.fest[which][y] || "cargando";
+    fetchJSON("https://date.nager.at/api/v3/PublicHolidays/" + y + "/" + N.pais)
+      .then(function (arr) {
+        var names = X.nombresFestivos || {};
+        var list = arr.filter(function (h) {
+          return (h.global || (N.region && (h.counties || []).indexOf(N.region) !== -1)) && (!h.types || h.types.indexOf("Public") !== -1);
+        }).map(function (h) {
+          return { fecha: h.date, nombre: names[h.name] || names[h.localName] || h.localName || h.name,
+                   ambito: h.global ? (N.ambitoNacional || "Nacional") : (N.ambitoRegion || N.region),
+                   provisional: !N.confirmados, online: true };
+        });
+        if (!list.length) throw new Error("vacío");
+        ONLINE.fest[which][y] = list; store(key, { t: Date.now(), list: list });
+        ONLINE.status.fest[which] = { ok: true, t: Date.now(), y: y };
+        refreshCalendarViews();
+      })
+      .catch(function () {
+        if (ONLINE.fest[which][y] === "cargando") delete ONLINE.fest[which][y];
+        if (!ONLINE.status.fest[which] || !ONLINE.status.fest[which].ok) ONLINE.status.fest[which] = { ok: false, y: y };
+        renderCalStatus();
+      });
   }
-  // Fecha y hora de Madrid a partir de la hora UTC que da la fuente
-  function madridFromUTC(dateStr, timeStr, stamp) {
+  function festList(which, y) {
+    var X = src(which), official = X.festivos && X.festivos[y];
+    if (official) return official;
+    loadOnlineHolidays(which, y);
+    var online = Array.isArray(ONLINE.fest[which][y]) && ONLINE.fest[which][y];
+    var hab = (X.festivosHabituales || []).map(function (h) {
+      var r = ymdOfRule(h, y);
+      return r && r[0] === y && { fecha: keyOf(r[0], r[1], r[2]), nombre: h.nombre, ambito: h.ambito || "",
+        provisional: true, estimado: true, soloConfig: !!h.soloConfig };
+    }).filter(Boolean);
+    // Los festivos que la fuente online no da (locales de una ciudad) se añaden desde config.js como previstos
+    return online ? online.concat(hab.filter(function (h) { return h.soloConfig; })) : hab;
+  }
+
+  // Partidos desde TheSportsDB (equipos de config.js > online.deportes)
+  var TSDB = "https://www.thesportsdb.com/api/v1/json/" + (SP.clave || "123") + "/";
+  function teamsIn(txt) {
+    var x = stripAcc(txt);
+    return (SP.equipos || []).filter(function (tm) {
+      return [].concat(tm.coincide || tm.nombre).some(function (w) { return x.indexOf(stripAcc(w)) !== -1; });
+    }).map(function (tm) { return tm.nombre; });
+  }
+  function tsdbTeamEvents(team) {
+    function ok(evs) {
+      return evs.filter(function (e) { return teamsIn((e.strHomeTeam || "") + " " + (e.strAwayTeam || "") + " " + (e.strEvent || "")).indexOf(team.nombre) !== -1; });
+    }
+    function byId(id) { return id ? fetchJSON(TSDB + "eventsnext.php?id=" + id).then(function (d) { return ok((d && d.events) || []); }) : Promise.resolve([]); }
+    var cachedId = load("equipo:" + team.nombre) || team.id;
+    return byId(cachedId).then(function (evs) {
+      if (evs.length) return evs;
+      // El identificador no devuelve partidos: se busca el equipo por nombre y se guarda el bueno
+      return fetchJSON(TSDB + "searchteams.php?t=" + encodeURIComponent(team.buscar || team.nombre)).then(function (d) {
+        var tm = ((d && d.teams) || []).filter(function (x) { return !team.deporte || x.strSport === team.deporte; })[0];
+        if (!tm || String(tm.idTeam) === String(cachedId)) return [];
+        store("equipo:" + team.nombre, tm.idTeam);
+        return byId(tm.idTeam);
+      });
+    });
+  }
+  function whenFromUTC(dateStr, timeStr, stamp) {
     var iso = stamp ? String(stamp).replace(" ", "T") : (dateStr + "T" + (timeStr || "00:00:00"));
     if (!/(Z|[+-]\d\d:?\d\d)$/.test(iso)) iso += "Z";
     var dt = new Date(iso);
     if (isNaN(dt)) return null;
-    var p = localParts(tzES, dt);
-    var known = !!(stamp || (timeStr && timeStr.slice(0, 5) !== "00:00"));
-    return { key: p.year + "-" + p.month + "-" + p.day, hora: known ? fmtTime(tzES, dt) : "" };
-  }
-  function refreshCalendarViews() { marksCache = {}; if (calY) renderCalendar(); renderDates(); renderCalStatus(); }
-
-  // Festivos: config.js manda; si un año no está, se piden a Nager.Date (nacionales + Comunidad de Madrid)
-  function loadOnlineHolidays(y) {
-    if (!OL.festivos || (CFG.calendario && CFG.calendario.festivos && CFG.calendario.festivos[y]) || ONLINE.fest[y]) return;
-    var key = "festivos:" + y, c = load(key);
-    if (c && c.list) { ONLINE.fest[y] = c.list; ONLINE.status.fest = { ok: true, t: c.t, y: y }; }
-    if (c && Date.now() - c.t < 7 * 86400000) return;
-    ONLINE.fest[y] = ONLINE.fest[y] || "cargando";
-    fetchJSON("https://date.nager.at/api/v3/PublicHolidays/" + y + "/ES")
-      .then(function (arr) {
-        var list = arr.filter(function (h) {
-          return (h.global || (h.counties || []).indexOf("ES-MD") !== -1) && (!h.types || h.types.indexOf("Public") !== -1);
-        }).map(function (h) {
-          return { fecha: h.date, nombre: h.localName || h.name, ambito: h.global ? "Nacional" : "Comunidad de Madrid", provisional: true, online: true };
-        });
-        if (!list.length) throw new Error("vacío");
-        ONLINE.fest[y] = list; store(key, { t: Date.now(), list: list });
-        ONLINE.status.fest = { ok: true, t: Date.now(), y: y };
-        refreshCalendarViews();
-      })
-      .catch(function () {
-        if (ONLINE.fest[y] === "cargando") delete ONLINE.fest[y];
-        ONLINE.status.fest = { ok: false, y: y };
-        renderCalStatus();
-      });
-  }
-
-  // Partidos (Real Madrid, Barça, Atlético) y UFC desde TheSportsDB
-  var TSDB = "https://www.thesportsdb.com/api/v1/json/" + ((OL.deportes && OL.deportes.clave) || "123") + "/";
-  function tsdbTeamEvents(team) {
-    var want = teamKeys(team.nombre);
-    function ok(evs) { return evs.filter(function (e) { return teamKeys(e.strEvent + " " + e.strHomeTeam + " " + e.strAwayTeam).indexOf(want) !== -1; }); }
-    function byId(id) { return fetchJSON(TSDB + "eventsnext.php?id=" + id).then(function (d) { return ok((d && d.events) || []); }); }
-    var cachedId = load("equipo:" + team.nombre) || team.id;
-    return byId(cachedId).then(function (evs) {
-      if (evs.length) return evs;
-      // El identificador no devuelve partidos del equipo: se busca por nombre y se guarda el bueno
-      return fetchJSON(TSDB + "searchteams.php?t=" + encodeURIComponent(team.buscar || team.nombre)).then(function (d) {
-        var t = ((d && d.teams) || []).filter(function (x) { return x.strSport === "Soccer" && /spain/i.test(x.strCountry || ""); })[0];
-        if (!t) return [];
-        store("equipo:" + team.nombre, t.idTeam);
-        return byId(t.idTeam);
-      });
-    });
+    var p = localParts(tzMain, dt), known = !!(stamp || (timeStr && timeStr.slice(0, 5) !== "00:00"));
+    return { key: p.year + "-" + p.month + "-" + p.day, nota: known ? bothTimes(dt) : "" };
   }
   function loadOnlineSports() {
-    var S = OL.deportes;
-    if (!S || !S.activo) return;
+    if (!SP.activo || !((SP.equipos || []).length || (SP.ligas || []).length)) return;
     var c = load("deportes");
     if (c && c.list) { ONLINE.sport = c.list; ONLINE.status.sport = { ok: true, t: c.t, cache: true }; }
-    if (c && Date.now() - c.t < (S.horasCache || 12) * 3600000) return;
-    var jobs = (S.equipos || []).map(function (tm) {
+    if (c && Date.now() - c.t < (SP.horasCache || 12) * 3600000) return;
+    var jobs = (SP.equipos || []).map(function (tm) {
       return tsdbTeamEvents(tm).then(function (evs) {
         return evs.map(function (e) {
-          var w = madridFromUTC(e.dateEvent, e.strTime, e.strTimestamp);
-          return w && { id: e.idEvent, key: w.key, nombre: (e.strHomeTeam || "") + " - " + (e.strAwayTeam || ""), categoria: "Fútbol",
-            nota: [e.strLeague, w.hora ? w.hora + " h" : "hora por confirmar", e.strVenue].filter(Boolean).join(" · ") };
+          var w = whenFromUTC(e.dateEvent, e.strTime, e.strTimestamp);
+          return w && { id: e.idEvent, key: w.key, nombre: (e.strHomeTeam || "") + " - " + (e.strAwayTeam || ""), categoria: tm.categoria || tm.nombre,
+            nota: [e.strLeague, w.nota || T.horaConfirmar, e.strVenue].filter(Boolean).join(" · ") };
         }).filter(Boolean);
       }).catch(function () { return null; });
     });
-    if (S.ufcLiga) jobs.push(fetchJSON(TSDB + "eventsnextleague.php?id=" + S.ufcLiga).then(function (d) {
-      return ((d && d.events) || []).filter(function (e) { return /ufc/i.test((e.strLeague || "") + (e.strEvent || "")); }).map(function (e) {
-        var w = madridFromUTC(e.dateEvent, e.strTime, e.strTimestamp);
-        return w && { id: e.idEvent, key: w.key, nombre: e.strEvent, categoria: "UFC",
-          nota: [w.hora ? "en España " + w.hora + " h" : "", e.strVenue || e.strCity].filter(Boolean).join(" · ") };
-      }).filter(Boolean);
-    }).catch(function () { return null; }));
+    // Ligas completas: config.js > online.deportes.ligas: [{ id, categoria, filtro }]
+    (SP.ligas || []).forEach(function (lg) {
+      jobs.push(fetchJSON(TSDB + "eventsnextleague.php?id=" + lg.id).then(function (d) {
+        var re = lg.filtro ? new RegExp(lg.filtro, "i") : null;
+        return ((d && d.events) || []).filter(function (e) { return !re || re.test((e.strLeague || "") + " " + (e.strEvent || "")); }).map(function (e) {
+          var w = whenFromUTC(e.dateEvent, e.strTime, e.strTimestamp);
+          return w && { id: e.idEvent, key: w.key, nombre: e.strEvent, categoria: lg.categoria,
+            nota: [w.nota || T.horaConfirmar, e.strVenue || e.strCity].filter(Boolean).join(" · ") };
+        }).filter(Boolean);
+      }).catch(function () { return null; }));
+    });
     Promise.all(jobs).then(function (res) {
       if (res.every(function (r) { return r === null; })) throw new Error("sin respuesta");
       var seen = {}, list = [];
@@ -908,88 +1478,127 @@
     });
   }
 
+  /* ---------- Calendario: marcas por día ---------- */
   var marksCache = {};
   function marksForYear(y) {
     if (marksCache[y]) return marksCache[y];
     var C = CFG.calendario || {}, map = {};
     function add(k, m) { (map[k] = map[k] || []).push(m); }
-    var official = C.festivos && C.festivos[y], online = Array.isArray(ONLINE.fest[y]) && ONLINE.fest[y];
-    if (!official) loadOnlineHolidays(y);
-    var fest = official || (online ? online.concat(defaultHolidays(y).filter(function (h) { return h.ambito === "Madrid capital"; })) : defaultHolidays(y));
-    fest.forEach(function (f) {
-      add(f.fecha, { tipo: "fest", nombre: f.nombre, ambito: f.ambito, provisional: !!f.provisional, estimado: !!f.estimado, online: !!f.online });
+
+    // Festivos de los dos países
+    ["pais", "usa"].forEach(function (which) {
+      festList(which, y).forEach(function (f) {
+        add(f.fecha, { tipo: "fest", pais: which, nombre: f.nombre, ambito: f.ambito, provisional: !!f.provisional, estimado: !!f.estimado, online: !!f.online });
+      });
     });
+    // Familia (cumpleaños y fechas con "lista" de mensajesEspeciales)
     (CFG.mensajesEspeciales || []).forEach(function (x) {
       if (!x.lista) return;
       var r = ymdOfRule(x, y);
       if (r) add(keyOf(r[0], r[1], r[2]), { tipo: "fam", nombre: x.lista });
     });
-    // Eventos online (fútbol y UFC). Sustituyen a los de config.js del mismo partido o velada (±1 día)
+    // Partidos online. Sustituyen a los de config.js de la misma categoría (±1 día)
     var onl = ONLINE.sport || [];
-    function dayNum(k) { var p = k.split("-"); return Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000; }
     onl.forEach(function (e) {
       if (+e.key.slice(0, 4) === y) add(e.key, { tipo: "evt", nombre: e.nombre, categoria: e.categoria, nota: e.nota, inicio: true, desde: e.key, online: true });
     });
     function coveredOnline(x) {
-      if (x.categoria !== "Fútbol" && x.categoria !== "UFC") return false;
-      var d0 = dayNum(x.fecha), tk = teamKeys(x.nombre);
+      if (SPORT_CATS.indexOf(x.categoria) === -1) return false;
+      var d0 = dayNum(x.fecha), tx0 = teamsIn(x.nombre);
+      // Mismo partido: misma categoría, ±1 día y algún equipo en común (o categoría sin equipos, como la UFC)
       return onl.some(function (e) {
         if (e.categoria !== x.categoria || Math.abs(dayNum(e.key) - d0) > 1) return false;
-        return x.categoria === "UFC" || teamKeys(e.nombre) === tk;
+        var te = teamsIn(e.nombre);
+        return !tx0.length || te.some(function (t) { return tx0.indexOf(t) !== -1; });
       });
     }
-    // Calendario escolar (rangos)
-    (C.escolar || []).forEach(function (x) {
-      var a = x.fecha.split("-").map(Number), b = (x.hasta || x.fecha).split("-").map(Number);
-      for (var tt = Date.UTC(a[0], a[1] - 1, a[2]), t1 = Date.UTC(b[0], b[1] - 1, b[2]); tt <= t1; tt += 86400000) {
-        var dd = new Date(tt);
-        if (dd.getUTCFullYear() === y) add(keyOf(y, dd.getUTCMonth() + 1, dd.getUTCDate()),
-          { tipo: "esc", nombre: x.nombre, inicio: tt === Date.UTC(a[0], a[1] - 1, a[2]), desde: x.fecha, hasta: x.hasta, nota: x.nota });
-      }
-    });
-    // Eventos con fecha concreta (pueden durar varios días con "hasta")
-    (C.eventos || []).forEach(function (x) {
-      if (coveredOnline(x)) return;
+    // Rangos de fechas (calendario escolar y eventos de varios días)
+    function addRange(x, tipo, extra) {
       var a = x.fecha.split("-").map(Number), b = (x.hasta || x.fecha).split("-").map(Number);
       var t0 = Date.UTC(a[0], a[1] - 1, a[2]), t1 = Date.UTC(b[0], b[1] - 1, b[2]);
-      for (var t = t0; t <= t1; t += 86400000) {
-        var d = new Date(t);
-        if (d.getUTCFullYear() !== y) continue;
-        add(keyOf(y, d.getUTCMonth() + 1, d.getUTCDate()), { tipo: "evt", nombre: x.nombre, categoria: x.categoria, nota: x.nota,
-          inicio: t === t0, desde: x.fecha, hasta: x.hasta, provisional: !!x.provisional });
+      for (var tt = t0; tt <= t1; tt += 86400000) {
+        var dd = new Date(tt);
+        if (dd.getUTCFullYear() !== y) continue;
+        var m = { tipo: tipo, nombre: x.nombre, inicio: tt === t0, desde: x.fecha, hasta: x.hasta, nota: x.nota, provisional: !!x.provisional };
+        for (var k in extra) m[k] = extra[k];
+        add(keyOf(y, dd.getUTCMonth() + 1, dd.getUTCDate()), m);
       }
+    }
+    (C.escolar || []).forEach(function (x) { addRange(x, "esc", { etiqueta: x.etiqueta }); });
+    // Eventos con fecha concreta. "hora" (HH:MM) va en la zona de EE. UU., o en la del país con zona: "pais".
+    (C.eventos || []).forEach(function (x) {
+      if (coveredOnline(x)) return;
+      var nota = x.nota || "";
+      if (x.hora && /^\d\d:\d\d$/.test(x.hora)) {
+        var f = x.fecha.split("-").map(Number), hm = x.hora.split(":").map(Number);
+        var dt = new Date(zonedTime(x.zona === "pais" || SOLO ? tzP : tzU, f[0], f[1], f[2], hm[0], hm[1]));
+        nota = [bothTimes(dt), nota].filter(Boolean).join(" · ");
+      }
+      addRange(x, "evt", { categoria: x.categoria, nota: nota, pais: x.pais });
     });
-    (C.senalados || []).forEach(function (x) {
-      var r = ymdOfRule(x, y);
-      if (!r || r[0] !== y) return;
-      var k = keyOf(r[0], r[1], r[2]);
-      // no repetir un día señalado que ese mismo día ya es festivo con el mismo nombre
-      var dup = (map[k] || []).some(function (m) { return m.tipo === "fest" && m.nombre.indexOf(x.nombre) === 0; });
-      if (!dup) add(k, { tipo: "sen", nombre: x.nombre });
+    // Días señalados de los dos países (sin repetir el mismo nombre el mismo día)
+    function addSen(k, which, nombre, nota) {
+      var same = (map[k] || []).filter(function (m) {
+        return (m.tipo === "sen" && m.nombre === nombre) || (m.tipo === "fest" && m.nombre.indexOf(nombre) === 0);
+      });
+      if (same.length) { same.forEach(function (m) { if (m.tipo === "sen" && m.pais !== which) m.pais = "ambos"; }); return; }
+      add(k, { tipo: "sen", pais: which, nombre: nombre, nota: nota });
+    }
+    ["pais", "usa"].forEach(function (which) {
+      (src(which).senalados || []).forEach(function (x) {
+        var r = ymdOfRule(x, y);
+        if (r && r[0] === y) addSen(keyOf(r[0], r[1], r[2]), which, x.nombre, x.nota);
+      });
+    });
+    // Cambios de hora: se calculan solos a partir de la zona horaria de cada sitio
+    var dstDays = {};
+    [["usa", tzU], ["pais", tzP]].filter(function (z) { return !(SOLO && z[0] === "usa"); }).forEach(function (z) {
+      var prev = offsetMinutes(z[1], new Date(Date.UTC(y - 1, 11, 31, 12)));
+      for (var tt = Date.UTC(y, 0, 1, 12); tt < Date.UTC(y + 1, 0, 1, 12); tt += 86400000) {
+        var o = offsetMinutes(z[1], new Date(tt));
+        if (o !== prev) {
+          var dd = new Date(tt), diff = Math.abs(offsetMinutes(tzP, dd) - offsetMinutes(tzU, dd)) / 60, dk = keyOf(y, dd.getUTCMonth() + 1, dd.getUTCDate());
+          if (dstDays[dk]) {
+            // Los dos países cambian el mismo día: se deja un único aviso con ambos nombres
+            dstDays[dk].nombre = tx(o > prev ? "cambioAdelanta" : "cambioRetrasa", countryName("pais") + T.yConj + countryName("usa"));
+            dstDays[dk].pais = "ambos"; dstDays[dk].nota = diff ? tx("desdeHoyDif", diff) : T.desdeHoyMisma;
+          } else {
+            addSen(dk, z[0], tx(o > prev ? "cambioAdelanta" : "cambioRetrasa", countryName(z[0])), SOLO ? "" : diff ? tx("desdeHoyDif", diff) : T.desdeHoyMisma);
+            dstDays[dk] = map[dk][map[dk].length - 1];
+          }
+        }
+        prev = o;
+      }
     });
     var order = { fest: 0, fam: 1, esc: 2, evt: 3, sen: 4 };
     Object.keys(map).forEach(function (k) { map[k].sort(function (a, b) { return order[a.tipo] - order[b.tipo]; }); });
     return (marksCache[y] = map);
   }
   function marksOn(y, m, d) { return marksForYear(y)[keyOf(y, m, d)] || []; }
-  function todayYMD() { var p = localParts(tzES); return [+p.year, +p.month, +p.day]; }
 
   /* ---------- Calendario mensual ---------- */
   var calY, calM, calSel;
-  var MONTHS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
-  function tagOf(m) { return m.tipo === "fest" ? "Fest" : m.tipo === "fam" ? "Fam" : m.tipo === "evt" ? "Evt" : m.tipo === "esc" ? "Esc" : "Dia"; }
-  function tagText(tag) { return tag === "Dia" ? "Día" : tag === "Esc" ? "Cole" : tag; }
+  var MONTHS = T.meses;
+  function tagOf(m) { return m.tipo === "fest" ? (m.pais === "usa" ? "FestU" : "Fest") : m.tipo === "fam" ? "Fam" : m.tipo === "evt" ? "Evt" : m.tipo === "esc" ? "Esc" : "Dia"; }
+  function tagText(tag) { return tag === "Dia" ? T.tagDia : tag === "Esc" ? T.tagEsc : tag === "Fam" ? T.tagFam : tag === "Evt" ? T.tagEvt : T.tagFest; }
   function shortDate(s) {
     var p = s.split("-");
-    return new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])));
+    return new Intl.DateTimeFormat(LOC, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])));
   }
+  function rangeTxt(m) { return m.hasta ? tx("rango", shortDate(m.desde), shortDate(m.hasta)) : ""; }
   function evtMeta(m) {
-    return [m.categoria || "Evento", m.hasta ? "del " + shortDate(m.desde) + " al " + shortDate(m.hasta) : "", m.nota || "",
-            m.provisional ? "fecha por confirmar" : "", m.online ? "dato online" : ""].filter(Boolean).join(" · ");
+    return [m.categoria || T.evento, rangeTxt(m), m.nota || "", m.provisional ? T.fechaConfirmar : "", m.online ? T.datoOnline : ""].filter(Boolean).join(" · ");
   }
   function festMeta(m) {
-    return "Festivo · " + m.ambito + (m.online ? " · fuente online (Nager.Date), pendiente de confirmar con el BOCM" :
-      m.estimado ? " · previsto, sin calendario oficial cargado" : m.provisional ? " · pendiente de aprobación" : "");
+    var X = src(m.pais), N = X.festivosOnline || {};
+    return tx("festivoDe", countryName(m.pais)) + (m.ambito ? " · " + m.ambito : "") +
+      (m.online ? T.fuenteOnline + (m.provisional ? (X.fuenteOficial ? tx("pendConfirmarCon", X.fuenteOficial) : T.pendConfirmar) : "") :
+       m.estimado ? T.previsto : m.provisional ? T.pendAprob : "");
+  }
+  function senMeta(m) { return [T.diaSenalado + (!SOLO && (m.pais === "usa" || m.pais === "pais") ? " · " + countryName(m.pais) : ""), m.nota || ""].filter(Boolean).join(" · "); }
+  function escMeta(m) {
+    var C = CFG.calendario || {};
+    return [m.etiqueta || C.nombreEscolar || T.calEscolar, rangeTxt(m), m.nota || "", m.provisional ? T.porConfirmar : ""].filter(Boolean).join(" · ");
   }
   function renderCalendar() {
     var td = todayYMD(), grid = $("cal-grid");
@@ -998,14 +1607,17 @@
     var first = (new Date(Date.UTC(calY, calM - 1, 1)).getUTCDay() + 6) % 7;     // lunes = 0
     var dim = new Date(Date.UTC(calY, calM, 0)).getUTCDate();
     var html = "";
-    ["L", "M", "X", "J", "V", "S", "D"].forEach(function (w) { html += '<div class="cal-dow">' + w + "</div>"; });
+    T.iniciales.forEach(function (w) { html += '<div class="cal-dow">' + w + "</div>"; });
     for (var i = 0; i < first; i++) html += '<div class="cal-day empty" aria-hidden="true"></div>';
     for (var d = 1; d <= dim; d++) {
-      var marks = marksOn(calY, calM, d), cls = "cal-day", dots = "", label = d + " de " + MONTHS[calM - 1];
-      var f = marks.filter(function (x) { return x.tipo === "fest"; })[0];
+      var marks = marksOn(calY, calM, d), cls = "cal-day", dots = "", label = tx("diaDe", d, MONTHS[calM - 1]);
+      ["pais", "usa"].forEach(function (which) {
+        var f = marks.filter(function (x) { return x.tipo === "fest" && x.pais === which; }), s = which === "pais" ? "p" : "u";
+        if (f.some(function (x) { return !x.provisional; })) cls += " fest-" + s;
+        else if (f.length) cls += " prov-" + s;
+      });
       if ((first + d - 1) % 7 === 6) cls += " sun";
-      if (f) cls += " fest" + (f.provisional ? " prov" : "");
-      if (calY === td[0] && calM === td[1] && d === td[2]) { cls += " today"; label += ", hoy"; }
+      if (calY === td[0] && calM === td[1] && d === td[2]) { cls += " today"; label += T.esHoyAria; }
       if (marks.some(function (x) { return x.tipo === "fam"; })) dots += '<i class="d-fam"></i>';
       if (marks.some(function (x) { return x.tipo === "esc"; })) dots += '<i class="d-esc"></i>';
       if (marks.some(function (x) { return x.tipo === "evt"; })) dots += '<i class="d-evt"></i>';
@@ -1020,9 +1632,8 @@
   function renderCalDetail() {
     var box = $("cal-detail"), marks = marksOn(calY, calM, calSel);
     var dt = new Date(Date.UTC(calY, calM - 1, calSel));
-    var title = new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(dt);
     box.innerHTML = '<p class="cal-date"></p>';
-    box.firstChild.textContent = title;
+    box.firstChild.textContent = new Intl.DateTimeFormat(LOC, { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(dt);
     if (marks.length) {
       var ul = document.createElement("ul");
       ul.className = "cal-marks";
@@ -1030,43 +1641,52 @@
         var li = document.createElement("li"), tag = tagOf(m);
         li.innerHTML = '<span class="tag ' + tag + '">' + tagText(tag) + '</span><span><span class="nm"></span><span class="meta"></span></span>';
         li.querySelector(".nm").textContent = m.nombre;
-        li.querySelector(".meta").textContent = m.tipo === "fest" ? festMeta(m) : m.tipo === "fam" ? "Familia" :
-          m.tipo === "evt" ? evtMeta(m) : m.tipo === "esc" ? ["Calendario escolar", m.hasta ? "del " + shortDate(m.desde) + " al " + shortDate(m.hasta) : "", m.nota || ""].filter(Boolean).join(" · ") : "Día señalado";
+        li.querySelector(".meta").textContent = m.tipo === "fest" ? festMeta(m) : m.tipo === "fam" ? T.familia :
+          m.tipo === "evt" ? evtMeta(m) : m.tipo === "esc" ? escMeta(m) : senMeta(m);
         ul.appendChild(li);
       });
       box.appendChild(ul);
     } else {
-      box.insertAdjacentHTML("beforeend", '<p class="cal-none">Nada marcado para este día.</p>');
+      box.insertAdjacentHTML("beforeend", '<p class="cal-none">' + T.nadaMarcado + '</p>');
     }
     var S = window.SANTORAL, santo = S && S[pad2(calM) + "-" + pad2(calSel)];
     if (santo) {
       var p = document.createElement("p");
       p.className = "cal-santo";
-      p.innerHTML = "<b>Santoral:</b> <span></span>";
+      p.innerHTML = "<b></b> <span></span>"; p.querySelector("b").textContent = T.santoral;
       p.querySelector("span").textContent = santo;
       box.appendChild(p);
     }
   }
   // Avisos de datos caducados o a punto de caducar + estado de las fuentes online
   function renderCalStatus() {
-    var C = CFG.calendario || {}, td = todayYMD(), y = td[0], warn = [], info = [];
-    var F = C.festivos || {};
-    if (!F[y]) warn.push("Faltan los festivos oficiales de " + y + " en config.js.");
-    if (td[1] >= 10 && !F[y + 1]) warn.push("Ya suele estar publicado el calendario laboral de " + (y + 1) + " (BOCM): añádelo a config.js.");
-    var todayK = keyOf(td[0], td[1], td[2]);
-    var escFuture = (C.escolar || []).some(function (x) { return (x.hasta || x.fecha) >= todayK; });
-    if (!escFuture) warn.push("Falta el calendario escolar del curso siguiente en config.js.");
-    var staticFuture = (C.eventos || []).some(function (x) { return (x.hasta || x.fecha) >= todayK && x.categoria !== "UFC" && x.categoria !== "Fútbol"; });
-    if (!staticFuture) warn.push("No quedan eventos de Madrid futuros en config.js.");
+    var C = CFG.calendario || {}, td = todayYMD(), y = td[0], warn = [], info = [], todayK = keyOf(td[0], td[1], td[2]);
+    function future(x) { return (x.hasta || x.fecha) >= todayK; }
+    if (P.fuenteOficial && P.avisarFestivos !== false) {
+      var F = P.festivos || {};
+      if (!F[y]) warn.push(tx("warnFestivos", countryName("pais"), y));
+      if (td[1] >= 10 && !F[y + 1]) warn.push(tx("warnFestivosSig", y + 1, P.fuenteOficial));
+    }
+    if (C.escolar && !C.escolar.some(future))
+      warn.push(tx("warnEscolar", C.nombreEscolar ? tx("deX", C.nombreEscolar) : ""));
+    var ev = C.eventos || [];
+    if (!ev.some(function (x) { return future(x) && SPORT_CATS.indexOf(x.categoria) === -1; }))
+      warn.push(T.warnEventos);
+    var sportFuture = ev.some(function (x) { return future(x) && SPORT_CATS.indexOf(x.categoria) !== -1; }) ||
+      (ONLINE.sport || []).some(function (e) { return e.key >= todayK; });
+    if (SPORT_CATS.length && !sportFuture && td[1] >= 6 && td[1] <= 9)
+      warn.push(tx("warnPartidos", SPORT_CATS.join(", ")));
     var st = ONLINE.status;
-    if (st.sport) info.push(st.sport.ok ? "Partidos y UFC online " + (st.sport.t ? ago(st.sport.t) : "") :
-      "Sin conexión con la fuente de partidos" + (st.sport.t ? ": se usa la copia de " + ago(st.sport.t).replace("hace ", "hace ") : ": se usan los de config.js"));
-    if (st.fest) info.push(st.fest.ok ? "Festivos " + st.fest.y + " desde fuente online" : "Sin conexión con la fuente de festivos " + st.fest.y);
-    var w = $("cal-warn"), s = $("cal-status");
-    w.hidden = !warn.length; w.textContent = warn.join(" ");
-    s.textContent = info.join(" · ");
+    if (st.sport) info.push(st.sport.ok ? tx("stPartidos", st.sport.t ? ago(st.sport.t) : "") :
+      st.sport.t ? tx("stPartidosCopia", ago(st.sport.t)) : T.stPartidosConfig);
+    ["pais", "usa"].forEach(function (w) {
+      var s = st.fest[w];
+      if (s) info.push(s.ok ? tx("stFestivos", countryName(w), s.y) : tx("stSinFestivos", countryName(w), s.y));
+    });
+    var wEl = $("cal-warn");
+    wEl.hidden = !warn.length; wEl.textContent = warn.join(" ");
+    $("cal-status").textContent = info.join(" · ");
   }
-
   function goMonth(y, m, sel) {
     calY = y; calM = m;
     var td = todayYMD();
@@ -1086,12 +1706,9 @@
     });
     renderCalDetail();
   });
-  // Primero se carga la copia guardada de partidos (si la hay), luego se pinta y, si toca, se actualiza online
   function renderCalendarToday() { var td = todayYMD(); loadOnlineSports(); marksCache = {}; goMonth(td[0], td[1]); renderCalStatus(); }
 
   /* ---------- Próximas fechas (misma fuente que el calendario) ---------- */
-  // Próximas fechas con cuenta atrás: todo lo de los próximos "proximasFechasDias" días
-  // y, si son menos de "mostrarFechas", se completa con las siguientes.
   var datesDay = "";
   function renderDates() {
     var td = todayYMD(), items = [], min = CFG.mostrarFechas || 12, dias = CFG.proximasFechasDias || 31,
@@ -1102,105 +1719,101 @@
       var r = shiftDays(td[0], td[1], td[2], k);
       marksOn(r[0], r[1], r[2]).forEach(function (m) {
         if ((m.tipo === "evt" || m.tipo === "esc") && !m.inicio && k > 0) return;      // un rango aparece una vez
-        if (m.tipo === "evt" && excl.indexOf(m.categoria) !== -1) return;              // fútbol y UFC solo en el calendario
+        if (m.tipo === "evt" && excl.indexOf(m.categoria) !== -1) return;              // categorías que solo van al calendario
         items.push({ r: r, k: k, m: m });
       });
     }
     var ul = $("dates"), rows = Math.ceil(items.length / 2);
     ul.innerHTML = "";
     ul.style.gridTemplateRows = "repeat(" + Math.max(rows, 1) + ", auto)";
-    if (!items.length) { ul.innerHTML = '<li class="col-top"><span class="muted">No hay fechas próximas.</span></li>'; return; }
-    var dfmt = new Intl.DateTimeFormat("es-ES", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
+    if (!items.length) { ul.innerHTML = '<li class="col-top"><span class="muted">' + T.noFechas + '</span></li>'; return; }
+    var dfmt = new Intl.DateTimeFormat(LOC, { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
     items.forEach(function (x, i) {
       var li = document.createElement("li"), tag = tagOf(x.m);
       if (i === 0 || i === rows) li.className = "col-top";
       li.innerHTML = '<span class="tag ' + tag + '">' + tagText(tag) + '</span><span class="d-txt"><span class="d-name"></span>' +
         '<span class="d-when"></span><span class="d-cd"></span></span>';
-      li.querySelector(".d-name").textContent = x.m.nombre + (x.m.provisional ? " (por confirmar)" : "");
+      li.querySelector(".d-name").textContent = x.m.nombre + (x.m.provisional && !x.m.online && x.m.tipo !== "fest" ? T.porConfirmarParen : "");
       li.querySelector(".d-when").textContent = dfmt.format(new Date(Date.UTC(x.r[0], x.r[1] - 1, x.r[2])));
       var cd = li.querySelector(".d-cd");
-      if (x.k === 0) { cd.textContent = x.m.desde && !x.m.inicio ? "En curso" : "¡Es hoy!"; cd.classList.add("today"); }
-      else cd.dataset.t = midnightIn(tzES, x.r[0], x.r[1], x.r[2]);
+      if (x.k === 0) { cd.textContent = x.m.desde && !x.m.inicio ? T.enCurso : T.esHoy; cd.classList.add("today"); }
+      else cd.dataset.t = midnightIn(tzMain, x.r[0], x.r[1], x.r[2]);
       ul.appendChild(li);
     });
     tickDates();
   }
   // Cuenta atrás en vivo: "4 días · 13:11:04" o "2 meses 3 días · 13:11:04"
+  function addMonths(tm, n) {
+    var d = new Date(tm), day = d.getDate();
+    d.setDate(1); d.setMonth(d.getMonth() + n);
+    d.setDate(Math.min(day, new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()));
+    return d.getTime();
+  }
+  function breakdown(from, to) {
+    var months = 0;
+    while (addMonths(from, months + 1) <= to) months++;
+    var rest = Math.floor((to - addMonths(from, months)) / 1000);
+    var weeks = Math.floor(rest / 604800); rest -= weeks * 604800;
+    var days = Math.floor(rest / 86400); rest -= days * 86400;
+    var hours = Math.floor(rest / 3600); rest -= hours * 3600;
+    var mins = Math.floor(rest / 60);
+    return [months, weeks, days, hours, mins, rest - mins * 60];
+  }
   function tickDates() {
     var now = Date.now(), td = todayYMD();
     if (keyOf(td[0], td[1], td[2]) !== datesDay) { renderDates(); return; }   // ha cambiado el día
     Array.prototype.forEach.call(document.querySelectorAll("#dates .d-cd[data-t]"), function (el) {
-      var t = +el.dataset.t;
-      if (t <= now) { renderDates(); return; }
-      var b = breakdown(now, t), d = b[1] * 7 + b[2], txt = "";
-      if (b[0]) txt = b[0] + (b[0] === 1 ? " mes " : " meses ");
-      if (d || !b[0]) txt += d + (d === 1 ? " día" : " días");
+      var tt = +el.dataset.t;
+      if (tt <= now) { renderDates(); return; }
+      var b = breakdown(now, tt), d = b[1] * 7 + b[2], txt = "";
+      if (b[0]) txt = b[0] + " " + (b[0] === 1 ? T.mes : T.mesesVarios && !(b[0] % 10 >= 2 && b[0] % 10 <= 4 && (b[0] % 100 < 12 || b[0] % 100 > 14)) ? T.mesesVarios : T.mesesN) + " ";
+      if (d || !b[0]) txt += d + " " + (d === 1 ? T.dia : T.dias);
       el.textContent = txt.trim() + " · " + [b[3], b[4], b[5]].map(function (v) { return String(v).padStart(2, "0"); }).join(":");
     });
   }
   setInterval(tickDates, 1000);
 
-  /* ---------- Utilidades de hora local ---------- */
-  function localParts(tz, d) {
-    var p = {};
-    new Intl.DateTimeFormat("en-US", {
-      timeZone: tz, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit"
-    }).formatToParts(d || new Date()).forEach(function (x) { p[x.type] = x.value; });
-    return p;
-  }
-  function localHourISO(tz, d) { var p = localParts(tz, d); return p.year + "-" + p.month + "-" + p.day + "T" + p.hour + ":00"; }
-
-  /* ---------- Rotación diaria ---------- */
+  /* ---------- Frase del día y mensajes especiales ---------- */
   var FRASES = window.FRASES || [];
   function pick(list, i) { return list[((i % list.length) + list.length) % list.length]; }
-  function dayNumber() {
-    var p = localParts(tzES);
-    return Math.floor(Date.UTC(+p.year, +p.month - 1, +p.day) / 86400000);   // cambia a medianoche de Madrid
-  }
-  // Mensajes especiales: "MM-DD" (cada año), "AAAA-MM-DD" (un día concreto)
-  // o regla de festivo móvil { mes, diaSemana (0 domingo ... 6 sábado), orden (1-5, o -1 = último) }.
-  // Todas las fechas se evalúan en hora de Madrid.
+  function dayNumber() { var td = todayYMD(); return Math.floor(Date.UTC(td[0], td[1] - 1, td[2]) / 86400000); }  // cambia a medianoche de la zona principal
   function ymdIn(tz, offsetDays) {
-    var d = new Date(Date.now() + (offsetDays || 0) * 86400000), p = localParts(tz, d);
+    var p = localParts(tz, new Date(Date.now() + (offsetDays || 0) * 86400000));
     return { y: +p.year, m: +p.month, d: +p.day, mmdd: p.month + "-" + p.day, full: p.year + "-" + p.month + "-" + p.day };
   }
-  function matches(x, t) {
-    if (x.fecha) { var f = x.fecha.replace(/\s/g, ""); return f === t.mmdd || f === t.full; }
+  function matches(x, tt) {
+    if (x.fecha) { var f = x.fecha.replace(/\s/g, ""); return f === tt.mmdd || f === tt.full; }
     if (x.regla) {
-      var r = x.regla, wd = new Date(Date.UTC(t.y, t.m - 1, t.d)).getUTCDay();
-      var dim = new Date(Date.UTC(t.y, t.m, 0)).getUTCDate();
-      if (r.mes !== t.m || r.diaSemana !== wd) return false;
-      return r.orden === -1 ? t.d + 7 > dim : Math.ceil(t.d / 7) === r.orden;
+      var r = ymdOfRule(x, tt.y);
+      return !!r && r[1] === tt.m && r[2] === tt.d;
     }
     return false;
   }
+  // zona: "ambas" (desde que empieza el día en el país hasta que acaba en EE. UU.), "pais", "usa"; sin zona, la principal
+  function zonesOf(x) { return x.zona === "ambas" ? [tzP, tzU] : x.zona === "pais" ? [tzP] : x.zona === "usa" ? [tzU] : [tzMain]; }
   function messagesFor(offsetDays) {
     return (CFG.mensajesEspeciales || []).filter(function (x) {
-      return matches(x, ymdIn(tzES, offsetDays));
+      return zonesOf(x).some(function (tz) { return matches(x, ymdIn(tz, offsetDays)); });
     });
   }
   function specialMessage() {
     var hit = messagesFor(0);
     return hit.length ? hit.map(function (x) { return x.texto; }).join("  ·  ") : null;
   }
-  // Aviso previo: cumpleaños y fechas marcadas con "lista" en los próximos N días
   function preNotice() {
-    var N = CFG.avisoPrevioDias || 0, out = [];
+    var N = CFG.avisoPrevioDias || 0, out = [], today = messagesFor(0);
     for (var k = 1; k <= N; k++) {
       messagesFor(k).forEach(function (x) {
-        if (!x.lista || !x.avisar) return;
-        // evita repetir si ese mensaje ya está activo hoy
-        if (messagesFor(0).indexOf(x) !== -1) return;
+        if (!x.lista || !x.avisar || today.indexOf(x) !== -1) return;
         if (out.some(function (o) { return o.x === x; })) return;
         out.push({ x: x, k: k });
       });
     }
-    return out.map(function (o) { return (o.k === 1 ? "Mañana" : "En " + o.k + " días") + ": " + o.x.lista.charAt(0).toLowerCase() + o.x.lista.slice(1); }).join("  ·  ");
+    return out.map(function (o) { return (o.k === 1 ? T.manana : tx("enNDias", o.k)) + ": " + o.x.lista.charAt(0).toLowerCase() + o.x.lista.slice(1); }).join("  ·  ");
   }
-
   function renderLove() {
     var special = specialMessage(), pre = preNotice();
-    $("love-pre").textContent = pre ? "Recuerda. " + pre : "";
+    $("love-pre").textContent = pre ? T.recuerda + pre : "";
     if (special) {
       $("love").className = "love special";
       $("love-en").textContent = special;
@@ -1211,13 +1824,12 @@
     $("love").className = "love";
     if (!FRASES.length) { $("love-en").textContent = ""; $("love-es").textContent = ""; $("love").hidden = !pre; return; }
     var f = pick(FRASES, dayNumber());
-    $("love-en").textContent = f.en;
-    $("love-es").textContent = f.es;
+    $("love-en").textContent = learnTxt(f);
+    $("love-es").textContent = f[LANG] != null ? f[LANG] : f.es;
     $("love").hidden = false;
   }
 
-  /* ---------- Expresiones útiles de la época del año ---------- */
-  // Elige n expresiones seguidas que cambian cada día a medianoche de Madrid (al acabar la lista, vuelve a empezar)
+  /* ---------- Expresiones útiles ---------- */
   function dailySlice(list, n) {
     if (list.length <= n) return list.slice();
     var start = (dayNumber() * n) % list.length, out = [];
@@ -1226,107 +1838,409 @@
   }
   function renderExpr() {
     var E = window.EXPRESIONES, card = $("expr-card");
-    if (!E) { card.hidden = true; return; }
-    // Todas las listas mezcladas por turnos (una de cada bloque), así cada día sale variado.
-    // Las marcadas como aprendidas salen de la rotación (se guardan en este navegador).
-    var learned = load("aprendidas") || {}, total = 0;
+    if (!E || card.dataset.off) { card.hidden = true; return; }
+    // Todas las listas mezcladas por turnos; las aprendidas salen de la rotación
+    var learned = load(LEARNED_KEY, true) || {}, total = 0;
     var groups = Object.keys(E).map(function (k) { return E[k] || []; }), list = [];
     var longest = Math.max.apply(null, groups.map(function (g) { return g.length; }));
-    for (var i = 0; i < longest; i++) groups.forEach(function (g) { if (g[i]) { total++; if (!learned[g[i].en]) list.push(g[i]); } });
+    for (var i = 0; i < longest; i++) groups.forEach(function (g) { if (g[i]) { total++; if (!learned[learnTxt(g[i])]) list.push(g[i]); } });
     if (!list.length) { card.hidden = true; return; }
-    $("expr-title").textContent = "Expresiones útiles";
     var ul = $("expr-list"), today = dailySlice(list, CFG.palabrasPorDia || 20), rows = Math.ceil(today.length / 2);
     ul.innerHTML = "";
     ul.style.gridTemplateRows = "repeat(" + rows + ", auto)";
     today.forEach(function (w, i) {
       var li = document.createElement("li");
       if (i === 0 || i === rows) li.className = "col-top";
-      li.innerHTML = '<span class="x-en"></span><span class="x-es"></span><button type="button" class="x-chk" aria-label="Marcar como aprendida">✓</button>';
-      li.children[0].textContent = w.en;
-      li.children[1].textContent = w.es;
-      li.dataset.en = w.en;
+      li.innerHTML = '<span class="x-en"></span><span class="x-es"></span><button type="button" class="x-chk" aria-label="' + T.marcarAprendida + '">✓</button>';
+      li.children[0].textContent = learnTxt(w);
+      li.children[1].textContent = w[LANG] != null ? w[LANG] : w.es;
+      li.dataset.en = learnTxt(w);
       ul.appendChild(li);
     });
     var nL = Object.keys(learned).length;
-    $("expr-count").textContent = nL ? "Aprendidas: " + nL + " de " + total + "." : "Marca con el círculo las que ya sepas: dejarán de salir.";
+    $("expr-count").textContent = nL ? tx("aprendidasDe", nL, total) : T.marcaCirculo;
     $("expr-reset").hidden = !nL;
     card.hidden = false;
   }
-
-  // Modo repaso: oculta traducciones; tocar una fila la muestra. El círculo marca/desmarca como aprendida.
   (function () {
     var btn = $("expr-mode"), ul = $("expr-list");
-    function setMode(on) { btn.setAttribute("aria-pressed", String(on)); ul.classList.toggle("repaso", on); store("repaso", on); }
-    setMode(!!load("repaso"));
+    function setMode(on) { btn.setAttribute("aria-pressed", String(on)); ul.classList.toggle("repaso", on); store("repaso", on, true); }
+    setMode(!!load("repaso", true));
     btn.addEventListener("click", function () { setMode(btn.getAttribute("aria-pressed") !== "true"); });
     ul.addEventListener("click", function (e) {
       var li = e.target.closest("li");
       if (!li) return;
       if (e.target.closest(".x-chk")) {
-        var L = load("aprendidas") || {};
+        var L = load(LEARNED_KEY, true) || {};
         if (L[li.dataset.en]) delete L[li.dataset.en]; else L[li.dataset.en] = Date.now();
-        store("aprendidas", L);
+        store(LEARNED_KEY, L, true);
         li.classList.toggle("learned", !!L[li.dataset.en]);
         var n = Object.keys(L).length;
-        $("expr-count").textContent = n ? "Aprendidas: " + n + ". Desde mañana ya no saldrán." : "";
+        $("expr-count").textContent = n ? tx("aprendidasManana", n) : "";
         $("expr-reset").hidden = !n;
         return;
       }
       if (ul.classList.contains("repaso")) li.classList.toggle("show");
     });
     $("expr-reset").addEventListener("click", function () {
-      if (!window.confirm("¿Volver a incluir todas las expresiones marcadas como aprendidas?")) return;
-      store("aprendidas", {}); renderExpr();
+      if (!window.confirm(T.confirmReiniciar)) return;
+      store(LEARNED_KEY, {}, true); renderExpr();
     });
   })();
 
-  /* ---------- Utilidades de fechas para la cuenta atrás ---------- */
-  // Medianoche (inicio del día) de una fecha en una zona horaria, como instante absoluto
-  function midnightIn(tz, y, m, d) {
-    var guess = Date.UTC(y, m - 1, d, 0, 0);
-    for (var i = 0; i < 2; i++) {
-      var p = localParts(tz, new Date(guess));
-      var shown = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, 0);
-      guess -= shown - Date.UTC(y, m - 1, d, 0, 0);
+  /* ---------- Conversor ---------- */
+  var nf2 = new Intl.NumberFormat(LOC, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  var nfMax2 = new Intl.NumberFormat(LOC, { maximumFractionDigits: 2 });
+  var nf4 = new Intl.NumberFormat(LOC, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+  function parseNum(v) {
+    v = String(v).replace(/\s/g, "");
+    if (v === "") return NaN;
+    if (v.indexOf(",") !== -1) v = v.replace(/\./g, "").replace(",", ".");
+    return parseFloat(v);
+  }
+  function lin(f) { return { toB: function (x) { return x * f; }, toA: function (x) { return x / f; } }; }
+  var MON = P.moneda || { codigo: "EUR", simbolo: "€", nombre: "Euros" };
+  var rate = null;                                   // unidades de la moneda del país por 1 dólar
+  var CONV = [
+    { id: "money", btn: T.dolares + " / " + MON.nombre.toLowerCase(), main: true, a: T.dolares, sa: "$", b: MON.nombre, sb: MON.simbolo, money: true,
+      conv: { toB: function (x) { return rate ? x * rate : NaN; }, toA: function (x) { return rate ? x / rate : NaN; } } },
+    { id: "mi", btn: T.bMillas, a: T.millas, sa: "mi", b: T.kilometros, sb: "km", conv: lin(1.609344) },
+    { id: "yd", btn: T.bYardas, a: T.yardas, sa: "yd", b: T.metros, sb: "m", conv: lin(0.9144) },
+    { id: "f", btn: "°F / °C", a: T.fahrenheit, sa: "°F", b: T.celsius, sb: "°C",
+      conv: { toB: function (x) { return (x - 32) * 5 / 9; }, toA: function (x) { return x * 9 / 5 + 32; } } },
+    { id: "lb", btn: T.bLibras, a: T.libras, sa: "lb", b: T.kilos, sb: "kg", conv: lin(0.45359237) },
+    { id: "oz", btn: T.bOnzas, a: T.onzas, sa: "oz", b: T.gramos, sb: "g", conv: lin(28.349523125) },
+    { id: "cup", btn: T.bTazas, a: T.tazas, sa: "cup", b: T.mililitros, sb: "ml", conv: lin(236.5882365) },
+    { id: "in", btn: T.bPulgadas, a: T.pulgadas, sa: "in", b: T.centimetros, sb: "cm", conv: lin(2.54) },
+    { id: "gal", btn: T.bGalones, a: T.galones, sa: "gal", b: T.litros, sb: "l", conv: lin(3.785411784) },
+    { id: "mph", btn: "mph / km/h", a: T.mph, sa: "mph", b: T.kmh, sb: "km/h", conv: lin(1.609344) }
+  ];
+  var convCur = CONV[0], convA = $("conv-a"), convB = $("conv-b"), rateTxt = T.cargandoCambio, rateWarn = false;
+  CONV.forEach(function (u) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "conv-btn" + (u.main ? " main" : ""); b.textContent = u.btn; b.dataset.id = u.id;
+    b.setAttribute("aria-pressed", String(u === convCur));
+    $("conv-btns").appendChild(b);
+  });
+  $("conv-btns").addEventListener("click", function (e) {
+    var b = e.target.closest(".conv-btn");
+    if (!b) return;
+    var u = CONV.filter(function (x) { return x.id === b.dataset.id; })[0];
+    if (u === convCur) return;
+    convCur = u;
+    Array.prototype.forEach.call(this.children, function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    convA.value = u.money ? "20" : "1";
+    setConv("a");
+  });
+  function setConv(from) {
+    var u = convCur, fmt = u.money ? nf2 : nfMax2;
+    $("conv-a-label").textContent = u.a; $("conv-a-sym").textContent = u.sa;
+    $("conv-b-label").textContent = u.b; $("conv-b-sym").textContent = u.sb;
+    if (from === "a") { var r = u.conv.toB(parseNum(convA.value)); convB.value = isNaN(r) ? "" : fmt.format(r); }
+    else { var r2 = u.conv.toA(parseNum(convB.value)); convA.value = isNaN(r2) ? "" : fmt.format(r2); }
+    var note = $("conv-note");
+    note.className = "rate" + (u.money && rateWarn ? " warn" : "");
+    note.textContent = u.money ? rateTxt : u.id === "oz" ? T.notaOnza : u.id === "cup" ? T.notaTaza : u.id === "gal" ? T.notaGalon : "";
+  }
+  convA.addEventListener("input", function () { setConv("a"); });
+  convB.addEventListener("input", function () { setConv("b"); });
+  [convA, convB].forEach(function (el) { el.addEventListener("focus", function () { el.select(); }); });
+
+  // Tipo de cambio: BCE (Frankfurter) > ExchangeRate-API > última tasa guardada > tasa manual de config.js
+  function showRate(r, txt, warn) {
+    rate = r; rateWarn = !!warn;
+    rateTxt = "1 $ = " + nf4.format(r) + " " + MON.simbolo + " · 1 " + MON.simbolo + " = " + nf4.format(1 / r) + " $ · " + txt;
+    setConv("a");
+  }
+  function loadRate() {
+    var to = MON.codigo;
+    fetchJSON("https://api.frankfurter.app/latest?from=USD&to=" + to)
+      .then(function (d) { return { r: d.rates[to], src: T.bce, fecha: String(d.date || "").split("-").reverse().join("/") }; })
+      .catch(function () {
+        return fetchJSON("https://open.er-api.com/v6/latest/USD")
+          .then(function (d) { return { r: d.rates[to], src: "ExchangeRate-API", fecha: (d.time_last_update_utc || "").slice(5, 16) }; });
+      })
+      .then(function (x) {
+        if (!(x.r > 0)) throw new Error("sin tasa");
+        store("cambio:" + to, { t: Date.now(), r: x.r, src: x.src, fecha: x.fecha });
+        showRate(x.r, x.src + (x.fecha ? " (" + x.fecha + ")" : ""), false);
+      })
+      .catch(function () {
+        var c = load("cambio:" + to);
+        if (c && c.r) showRate(c.r, tx("tasaGuardada", ago(c.t)), Date.now() - c.t > 3 * 86400000);
+        else if (MON.tasaRespaldo) showRate(MON.tasaRespaldo, T.tasaManual, true);
+        else { rate = null; rateWarn = true; rateTxt = T.sinCambio; setConv("a"); }
+      });
+  }
+  setConv("a");
+
+  /* ---------- Sol y aire: índice UV por hora y calidad del aire (Open-Meteo) ---------- */
+  // Las horas se centran solas en el pico de UV de cada lugar (mediodía solar).
+  var UV_TXT = T.uvTxt;
+  function uvClass(v) { return v < 3 ? 0 : v < 6 ? 1 : v < 8 ? 2 : v < 11 ? 3 : 4; }
+  var AQ_TXT = T.aqTxt;
+  function aqClass(v) { return v <= 50 ? 0 : v <= 100 ? 1 : v <= 150 ? 2 : v <= 200 ? 3 : v <= 300 ? 4 : 5; }
+  (function buildUV() {
+    var wrap = $("uv-wrap");
+    DETAILS.forEach(function (D, n) {
+      var div = document.createElement("div");
+      div.className = "uv-place";
+      div.innerHTML = '<div class="uv-head"><strong id="uv-name-' + n + '"></strong>' +
+        '<span class="aq" id="aq-' + n + '"><span class="dot" aria-hidden="true"></span><span id="aq-text-' + n + '">' + T.cargandoAire + '</span></span></div>' +
+        '<div class="uv-bar" id="uv-bar-' + n + '"><p class="status">' + T.cargandoUV + '</p></div>' +
+        '<p class="uv-note small muted" id="uv-note-' + n + '"></p>';
+      wrap.appendChild(div);
+      $("uv-name-" + n).textContent = D.nombre || T.tiempoOtroLugar;
+    });
+  })();
+  function renderUV(D, n, d, savedAt) {
+    var td = todayIn(D.zonaHoraria), todayStr = keyOf(td[0], td[1], td[2]), nowH = +localParts(D.zonaHoraria).hour;
+    var rows = [], maxV = -1, maxH = null;
+    d.hourly.time.forEach(function (tm, i) {
+      if (tm.slice(0, 10) !== todayStr) return;
+      var h = +tm.slice(11, 13), v = d.hourly.uv_index[i];
+      rows.push({ h: h, v: v });
+      if (v != null && v > maxV) { maxV = v; maxH = h; }
+    });
+    if (!rows.length) return false;
+    var c0 = maxH == null ? 13 : maxH, from = Math.max(0, c0 - 3), to = Math.min(23, c0 + 4), html = "";
+    rows.forEach(function (x) {
+      if (x.h < from || x.h > to) return;
+      html += '<div class="uv-cell' + (x.h === nowH ? " now" : "") + '">' +
+        '<span class="uv-val uv' + (x.v == null ? 0 : uvClass(x.v)) + '">' + (x.v == null ? "—" : Math.round(x.v)) + "</span>" +
+        '<span class="uv-hour">' + x.h + "h</span></div>";
+    });
+    $("uv-bar-" + n).innerHTML = html;
+    $("uv-bar-" + n).setAttribute("aria-label", tx("uvAria", D.nombre));
+    $("uv-note-" + n).textContent = (savedAt ? tx("datosGuardados", ago(savedAt)) : "") + (maxV >= 0
+      ? tx("uvMax", Math.round(maxV), UV_TXT[uvClass(maxV)], maxH) + (maxV >= 3 ? T.protSi : T.protNo) : "");
+    var aq = !savedAt && d.current && d.current.us_aqi;
+    if (aq != null && aq !== false) {
+      var c = aqClass(aq);
+      $("aq-" + n).className = "aq a" + c;
+      $("aq-text-" + n).textContent = tx("aire", Math.round(aq), AQ_TXT[c]);
+    } else {
+      $("aq-" + n).className = "aq";
+      $("aq-text-" + n).textContent = T.aireSinDatos;
     }
-    return guess;
+    return true;
   }
-  function nthWeekday(y, r) {
-    var dim = new Date(Date.UTC(y, r.mes, 0)).getUTCDate(), days = [];
-    for (var d = 1; d <= dim; d++) if (new Date(Date.UTC(y, r.mes - 1, d)).getUTCDay() === r.diaSemana) days.push(d);
-    return r.orden === -1 ? days[days.length - 1] : days[r.orden - 1];
+  function loadUVOne(D, n) {
+    if ($("uv-card").dataset.off || !$("uv-bar-" + n)) return;
+    if (D.lat == null) { $("uv-bar-" + n).innerHTML = '<p class="status">' + T.buscaLugar + '</p>'; $("aq-text-" + n).textContent = ""; $("uv-note-" + n).textContent = ""; return; }
+    fetchJSON("https://air-quality-api.open-meteo.com/v1/air-quality?latitude=" + D.lat + "&longitude=" + D.lon +
+      "&current=us_aqi&hourly=uv_index&forecast_days=1&timezone=" + encodeURIComponent(D.zonaHoraria))
+      .then(function (d) {
+        if (!renderUV(D, n, d, null)) throw new Error("sin datos de hoy");
+        store("uv:" + D.key, { t: Date.now(), d: d, lat: D.lat, lon: D.lon });
+      })
+      .catch(function () {
+        var c = load("uv:" + D.key);
+        if (c && c.d && (!D.buscador || (c.lat === D.lat && c.lon === D.lon)) && renderUV(D, n, c.d, c.t)) return;
+        $("uv-bar-" + n).innerHTML = '<p class="status warn">' + T.errUV + '</p>';
+        $("aq-text-" + n).textContent = T.aireSinDatos;
+      });
   }
-  function addMonths(t, n) {
-    var d = new Date(t), day = d.getDate();
-    d.setDate(1); d.setMonth(d.getMonth() + n);
-    var dim = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
-    d.setDate(Math.min(day, dim));
-    return d.getTime();
+  function loadUV() { DETAILS.forEach(function (D, n) { loadUVOne(D, n); }); }
+
+  /* ---------- Avisos meteorológicos (MeteoAlarm) ----------
+     config.js > avisos: { feed, minutosCache, zonas: [{ nombre, buscar: ["zona de AEMET", …] }] }.
+     El feed Atom de MeteoAlarm trae los avisos oficiales (CAP) de cada país; se leen a través de un servicio intermedio. */
+  var AV = CFG.avisos;
+  function fetchRaw(url) {
+    var bases = ["https://api.allorigins.win/raw?url=", "https://api.codetabs.com/v1/proxy/?quest="], i = 0;
+    function next() {
+      if (i >= bases.length) return Promise.reject(new Error("sin respuesta"));
+      var base = bases[i++];
+      return withTimeout(base + encodeURIComponent(url), 10000).then(function (r) { return r.text(); })
+        .then(function (t) { if (!/<(feed|rss)[\s>]/i.test(t)) throw new Error("no es XML"); return t; })
+        .catch(next);
+    }
+    return next();
   }
-  function breakdown(from, to) {
-    var months = 0, cur = from;
-    while (addMonths(from, months + 1) <= to) months++;
-    cur = addMonths(from, months);
-    var rest = Math.floor((to - cur) / 1000);
-    var weeks = Math.floor(rest / 604800); rest -= weeks * 604800;
-    var days = Math.floor(rest / 86400); rest -= days * 86400;
-    var hours = Math.floor(rest / 3600); rest -= hours * 3600;
-    var mins = Math.floor(rest / 60), secs = rest - mins * 60;
-    return [months, weeks, days, hours, mins, secs];
+  function parseAlerts(xml) {
+    var doc = new DOMParser().parseFromString(xml, "text/xml");
+    return Array.prototype.map.call(doc.getElementsByTagName("entry"), function (e) {
+      function g(tag) { var x = e.getElementsByTagName(tag)[0]; return x ? x.textContent.trim() : ""; }
+      var lvl = (g("cap:awareness_level") + " " + g("cap:severity") + " " + g("title")).toLowerCase();
+      var nivel = /red|extreme|rojo/.test(lvl) ? 2 : /orange|severe|naranja/.test(lvl) ? 1 : /yellow|moderate|amarill/.test(lvl) ? 0 : -1;
+      return { area: g("cap:areaDesc"), evento: g("cap:event") || g("title"), nivel: nivel,
+               desde: Date.parse(g("cap:onset") || g("cap:effective")) || 0, hasta: Date.parse(g("cap:expires")) || 0 };
+    }).filter(function (a) { return a.nivel >= 0 && (!a.hasta || a.hasta > Date.now()); });
   }
+  function renderAlerts(st) {
+    var body = $("alerts-body"), foot = $("alerts-foot");
+    body.innerHTML = "";
+    if (!st) { body.innerHTML = '<p class="status">' + T.cargandoAvisos + "</p>"; return; }
+    if (!st.items) { body.innerHTML = '<p class="status warn">' + T.errAvisos + "</p>"; foot.textContent = ""; return; }
+    var df = new Intl.DateTimeFormat(LOC, { weekday: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone: tzMain });
+    (AV.zonas || []).forEach(function (z) {
+      var div = document.createElement("div"), h = document.createElement("h3"), ul = document.createElement("ul");
+      div.className = "alert-zone"; ul.className = "alert-list"; h.textContent = z.nombre;
+      var keys = [].concat(z.buscar || z.nombre).map(stripAcc);
+      var mine = st.items.filter(function (a) { var ar = stripAcc(a.area); return keys.some(function (k) { return ar.indexOf(k) !== -1; }); })
+        .sort(function (a, b) { return b.nivel - a.nivel || a.desde - b.desde; });
+      if (!mine.length) { var li0 = document.createElement("li"); li0.className = "muted"; li0.textContent = T.sinAvisos; ul.appendChild(li0); }
+      mine.forEach(function (a) {
+        var li = document.createElement("li"), dot = document.createElement("i"), txt = document.createElement("span"), when = document.createElement("span");
+        dot.className = "alert-dot " + ["amarillo", "naranja", "rojo"][a.nivel]; dot.setAttribute("aria-hidden", "true");
+        var dice = /amarill|naranja|rojo|yellow|orange|red\b|giall|arancion|rosso|jaune|rouge/i.test(a.evento);
+        txt.textContent = a.evento + (dice ? "" : " · " + T.avisoNivel[a.nivel]) + (a.area ? " · " + a.area : "");
+        when.className = "alert-when";
+        when.textContent = a.desde && a.hasta ? tx("avisoDesdeHasta", df.format(a.desde), df.format(a.hasta)) : "";
+        txt.appendChild(when); li.appendChild(dot); li.appendChild(txt); ul.appendChild(li);
+      });
+      div.appendChild(h); div.appendChild(ul); body.appendChild(div);
+    });
+    foot.textContent = st.saved ? tx("avisosGuardados", ago(st.t)) : tx("avisosFuente", ago(st.t));
+  }
+  function loadAlerts(force) {
+    if (!AV || $("alerts-card").dataset.off) return;
+    $("alerts-card").hidden = false;
+    var c = load("avisos");
+    if (!force && c && Date.now() - c.t < (AV.minutosCache || 30) * 60000) { renderAlerts({ items: c.items, t: c.t }); return; }
+    if (!c) renderAlerts(null);
+    fetchRaw(AV.feed).then(function (xml) {
+      var items = parseAlerts(xml);
+      store("avisos", { t: Date.now(), items: items });
+      renderAlerts({ items: items, t: Date.now() });
+    }).catch(function () {
+      renderAlerts(c ? { items: c.items.filter(function (a) { return !a.hasta || a.hasta > Date.now(); }), t: c.t, saved: true } : {});
+    });
+  }
+
+  /* ---------- Noticias políticas ----------
+     config.js > noticias: { porPais, minutosCache, paises: [{ nombre, fuentes: [{ nombre, rss }] }] }.
+     El navegador no puede leer un RSS de otra web directamente: se pide a un servicio intermedio
+     (rss2json, después allorigins y después codetabs, con 8 s de límite cada uno).
+     Los titulares de todas las fuentes de un país se mezclan por fecha. Sin conexión: última copia guardada. */
+  var NEWS = CFG.noticias, newsSel = 0, newsData = {};
+  function newsItemsFromXML(xml) {
+    var doc = new DOMParser().parseFromString(xml, "text/xml");
+    var nodes = doc.querySelectorAll("item");
+    if (!nodes.length) nodes = doc.querySelectorAll("entry");                 // Atom
+    return Array.prototype.map.call(nodes, function (it) {
+      function g(tag) { var el = it.querySelector(tag); return el ? el.textContent.trim() : ""; }
+      var le = it.querySelector("link"), link = le ? (le.textContent.trim() || le.getAttribute("href") || "") : "";
+      return { title: g("title"), link: link, date: g("pubDate") || g("updated") || g("published"), source: g("source") };
+    });
+  }
+  function withTimeout(url, ms) {
+    var ctl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, ms || 8000);
+    return fetch(url, ctl ? { signal: ctl.signal } : {}).then(function (r) { clearTimeout(timer); if (!r.ok) throw new Error(r.status); return r; },
+      function (e) { clearTimeout(timer); throw e; });
+  }
+  var PROXIES = [
+    { via: "rss2json", go: function (u) {
+      return withTimeout("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(u)).then(function (r) { return r.json(); }).then(function (d) {
+        if (!d || d.status !== "ok" || !(d.items || []).length) throw new Error("rss2json");
+        return d.items.map(function (it) { return { title: it.title, link: it.link, date: it.pubDate, source: "" }; });
+      }); } },
+    { via: "allorigins", go: function (u) {
+      return withTimeout("https://api.allorigins.win/raw?url=" + encodeURIComponent(u)).then(function (r) { return r.text(); }).then(function (t) {
+        var x = newsItemsFromXML(t); if (!x.length) throw new Error("allorigins"); return x; }); } },
+    { via: "codetabs", go: function (u) {
+      return withTimeout("https://api.codetabs.com/v1/proxy/?quest=" + encodeURIComponent(u)).then(function (r) { return r.text(); }).then(function (t) {
+        var x = newsItemsFromXML(t); if (!x.length) throw new Error("codetabs"); return x; }); } }
+  ];
+  // Prueba los servicios en orden hasta que uno devuelva titulares
+  function fetchFeed(url) {
+    var i = 0;
+    function next() {
+      if (i >= PROXIES.length) return Promise.reject(new Error("sin respuesta"));
+      var P3 = PROXIES[i++];
+      return P3.go(url).then(function (items) { return { items: items, via: P3.via }; }, next);
+    }
+    return next();
+  }
+  function cleanNews(raw) {
+    var seen = {};
+    return raw.map(function (x) {
+      var title = String(x.title || "").replace(/\s+/g, " "), src = String(x.source || "");
+      if (x.splitSource) {                                                  // "Titular - Medio" (Google News)
+        var m = title.match(/^(.*)\s[-–]\s([^-–]{2,60})$/);
+        if (m) { title = m[1]; if (!src) src = m[2]; }
+      }
+      var ds = String(x.date || ""), iso = /^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$/.test(ds);   // rss2json: "AAAA-MM-DD hh:mm:ss" en UTC
+      var d = Date.parse(iso ? ds.replace(" ", "T") + "Z" : ds);
+      var link = /^https?:\/\//i.test(String(x.link || "").trim()) ? String(x.link).trim() : "";
+      return { t: title.trim(), s: src.trim(), l: link, d: isNaN(d) ? 0 : d };
+    }).filter(function (x) {
+      var k = x.t.toLowerCase();
+      if (!x.t || !x.l || seen[k]) return false;
+      seen[k] = 1; return true;
+    }).sort(function (a, b) { return b.d - a.d; }).slice(0, NEWS.porPais || 8);
+  }
+  function renderNews() {
+    if (!NEWS) return;
+    var P2 = NEWS.paises[newsSel], st = newsData[newsSel], ul = $("news-list"), foot = $("news-foot");
+    ul.innerHTML = "";
+    Array.prototype.forEach.call($("news-tabs").children, function (b, i) { b.setAttribute("aria-pressed", String(i === newsSel)); });
+    if (!st) { ul.innerHTML = '<li class="muted">' + T.cargandoNoticias + "</li>"; foot.textContent = ""; return; }
+    var diag = (st.diag || []).map(function (f) { return f.nombre + " (" + (f.ok ? f.via : T.sinRespuesta) + ")"; }).join(", ");
+    if (!st.items || !st.items.length) { ul.innerHTML = '<li class="status warn">' + T.sinNoticias + "</li>"; foot.textContent = diag ? T.fuentes + diag : ""; return; }
+    st.items.forEach(function (x) {
+      var li = document.createElement("li"), a = document.createElement("a"), meta = document.createElement("span");
+      a.href = x.l; a.target = "_blank"; a.rel = "noopener noreferrer"; a.textContent = x.t;
+      meta.className = "news-meta"; meta.textContent = [x.s, x.d ? ago(x.d) : ""].filter(Boolean).join(" · ");
+      li.appendChild(a); li.appendChild(meta); ul.appendChild(li);
+    });
+    foot.textContent = (st.saved ? tx("noticiasGuardadas", ago(st.t)) : tx("noticiasActualizadas", ago(st.t))) + " " +
+      (P2.nota || T.noticiasFuente) + (diag ? " " + T.fuentes + diag + "." : "");
+  }
+  function loadNews(force) {
+    if (!NEWS || $("news-card").dataset.off) return;
+    NEWS.paises.forEach(function (P2, i) {
+      var key = "noticias:" + i, c = load(key);
+      if (c && c.items && !newsData[i]) newsData[i] = { items: c.items, t: c.t, saved: true, diag: c.diag };
+      if (!force && c && Date.now() - c.t < (NEWS.minutosCache || 30) * 60000) { newsData[i] = { items: c.items, t: c.t, diag: c.diag }; renderNews(); return; }
+      var fuentes = P2.fuentes || [{ nombre: "", rss: P2.rss }];
+      Promise.all(fuentes.map(function (f) {
+        return fetchFeed(f.rss).then(function (r) {
+          r.items.forEach(function (x) { if (f.nombre) x.source = f.nombre; else x.splitSource = true; });
+          return { nombre: f.nombre || "RSS", ok: true, via: r.via, items: r.items };
+        }, function () { return { nombre: f.nombre || "RSS", ok: false, items: [] }; });
+      })).then(function (res) {
+        var diag = res.map(function (r) { return { nombre: r.nombre, ok: r.ok, via: r.via }; });
+        var items = cleanNews([].concat.apply([], res.map(function (r) { return r.items; })));
+        if (items.length) {
+          store(key, { t: Date.now(), items: items, diag: diag });
+          newsData[i] = { items: items, t: Date.now(), diag: diag };
+        } else {
+          newsData[i] = c && c.items ? { items: c.items, t: c.t, saved: true, diag: diag } : { items: [], diag: diag };
+        }
+        renderNews();
+      });
+    });
+    renderNews();
+  }
+  (function () {
+    if (!NEWS || !(NEWS.paises || []).length) return;
+    if ($("news-card").dataset.off) return;
+    $("news-card").hidden = false;
+    NEWS.paises.forEach(function (P2, i) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "chip"; b.textContent = P2.nombre;
+      b.addEventListener("click", function () { newsSel = i; renderNews(); });
+      $("news-tabs").appendChild(b);
+    });
+    if (NEWS.paises.length === 1) $("news-tabs").hidden = true;
+  })();
+
   /* ---------- Carga y refresco ---------- */
   function loadWeatherAll() {
-    loadDetail();
-    $("updated").textContent = "Actualizado a las " + fmtTime(tzES) + " (" + CFG.espana.ciudadReloj + ")";
+    loadDetail(); loadUV(); loadRate();
+    $("updated").textContent = tx("actualizado", fmtTime(tzMain), cityMain);
   }
   var lastLoad = Date.now();
-  function loadAll() { lastLoad = Date.now(); loadWeatherAll(); renderCalendarToday(); renderDates(); renderLove(); renderExpr(); }
-  $("refresh").addEventListener("click", loadAll);
+  function loadAll(force) { lastLoad = Date.now(); loadWeatherAll(); loadNews(force === true); loadAlerts(force === true); renderCalendarToday(); renderDates(); renderLove(); renderExpr(); }
+  $("refresh").addEventListener("click", function () { loadAll(true); });
   loadAll();
   showSplash();
 
   /* ---------- Aviso a pantalla completa en fechas clave ---------- */
-  // Confeti con los colores de la bandera de España. No se lanza si el iPhone tiene "Reducir movimiento".
+  // Confeti con los colores de las dos banderas. No se lanza si el móvil tiene "Reducir movimiento".
   function startConfetti(secs) {
     var canvas = $("confetti");
     var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1336,22 +2250,18 @@
     var W = canvas.clientWidth || window.innerWidth, H = canvas.clientHeight || window.innerHeight;
     canvas.width = W * dpr; canvas.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    var COLORS = ["#aa151b", "#f1bf00", "#c8102e", "#ffd200", "#aa151b", "#f1bf00"];
+    var COLORS = FP.confeti.concat(FU.confeti);
     var pieces = [], N = Math.round(Math.min(160, W * 0.35));
     for (var i = 0; i < N; i++) {
       pieces.push({
-        x: Math.random() * W,
-        y: -20 - Math.random() * H * 0.9,
+        x: Math.random() * W, y: -20 - Math.random() * H * 0.9,
         w: 6 + Math.random() * 6, h: 8 + Math.random() * 8,
-        vx: -0.6 + Math.random() * 1.2,
-        vy: 1.6 + Math.random() * 2.4,
+        vx: -0.6 + Math.random() * 1.2, vy: 1.6 + Math.random() * 2.4,
         rot: Math.random() * Math.PI, vr: -0.12 + Math.random() * 0.24,
-        sway: Math.random() * Math.PI * 2,
-        color: COLORS[i % COLORS.length]
+        sway: Math.random() * Math.PI * 2, color: COLORS[i % COLORS.length]
       });
     }
-    var start = performance.now(), last = start, raf, running = true;
-    var spawnEnd = secs * 1000 * 0.55;   // deja de reponer piezas pasada la mitad, para que se vacíe al final
+    var start = performance.now(), last = start, raf, running = true, spawnEnd = secs * 1000 * 0.55;
     function frame(now) {
       if (!running) return;
       var dt = Math.min(2.5, (now - last) / 16.67); last = now;
@@ -1365,13 +2275,8 @@
         if (p.y > H + 20 && now - start < spawnEnd) { p.y = -20; p.x = Math.random() * W; }
         if (p.y <= H + 20) {
           alive++;
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.rot);
-          ctx.scale(1, Math.cos(p.sway * 1.7));   // efecto de giro del papel
-          ctx.fillStyle = p.color;
-          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-          ctx.restore();
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.scale(1, Math.cos(p.sway * 1.7));
+          ctx.fillStyle = p.color; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore();
         }
       });
       if (alive) raf = requestAnimationFrame(frame);
@@ -1379,19 +2284,16 @@
     raf = requestAnimationFrame(frame);
     return function () { running = false; cancelAnimationFrame(raf); ctx.clearRect(0, 0, W, H); };
   }
-
   function showSplash() {
     var S = CFG.aviso || {};
     if (S.activo === false) return;
     var msg = specialMessage();
     if (!msg) return;
     var withConfetti = messagesFor(0).some(function (x) { return x.confeti; });
-    var secs = S.segundos || 5;
-    var el = $("splash"), bar = $("splash-bar"), timer;
+    var secs = S.segundos || 5, el = $("splash"), bar = $("splash-bar"), timer;
     $("splash-text").textContent = msg;
     el.hidden = false;
     document.body.classList.add("splash-open");
-    // Barra de cuenta atrás
     bar.style.transition = "none";
     bar.style.transform = "scaleX(1)";
     requestAnimationFrame(function () {
@@ -1405,16 +2307,13 @@
       clearTimeout(timer);
       stopConfetti();
       el.classList.add("closing");
-      setTimeout(function () {
-        el.hidden = true;
-        el.classList.remove("closing");
-        document.body.classList.remove("splash-open");
-      }, 600);
+      setTimeout(function () { el.hidden = true; el.classList.remove("closing"); document.body.classList.remove("splash-open"); }, 600);
     }
     el.addEventListener("click", close, { once: true });
     timer = setTimeout(close, secs * 1000);
   }
   setInterval(loadWeatherAll, 30 * 60 * 1000);
+  setInterval(function () { loadNews(false); loadAlerts(false); }, 15 * 60 * 1000);
   document.addEventListener("visibilitychange", function () {
     if (document.visibilityState === "visible" && Date.now() - lastLoad > 10 * 60 * 1000) loadAll();
   });
