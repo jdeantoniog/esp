@@ -117,8 +117,33 @@
     font: inherit; font-weight: 600; color: var(--ink); background: var(--paper);
     border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; cursor: pointer;
   }
-  /* ---------- Unidades ---------- */
-  .unit-row { margin-top: 12px; }
+  /* ---------- Conversor: botones en 2 columnas a la izquierda, resultados a la derecha ---------- */
+  .conv { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+  .conv-btns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .conv-btn {
+    font: inherit; font-size: 0.82rem; font-weight: 700; line-height: 1.15; color: var(--ink); background: var(--paper);
+    border: 1px solid var(--line); border-radius: 10px; padding: 9px 4px; cursor: pointer; min-width: 0; overflow-wrap: anywhere;
+  }
+  .conv-btn.main { grid-column: 1 / -1; font-size: 0.95rem; padding: 11px 4px; }
+  .conv-btn:last-child:nth-child(even) { grid-column: 1 / -1; }
+  .conv-btn[aria-pressed="true"] { background: var(--oh-accent-bg); border-color: var(--oh-accent-bg); color: var(--oh-on-accent); }
+  .conv-out { display: grid; gap: 6px; }
+  .field label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 3px; }
+  .box {
+    display: flex; align-items: baseline; border: 1px solid var(--line);
+    border-radius: 10px; padding: 7px 10px; background: var(--paper);
+  }
+  .box:focus-within { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .sym { font-weight: 700; color: var(--muted); margin-right: 6px; white-space: nowrap; }
+  .box input {
+    width: 100%; min-width: 0; border: 0; background: transparent; color: var(--ink);
+    font: inherit; font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; outline: none;
+  }
+  .conv-eq { text-align: center; color: var(--muted); font-weight: 700; line-height: 1; }
+  .rate { margin: 10px 0 0; font-size: 0.8rem; color: var(--muted); }
+  .rate.warn { color: var(--warn); font-weight: 600; }
+  @media (max-width: 520px) { .conv { gap: 8px; } .conv-btn { font-size: 0.75rem; padding: 8px 2px; } .box input { font-size: 1.15rem; } .box { padding: 6px 8px; } }
+
 
   /* ---------- Previsión: bloques de temperatura ---------- */
   .list { list-style: none; margin: 0; padding: 0; }
@@ -387,23 +412,24 @@
     <p class="x-foot small muted"><span id="expr-count"></span> <button type="button" class="linkbtn" id="expr-reset" hidden>Reiniciar aprendidas</button></p>
   </section>
 
-  <!-- Conversor de unidades -->
-  <section class="card" aria-labelledby="units-title">
-    <h2 id="units-title">Conversor de unidades</h2>
-    <label class="small muted" for="unit-pair">Qué quieres convertir</label>
-    <select id="unit-pair"></select>
-    <div class="conv-row unit-row">
-      <div class="field">
-        <label for="unit-a" id="unit-a-label"></label>
-        <div class="box"><input id="unit-a" inputmode="decimal" autocomplete="off" value="1"></div>
-      </div>
-      <div class="equals" aria-hidden="true">=</div>
-      <div class="field">
-        <label for="unit-b" id="unit-b-label"></label>
-        <div class="box"><input id="unit-b" inputmode="decimal" autocomplete="off"></div>
+  <!-- Conversor: dólares y euros (principal) + medidas de EE. UU. -->
+  <section class="card" id="conv-card" aria-labelledby="conv-title">
+    <h2 id="conv-title">Conversor</h2>
+    <div class="conv">
+      <div class="conv-btns" id="conv-btns" role="group" aria-label="Qué convertir"></div>
+      <div class="conv-out">
+        <div class="field">
+          <label for="conv-a" id="conv-a-label"></label>
+          <div class="box"><span class="sym" id="conv-a-sym"></span><input id="conv-a" inputmode="decimal" autocomplete="off" value="20"></div>
+        </div>
+        <div class="conv-eq" aria-hidden="true">=</div>
+        <div class="field">
+          <label for="conv-b" id="conv-b-label"></label>
+          <div class="box"><span class="sym" id="conv-b-sym"></span><input id="conv-b" inputmode="decimal" autocomplete="off"></div>
+        </div>
       </div>
     </div>
-    <p class="small muted" id="unit-note"></p>
+    <p class="rate" id="conv-note"></p>
   </section>
 
   <footer>
@@ -489,46 +515,93 @@
 
   setInterval(function () { if (typeof renderLove === "function") renderLove(); }, 15 * 60 * 1000);
 
-  /* ---------- Conversor de unidades ---------- */
+  /* ---------- Conversor: botones (mismo formato que la versión de EE. UU.) ----------
+     Dólares / euros es el principal; el resto son medidas de EE. UU. */
   function lin(f) { return { toB: function (x) { return x * f; }, toA: function (x) { return x / f; } }; }
-  var UNITS = [
-    { a: "Millas", b: "Kilómetros", conv: lin(1.609344) },
-    { a: "Grados Fahrenheit", b: "Grados Celsius", conv: {
-        toB: function (x) { return (x - 32) * 5 / 9; }, toA: function (x) { return x * 9 / 5 + 32; } } },
-    { a: "Libras (lb)", b: "Kilos", conv: lin(0.45359237) },
-    { a: "Onzas de peso (oz)", b: "Gramos", conv: lin(28.349523125) },
-    { a: "Onzas líquidas (fl oz)", b: "Mililitros", conv: lin(29.5735295625) },
-    { a: "Tazas (cup)", b: "Mililitros", conv: lin(236.5882365), note: "Taza estadounidense de cocina." },
-    { a: "Cucharadas (tbsp)", b: "Mililitros", conv: lin(14.78676478125) },
-    { a: "Galones", b: "Litros", conv: lin(3.785411784) },
-    { a: "Pies", b: "Metros", conv: lin(0.3048) },
-    { a: "Pulgadas", b: "Centímetros", conv: lin(2.54) },
-    { a: "Millas por hora", b: "Km por hora", conv: lin(1.609344) }
+  var nf4 = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+  var MON = CFG.moneda || { codigo: "EUR", simbolo: "€", nombre: "Euros", tasaRespaldo: 0.87 };
+  var rate = null, rateTxt = "Cargando tipo de cambio…", rateWarn = false;     // euros por 1 dólar
+  var CONV = [
+    { id: "money", btn: "Dólares / " + MON.nombre.toLowerCase(), main: true, a: "Dólares", sa: "$", b: MON.nombre, sb: MON.simbolo, money: true,
+      conv: { toB: function (x) { return rate ? x * rate : NaN; }, toA: function (x) { return rate ? x / rate : NaN; } } },
+    { id: "mi", btn: "Millas / km", a: "Millas", sa: "mi", b: "Kilómetros", sb: "km", conv: lin(1.609344) },
+    { id: "yd", btn: "Yardas / m", a: "Yardas", sa: "yd", b: "Metros", sb: "m", conv: lin(0.9144) },
+    { id: "f", btn: "°F / °C", a: "Fahrenheit", sa: "°F", b: "Celsius", sb: "°C",
+      conv: { toB: function (x) { return (x - 32) * 5 / 9; }, toA: function (x) { return x * 9 / 5 + 32; } } },
+    { id: "lb", btn: "Libras / kilos", a: "Libras", sa: "lb", b: "Kilos", sb: "kg", conv: lin(0.45359237) },
+    { id: "oz", btn: "Onzas / gramos", a: "Onzas", sa: "oz", b: "Gramos", sb: "g", conv: lin(28.349523125),
+      note: "Onza de peso. La onza líquida (fl oz) tiene su propio botón." },
+    { id: "cup", btn: "Tazas / ml", a: "Tazas", sa: "cup", b: "Mililitros", sb: "ml", conv: lin(236.5882365),
+      note: "Taza de cocina de EE. UU. En las etiquetas nutricionales se redondea a 240 ml." },
+    { id: "in", btn: "Pulgadas / cm", a: "Pulgadas", sa: "in", b: "Centímetros", sb: "cm", conv: lin(2.54) },
+    { id: "gal", btn: "Galones / litros", a: "Galones", sa: "gal", b: "Litros", sb: "l", conv: lin(3.785411784),
+      note: "Galón de EE. UU. (gasolina, leche). El galón británico son 4,55 litros." },
+    { id: "mph", btn: "mph / km/h", a: "Millas por hora", sa: "mph", b: "Km por hora", sb: "km/h", conv: lin(1.609344) },
+    // Solo en esta versión (ya estaban en el desplegable anterior)
+    { id: "floz", btn: "Onzas líquidas / ml", a: "Onzas líquidas", sa: "fl oz", b: "Mililitros", sb: "ml", conv: lin(29.5735295625) },
+    { id: "tbsp", btn: "Cucharadas / ml", a: "Cucharadas", sa: "tbsp", b: "Mililitros", sb: "ml", conv: lin(14.78676478125) },
+    { id: "ft", btn: "Pies / m", a: "Pies", sa: "ft", b: "Metros", sb: "m", conv: lin(0.3048) }
   ];
-  var pairSel = $("unit-pair"), uA = $("unit-a"), uB = $("unit-b");
-  UNITS.forEach(function (u, i) {
-    var o = document.createElement("option");
-    o.value = i; o.textContent = u.a + " y " + u.b.toLowerCase();
-    pairSel.appendChild(o);
+  var convCur = CONV[0], convA = $("conv-a"), convB = $("conv-b");
+  CONV.forEach(function (u) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "conv-btn" + (u.main ? " main" : ""); b.textContent = u.btn; b.dataset.id = u.id;
+    b.setAttribute("aria-pressed", String(u === convCur));
+    $("conv-btns").appendChild(b);
   });
-  function convertUnits(from) {
-    var u = UNITS[+pairSel.value];
-    $("unit-a-label").textContent = u.a;
-    $("unit-b-label").textContent = u.b;
-    $("unit-note").textContent = u.note || "";
-    if (from === "a") {
-      var a = parseNum(uA.value), rb = u.conv.toB(a);
-      uB.value = isNaN(rb) ? "" : nfMax2.format(rb);
-    } else {
-      var b = parseNum(uB.value), ra = u.conv.toA(b);
-      uA.value = isNaN(ra) ? "" : nfMax2.format(ra);
-    }
+  $("conv-btns").addEventListener("click", function (e) {
+    var b = e.target.closest(".conv-btn");
+    if (!b) return;
+    var u = CONV.filter(function (x) { return x.id === b.dataset.id; })[0];
+    if (u === convCur) return;
+    convCur = u;
+    Array.prototype.forEach.call(this.children, function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    convA.value = u.money ? "20" : "1";
+    setConv("a");
+  });
+  function setConv(from) {
+    var u = convCur, fmt = u.money ? nf2 : nfMax2;
+    $("conv-a-label").textContent = u.a; $("conv-a-sym").textContent = u.sa;
+    $("conv-b-label").textContent = u.b; $("conv-b-sym").textContent = u.sb;
+    if (from === "a") { var r = u.conv.toB(parseNum(convA.value)); convB.value = isNaN(r) ? "" : fmt.format(r); }
+    else { var r2 = u.conv.toA(parseNum(convB.value)); convA.value = isNaN(r2) ? "" : fmt.format(r2); }
+    var note = $("conv-note");
+    note.className = "rate" + (u.money && rateWarn ? " warn" : "");
+    note.textContent = u.money ? rateTxt : (u.note || "");
   }
-  pairSel.addEventListener("change", function () { convertUnits("a"); });
-  uA.addEventListener("input", function () { convertUnits("a"); });
-  uB.addEventListener("input", function () { convertUnits("b"); });
-  selectOnFocus(uA); selectOnFocus(uB);
-  convertUnits("a");
+  convA.addEventListener("input", function () { setConv("a"); });
+  convB.addEventListener("input", function () { setConv("b"); });
+  selectOnFocus(convA); selectOnFocus(convB);
+
+  // Tipo de cambio: BCE (Frankfurter) > ExchangeRate-API > última tasa guardada > tasa manual
+  function showRate(r, txt, warn) {
+    rate = r; rateWarn = !!warn;
+    rateTxt = "1 $ = " + nf4.format(r) + " " + MON.simbolo + " · 1 " + MON.simbolo + " = " + nf4.format(1 / r) + " $ · " + txt;
+    setConv("a");
+  }
+  function loadRate() {
+    var to = MON.codigo;
+    fetchJSON("https://api.frankfurter.app/latest?from=USD&to=" + to)
+      .then(function (d) { return { r: d.rates[to], src: "tipo de referencia del BCE", fecha: String(d.date || "").split("-").reverse().join("/") }; })
+      .catch(function () {
+        return fetchJSON("https://open.er-api.com/v6/latest/USD")
+          .then(function (d) { return { r: d.rates[to], src: "ExchangeRate-API", fecha: (d.time_last_update_utc || "").slice(5, 16) }; });
+      })
+      .then(function (x) {
+        if (!(x.r > 0)) throw new Error("sin tasa");
+        store("cambio:" + to, { t: Date.now(), r: x.r });
+        showRate(x.r, x.src + (x.fecha ? " (" + x.fecha + ")" : ""), false);
+      })
+      .catch(function () {
+        var c = load("cambio:" + to);
+        if (c && c.r) showRate(c.r, "sin conexión: tasa guardada " + ago(c.t), Date.now() - c.t > 3 * 86400000);
+        else if (MON.tasaRespaldo) showRate(MON.tasaRespaldo, "sin conexión: tasa manual de config.js, revísala", true);
+        else { rate = null; rateWarn = true; rateTxt = "Sin tipo de cambio: no hay conexión."; setConv("a"); }
+      });
+  }
+  setConv("a");
+  loadRate();
+  setInterval(loadRate, 30 * 60 * 1000);
 
   /* ---------- Tiempo (Open-Meteo) ---------- */
   var WMO = {

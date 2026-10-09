@@ -47,6 +47,11 @@ window.CONFIG = {
     }
   ],
 
+  /* ---------- Conversor ----------
+     Moneda frente al dólar. tasaRespaldo: euros por 1 dólar, solo si no hay conexión
+     ni tasa guardada en el navegador. Revísala de vez en cuando. */
+  moneda: { codigo: "EUR", simbolo: "€", nombre: "Euros", tasaRespaldo: 0.87 },
+
   /* ---------- Reloj ---------- */
   espana: {
     zonaHoraria: "Europe/Madrid",

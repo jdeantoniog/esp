@@ -7,7 +7,7 @@ Página de inicio estática. Orden en pantalla:
 3. Calendario mensual con festivos, cumpleaños, calendario escolar, eventos (fútbol, UFC, Madrid) y días señalados; al tocar un día muestra lo marcado y el santoral. Avisa solo si falta algún dato.
 4. Próximas fechas con cuenta atrás en vivo: todo lo de los próximos 31 días (mínimo 12), en 2 columnas. Sale de los mismos datos que el calendario.
 5. Expresiones útiles en inglés: 20 al día (2 columnas de 10) de un total de 2.000, con modo repaso y marcado de aprendidas.
-6. Conversor de unidades (al final).
+6. Conversor (al final): dólares/euros como principal y botones para medidas de EE. UU. (millas, yardas, grados, libras, onzas, tazas, pulgadas, galones, mph, onzas líquidas, cucharadas y pies). Mismo formato que las versiones con EE. UU.
 
 ## Archivos
 
