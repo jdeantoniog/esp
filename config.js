@@ -1,5 +1,5 @@
 /* =============================================================
-   CONFIGURACIÓN · INICIO (solo España)
+   CONFIGURACIÓN · INICIO (solo España) 
    Edita solo este archivo para cambiar lugares, fechas o textos.
    - Fechas siempre "AAAA-MM-DD" (o "MM-DD" si se repite cada año).
    - Respeta comas y comillas: un error aquí deja la página en blanco.
